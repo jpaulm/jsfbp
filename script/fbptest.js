@@ -4,22 +4,31 @@ function IP(contents) {
     this.contents = contents;    
 }
 
-var sender = new Fiber(function() { 
+function Process(name, func) {
+  this.name = name;
+  this.func = new Fiber(func); 
+}                
+
+function Sender() {
     for (var i = 0; i < 20000; i++) {
       var ip = new IP(i + ''); 
       send(ip);
     }
-    close();
-    
-  });
+    close_out();    
+  }
+  
+var sender = new Process('Sender', Sender);
 
-var recvr = new Fiber (function(){  
+function Receiver() {
     while (true) {      
       ip = receive();      
       var i = ip.contents;  
       console.log(i); 
     }
-  });
+  }
+  
+var recvr = new Process('Recvr', Receiver);  
+
 function send(ip){
       if (nxtget == nxtput && array[nxtget] != null){
         queue.push(recvr);       
@@ -44,25 +53,26 @@ function receive(){
       return ip; 
 }
 
-function close() {
+function close_out() {
   queue.push(recvr); 
   Fiber.yield(); 
 }
 
 var d = new Date();
 var st = d.getTime(); 
-var queue = [];
 var array = [];
+var queue = [];
 var array_size = 50;
 for (var i = 0; i < array_size; i++)
    array[i] = null;
 
 var nxtget = 0;
 var nxtput = 0;
-sender.run();
+sender.func.run();
+console.log('s'); 
 var x = queue.shift();
 while (x != undefined) {    
-  x.run();
+  x.func.run();
   x = queue.shift();
 } 
 d = new Date();
