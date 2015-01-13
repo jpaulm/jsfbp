@@ -9,6 +9,16 @@ function Process(name, func) {
   this.func = new Fiber(func); 
 }                
 
+function Connection(size){
+  this.array = [];
+  this.nxtget = 0;
+  this.nxtput = 0; 
+  for (var i = 0; i < size; i++)
+    this.array[i] = null;
+}
+
+var conn = new Connection(50);
+ 
 function Sender() {
     for (var i = 0; i < 20000; i++) {
       var ip = new IP(i + ''); 
@@ -30,26 +40,26 @@ function Receiver() {
 var recvr = new Process('Recvr', Receiver);  
 
 function send(ip){
-      if (nxtget == nxtput && array[nxtget] != null){
+      if (conn.nxtget == conn.nxtput && conn.array[conn.nxtget] != null){
         queue.push(recvr);       
         Fiber.yield();  
         }       
-      array[nxtput] = ip; 
-      nxtput ++;
-      if (nxtput > array.length - 1)
-        nxtput = 0;
+      conn.array[conn.nxtput] = ip; 
+      conn.nxtput ++;
+      if (conn.nxtput > conn.array.length - 1)
+        conn.nxtput = 0;
 }
 
 function receive(){
-      if (nxtget == nxtput && array[nxtget] == null){
+      if (conn.nxtget == conn.nxtput && conn.array[conn.nxtget] == null){
          queue.push(sender);        
          Fiber.yield();
       }     
-      var ip = array[nxtget];
-      array[nxtget] = null;
-      nxtget ++;
-      if (nxtget > array.length - 1)
-        nxtget = 0;    
+      var ip = conn.array[conn.nxtget];
+      conn.array[conn.nxtget] = null;
+      conn.nxtget ++;
+      if (conn.nxtget > conn.array.length - 1)
+        conn.nxtget = 0;    
       return ip; 
 }
 
@@ -60,16 +70,11 @@ function close_out() {
 
 var d = new Date();
 var st = d.getTime(); 
-var array = [];
-var queue = [];
-var array_size = 50;
-for (var i = 0; i < array_size; i++)
-   array[i] = null;
 
-var nxtget = 0;
-var nxtput = 0;
+var queue = [];
+
 sender.func.run();
-console.log('s'); 
+
 var x = queue.shift();
 while (x != undefined) {    
   x.func.run();
