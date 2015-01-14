@@ -15,7 +15,6 @@ Current test case (in same JS file) has 3 processes:
 
 ![JSFBP](https://github.com/jpaulm/jsfbp/blob/master/docs/JSFBP.png "Simple Test Network")
 
-
 Programming issues
 ---
 Objects are `Process` and `Connection`; currently we don't have any Port objects (Connections are attached directly to Process instances) - this may change.
