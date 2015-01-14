@@ -1,7 +1,7 @@
 jsfbp
 =====
 
-Baseic FBP impleemntation written in JavaScript, using https://github.com/laverdet/node-fibers .
+Basic FBP implementation written in JavaScript, using https://github.com/laverdet/node-fibers .
 
 General
 ---
