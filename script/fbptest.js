@@ -19,12 +19,13 @@ function Connection(size){
   this.nxtput = 0; 
   this.sender = null;
   this.recvr = null;
+  this.closed = false;
   for (var i = 0; i < size; i++)
     this.array[i] = null;
 }
 
 function Sender() {
-    for (var i = 0; i < 20000; i++) {
+    for (var i = 0; i < 1000; i++) {
       var ip = new IP(i + ''); 
       send('OUT', ip);
     }
@@ -33,15 +34,20 @@ function Sender() {
 
 function Receiver() {
     while (true) {      
-      var ip = receive('IN');      
+      var ip = receive('IN');     
+      if (ip == null)
+        break; 
       var i = ip.contents;  
-      console.log(i); 
+      console.log('R: ' + i); 
     }
   }
 
 function Copier() {
     while (true) {      
-      var ip = receive('IN');      
+      var ip = receive('IN');         
+      if (ip == null)
+        break;
+      var i = ip.contents; 
       send('OUT', ip);
     }
     close_out('OUT');    
@@ -63,9 +69,13 @@ function send(name, ip){
 function receive(name){
       var conn = getInport(name);
       if (conn.nxtget == conn.nxtput && conn.array[conn.nxtget] == null){
+        if (conn.closed)  
+          return null;
+      
          queue.push(conn.sender);        
          Fiber.yield();
-      }     
+      } 
+        
       var ip = conn.array[conn.nxtget];
       conn.array[conn.nxtget] = null;
       conn.nxtget ++;
@@ -77,6 +87,7 @@ function receive(name){
 function close_out(name) {
   var conn = getOutport(name);
   queue.push(conn.recvr); 
+  conn.closed = true;
   Fiber.yield(); 
 }
 
