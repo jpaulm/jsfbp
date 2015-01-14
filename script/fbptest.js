@@ -1,47 +1,57 @@
 var Fiber = require('fibers');
 
+// --- classes and functions ---
 function IP(contents) {
     this.contents = contents;    
 }
 
 function Process(name, func) {
   this.name = name;
-  this.func = new Fiber(func); 
+  this.fiber = new Fiber(func); 
+  this.inports = {};
+  this.outports = {};
+  processes[processes.length] = [this.fiber, this];
 }                
 
 function Connection(size){
   this.array = [];
   this.nxtget = 0;
   this.nxtput = 0; 
+  this.sender = null;
+  this.recvr = null;
   for (var i = 0; i < size; i++)
     this.array[i] = null;
 }
 
-var conn = new Connection(50);
- 
 function Sender() {
     for (var i = 0; i < 20000; i++) {
       var ip = new IP(i + ''); 
-      send(ip);
+      send('OUT', ip);
     }
-    close_out();    
+    close_out('OUT');    
   }
-  
-var sender = new Process('Sender', Sender);
 
 function Receiver() {
     while (true) {      
-      ip = receive();      
+      var ip = receive('IN');      
       var i = ip.contents;  
       console.log(i); 
     }
   }
-  
-var recvr = new Process('Recvr', Receiver);  
 
-function send(ip){
+function Copier() {
+    while (true) {      
+      var ip = receive('IN');      
+      send('OUT', ip);
+    }
+    close_out('OUT');    
+  }
+  
+  
+function send(name, ip){
+      var conn = getOutport(name);
       if (conn.nxtget == conn.nxtput && conn.array[conn.nxtget] != null){
-        queue.push(recvr);       
+        queue.push(conn.recvr);       
         Fiber.yield();  
         }       
       conn.array[conn.nxtput] = ip; 
@@ -50,9 +60,10 @@ function send(ip){
         conn.nxtput = 0;
 }
 
-function receive(){
+function receive(name){
+      var conn = getInport(name);
       if (conn.nxtget == conn.nxtput && conn.array[conn.nxtget] == null){
-         queue.push(sender);        
+         queue.push(conn.sender);        
          Fiber.yield();
       }     
       var ip = conn.array[conn.nxtget];
@@ -63,23 +74,65 @@ function receive(){
       return ip; 
 }
 
-function close_out() {
-  queue.push(recvr); 
+function close_out(name) {
+  var conn = getOutport(name);
+  queue.push(conn.recvr); 
   Fiber.yield(); 
 }
 
+function getInport(name) {
+  var ips = null;
+  for (var i = 0; i < processes.length; i++) {
+    if (processes[i][0] == Fiber.current){
+      ips = processes[i][1].inports;
+      return ips[name];
+      break;
+    }
+  } 
+}
+
+function getOutport(name) {
+  var ops = null;
+  for (var i = 0; i < processes.length; i++) {
+    if (processes[i][0] == Fiber.current){
+      ops = processes[i][1].outports;
+      return ops[name];
+      break;
+    }
+  }  
+}
+
+// --- define network ---
+
+var processes = [];
+var sender = new Process('Sender', Sender);
+var copier = new Process('Copier', Copier);  
+var recvr = new Process('Recvr', Receiver);  
+var conn1 = new Connection(50);
+var conn2 = new Connection(50);
+sender.outports['OUT'] = conn1;
+copier.inports['IN'] = conn1;
+conn1.sender = sender;
+conn1.recvr = copier;
+copier.outports['OUT'] = conn2;
+recvr.inports['IN'] = conn2;
+conn2.sender = copier;
+conn2.recvr = recvr;
+
+// --- run ---  
 var d = new Date();
 var st = d.getTime(); 
 
 var queue = [];
 
-sender.func.run();
+sender.fiber.run();   //self-starting
 
 var x = queue.shift();
 while (x != undefined) {    
-  x.func.run();
+  x.fiber.run();
   x = queue.shift();
 } 
+
 d = new Date();
 var et = d.getTime();  
 et -= st;
