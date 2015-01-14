@@ -13,9 +13,9 @@ Current test case (in same JS file) has 3 processes:
  - `Copier`
  - `Recvr`
  
- All ports in this example are labelled `IN` and `OUT`.  
+All ports in this example are labelled `IN` and `OUT`.  
 
-Objects are `Process` and `Connection`; currently no Port objects (Connections are attached directly to Process instances) - this may change.
+Objects are `Process` and `Connection`; currently we don't have any Port objects (Connections are attached directly to Process instances) - this may change.
 
 Programming concerns
 ---
