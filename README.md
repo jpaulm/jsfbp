@@ -13,10 +13,12 @@ Current test case (in same JS file) has 3 processes:
  - `Copier`
  - `Recvr`
 
-Objects are `Process` and `Connection`; currently we don't have any Port objects (Connections are attached directly to Process instances) - this may change.
+![JSFBP](https://github.com/jpaulm/jsfbp/blob/master/docs/JSFBP.png "Simple Test Network")
 
-Programming concerns
+
+Programming issues
 ---
+Objects are `Process` and `Connection`; currently we don't have any Port objects (Connections are attached directly to Process instances) - this may change.
 
 Two main 'globals': `processes` (linking Processes to fibers), and `queue` (future events queue).  These should be hidden - packaging suggestions would be welcome.
 
