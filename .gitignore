@@ -1,0 +1,13 @@
+# node stuff
+
+node_modules/
+
+
+# Eclipse project
+
+.settings/
+.project
+
+#Windows stuff
+
+Thumbs.db
