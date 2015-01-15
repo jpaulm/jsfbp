@@ -2,9 +2,11 @@ var Fiber = require('fibers');
 
 // --- classes and functions ---
 
-exports.IP = function (contents) {
+function IP(contents) {
     this.contents = contents;    
 }
+
+exports.IP = IP;
 
 exports.Process = function (name, func) {
   this.name = name;  
@@ -47,19 +49,30 @@ exports.send = function(name, ip){
       conn.nxtput ++;
       if (conn.nxtput > conn.array.length - 1)
         conn.nxtput = 0;
+      if (tracing)
+        console.log(proc.name + ' send OK');  
 }
 
 exports.receive = function(name){
       var proc = getProc();
       var conn = proc.inports[name];
+            
+      if (conn.constructor == String)  {
+        if (tracing)
+          console.log(proc.name + ' recv IIP from ' + name + ': ' + conn);
+        var ip = new IP(conn + '');
+        return ip;
+        }
+        
       if (tracing)
         console.log(proc.name + ' recv from ' + name);
+           
       if (conn.nxtget == conn.nxtput && conn.array[conn.nxtget] == null){
         if (conn.closed)  
           return null;
       
-         queue.push(conn.up);        
-         Fiber.yield();
+        queue.push(conn.up);        
+        Fiber.yield();
       } 
         
       var ip = conn.array[conn.nxtget];
@@ -67,6 +80,8 @@ exports.receive = function(name){
       conn.nxtget ++;
       if (conn.nxtget > conn.array.length - 1)
         conn.nxtget = 0;    
+      if (tracing)
+        console.log(proc.name + ' recv OK'); 
       return ip; 
 }
 
@@ -78,6 +93,8 @@ exports.close_out = function(name) {
   queue.push(conn.down); 
   conn.closed = true;
   Fiber.yield(); 
+  if (tracing)
+        console.log(proc.name + ' close out OK'); 
 }
 
 function getProc() {  
@@ -111,13 +128,6 @@ function getOutport(name) {
 }
 
 
-function isEmpty(object) {   // Nicholas Kreidburg - thanks
- for(var i in object) {
-    return false; 
-  } 
-  return true; 
-} 
-
 exports.run = function() { 
 
 //console.log('Run');
@@ -130,10 +140,15 @@ console.log('Start time: ' + d.toISOString());
 
 for (var i = 0; i < list.length; i++) {
    list[i].fiber = Fiber(list[i].func);   //console.log(list[i]);
-   processes[i] = [list[i].fiber, list[i]];   
-   if (isEmpty(processes[i].inports))    
-      queue.push(list[i]);
+   processes[i] = [list[i].fiber, list[i]];         
       
+   var selfstarting = true;   
+   for (var i in processes[i].inports) {
+      if (inports[i].constructor != String)
+         selfstarting = false;
+   } 
+   if (selfstarting)  
+      queue.push(list[i])
 }
 
 var x = queue.shift();

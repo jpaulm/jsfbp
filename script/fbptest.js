@@ -14,6 +14,8 @@ var copierp = new fbp.Process('Copier', copiers.copier);
 var recvrp = new fbp.Process('Recvr', recvrs.receiver);  
 var conn1 = new fbp.Connection(5);
 var conn2 = new fbp.Connection(5);
+
+senderp.inports['COUNT'] = '200';   // IIP  (must be a String)
 senderp.outports['OUT'] = conn1;
 copierp.inports['IN'] = conn1;
 conn1.up = senderp;
