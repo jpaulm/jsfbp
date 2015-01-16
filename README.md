@@ -1,14 +1,14 @@
 jsfbp
 =====
 
-Basic FBP implementation written in JavaScript, using https://github.com/laverdet/node-fibers .
+Basic FBP implementation written in JavaScript, using Node-Fibers - https://github.com/laverdet/node-fibers .
 
 General
 ---
 
-Very early feasibility study - will be changing continually over time.
+Very early feasibility study.
 
-Current test case (in same JS file) has 3 processes:
+Current test case has 3 processes:
  - `Sender`
  - `Copier`
  - `Recvr`
@@ -19,11 +19,8 @@ Programming issues
 ---
 Objects are `Process` and `Connection`; currently we don't have any Port objects (Connections are attached directly to Process instances) - this may change.
 
-Two main 'globals': `processes` (linking Processes to fibers), and `queue` (future events queue).  These should be hidden - packaging suggestions would be welcome.
-
 Performance
 ---
 
-This first test case (Jan. 13, 2015) with two processes runs at approx. 100 microsecs per send/receive pair.  
+This first test case (Jan. 16, 2015) with 2000 IPs running through three processes takes 200 ms, giving approx. 50 microsecs per send/receive pair.  
 
-With 3 processes it runs at 68 microsecs per send/receive pair (connection capacity = 50).
