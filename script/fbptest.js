@@ -15,7 +15,7 @@ var recvrp = new fbp.Process('Recvr', recvrs.receiver);
 var conn1 = new fbp.Connection(5);
 var conn2 = new fbp.Connection(5);
 
-senderp.inports['COUNT'] = '200';   // IIP  (must be a String)
+senderp.inports['COUNT'] = '2000';   // IIP  (must be a String)
 senderp.outports['OUT'] = conn1;
 copierp.inports['IN'] = conn1;
 conn1.up = senderp;
@@ -25,6 +25,7 @@ recvrp.inports['IN'] = conn2;
 conn2.up = copierp;
 conn2.down = recvrp;
 
+var trace = false;
 // --- run ---  
-fbp.run();
+fbp.run(trace);
 

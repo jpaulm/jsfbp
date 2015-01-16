@@ -26,6 +26,7 @@ exports.Connection = function (size){
   this.up = null;
   this.down = null;
   this.closed = false;
+  this.usedslots = 0;
   for (var i = 0; i < size; i++)
     this.array[i] = null;
 }
@@ -33,7 +34,8 @@ exports.Connection = function (size){
 var processes = [];
 var list = [];
 var queue = [];
-var tracing = true;
+
+var tracing = false;
 
 exports.send = function(name, ip){
            
@@ -41,14 +43,19 @@ exports.send = function(name, ip){
       var conn = proc.outports[name];
       if (tracing)
         console.log(proc.name + ' send to ' + name);
-      if (conn.nxtget == conn.nxtput && conn.array[conn.nxtget] != null){
-        queue.push(conn.down);       
-        Fiber.yield();  
-        }       
+      while (true) {         
+        if (conn.usedslots == 0) 
+          queue.push(conn.down);  
+        if (conn.usedslots == conn.array.length)              
+          Fiber.yield();   
+        else   
+          break; 
+      }        
       conn.array[conn.nxtput] = ip; 
       conn.nxtput ++;
       if (conn.nxtput > conn.array.length - 1)
         conn.nxtput = 0;
+        conn.usedslots++;
       if (tracing)
         console.log(proc.name + ' send OK');  
 }
@@ -66,14 +73,20 @@ exports.receive = function(name){
         
       if (tracing)
         console.log(proc.name + ' recv from ' + name);
-           
-      if (conn.nxtget == conn.nxtput && conn.array[conn.nxtget] == null){
-        if (conn.closed)  
-          return null;
-      
-        queue.push(conn.up);        
-        Fiber.yield();
-      } 
+      while (true) {             
+        if (conn.usedslots == 0){
+          if (conn.closed)  {
+            if (tracing)
+              console.log(proc.name + ' recv EOS from ' + name );
+            return null; 
+            }             
+          Fiber.yield();
+        }
+        else
+          break;
+      }
+      if (conn.usedslots == conn.array.length) 
+        queue.push(conn.up); 
         
       var ip = conn.array[conn.nxtget];
       conn.array[conn.nxtget] = null;
@@ -82,6 +95,7 @@ exports.receive = function(name){
         conn.nxtget = 0;    
       if (tracing)
         console.log(proc.name + ' recv OK'); 
+      conn.usedslots--;
       return ip; 
 }
 
@@ -89,12 +103,13 @@ exports.close_out = function(name) {
   var proc = getProc();
   var conn = proc.outports[name];
   if (tracing)
-        console.log(proc.name + ' close out ' + name);
-  queue.push(conn.down); 
+    console.log(proc.name + ' close out ' + name);
+  if (conn.usedslots == 0)
+    queue.push(conn.down); 
   conn.closed = true;
   Fiber.yield(); 
   if (tracing)
-        console.log(proc.name + ' close out OK'); 
+    console.log(proc.name + ' close out OK'); 
 }
 
 function getProc() {  
@@ -128,7 +143,7 @@ function getOutport(name) {
 }
 
 
-exports.run = function() { 
+exports.run = function(trace) { 
 
 //console.log('Run');
 //console.log(list.length);
@@ -136,7 +151,7 @@ var d = new Date();
 var st = d.getTime(); 
 console.log('Start time: ' + d.toISOString());
 //console.log(module.exports);
-
+tracing = trace;
 
 for (var i = 0; i < list.length; i++) {
    list[i].fiber = Fiber(list[i].func);   //console.log(list[i]);
