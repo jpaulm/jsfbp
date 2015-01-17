@@ -36,6 +36,7 @@ var list = [];
 var queue = [];
 
 var tracing = false;
+var currentproc;
 
 exports.create = function(contents) {
    return new exports.IP(contents); 
@@ -48,6 +49,7 @@ exports.drop = function(contents) {
 exports.send = function(name, ip){
            
       var proc = getProc();
+      //console.log(proc);
       var conn = proc.outports[name];
       if (tracing)
         console.log(proc.name + ' send to ' + name);
@@ -125,11 +127,12 @@ exports.close_out = function(name) {
 
 function getProc() {  
   //console.log(Fiber.current); 
-  for (var i = 0; i < processes.length; i++) {
+  //for (var i = 0; i < processes.length; i++) {
     //console.log(processes[i][1].name); 
-    if (processes[i][0] == Fiber.current) 
-      return processes[i][1];   
-  } 
+   // if (processes[i][0] == Fiber.current) 
+   //   return processes[i][1];   
+  //} 
+  return currentproc;
 }
 
 function getInport(name) {
@@ -167,6 +170,8 @@ exports.connect = function(upproc, upport, downproc, downport, capacity) {
    cnxt.down = downproc;
 }
 
+
+
 exports.run = function(trace) { 
 
 //console.log('Run');
@@ -191,7 +196,8 @@ for (var i = 0; i < list.length; i++) {
 }
 
 var x = queue.shift();
-while (x != undefined) {    
+while (x != undefined) {  
+currentproc = x;  
   x.fiber.run();
   x = queue.shift();
 } 
