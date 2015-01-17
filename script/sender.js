@@ -5,7 +5,7 @@ exports.sender = function () {
     var count = ip.contents;
     //console.log(count);
     for (var i = 0; i < count; i++) {
-      var ip = new fbp.IP(i + ''); 
+      var ip = fbp.create(i + ''); 
       fbp.send('OUT', ip);
     }
     fbp.close_out('OUT');    

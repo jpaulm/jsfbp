@@ -8,5 +8,6 @@ exports.receiver = function () {
         break; 
       var i = ip.contents;  
       console.log(i); 
+      fbp.drop(ip);
     }
   }

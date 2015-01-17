@@ -37,6 +37,14 @@ var queue = [];
 
 var tracing = false;
 
+exports.create = function(contents) {
+   return new exports.IP(contents); 
+}
+
+exports.drop = function(contents) {
+   var i = 0; 
+}
+
 exports.send = function(name, ip){
            
       var proc = getProc();
