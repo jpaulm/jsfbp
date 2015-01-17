@@ -46,6 +46,7 @@ exports.send = function(name, ip){
       while (true) {         
         if (conn.usedslots == 0) 
           queue.push(conn.down);  
+          //queue[conn.down.name] = queue.conn;
         if (conn.usedslots == conn.array.length)              
           Fiber.yield();   
         else   
@@ -87,6 +88,7 @@ exports.receive = function(name){
       }
       if (conn.usedslots == conn.array.length) 
         queue.push(conn.up); 
+        //queue[conn.up.name] = queue.conn;
         
       var ip = conn.array[conn.nxtget];
       conn.array[conn.nxtget] = null;
@@ -106,6 +108,7 @@ exports.close_out = function(name) {
     console.log(proc.name + ' close out ' + name);
   if (conn.usedslots == 0)
     queue.push(conn.down); 
+    //queue[conn.down.name] = queue.conn;
   conn.closed = true;
   Fiber.yield(); 
   if (tracing)
@@ -142,6 +145,17 @@ function getOutport(name) {
   }  
 }
 
+exports.initialize = function(proc, port, string) {
+   proc.inports[port] = string;
+}
+
+exports.connect = function(upproc, upport, downproc, downport, capacity) {
+   var cnxt = new exports.Connection(capacity);
+   upproc.outports[upport] = cnxt; 
+   downproc.inports[downport] = cnxt;
+   cnxt.up = upproc;
+   cnxt.down = downproc;
+}
 
 exports.run = function(trace) { 
 
