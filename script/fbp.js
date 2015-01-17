@@ -124,7 +124,9 @@ exports.close_out = function(name) {
 }
 
 function getProc() {  
+  //console.log(Fiber.current); 
   for (var i = 0; i < processes.length; i++) {
+    //console.log(processes[i][1].name); 
     if (processes[i][0] == Fiber.current) 
       return processes[i][1];   
   } 
