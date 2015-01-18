@@ -14,12 +14,12 @@ var readerp = new fbp.Process('Reader', readers.reader);
 var copierp = new fbp.Process('Copier', copiers.copier);  
 var recvrp = new fbp.Process('Recvr', recvrs.receiver);  
 
-//fbp.initialize(senderp, 'COUNT', '2000');
+//fbp.initialize(senderp, 'COUNT', '20');
 //fbp.connect(senderp, 'OUT', copierp, 'IN', 5);
 fbp.connect(readerp, 'OUT', copierp, 'IN', 5);
 fbp.connect(copierp, 'OUT', recvrp, 'IN', 5);
 
-var trace = false;
+var trace = true;
 // --- run ---  
 fbp.run(trace);
 

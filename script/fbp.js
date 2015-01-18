@@ -12,10 +12,10 @@ exports.Process = function (name, func) {
   this.name = name;  
   this.func = func; 
   this.fiber = null;
-  this.inports = {};
-  this.outports = {};  
+  this.inports = [];
+  this.outports = [];
   list[list.length] = this;
-  //processes[processes.length] = [this.fiber, this];
+  this.closed = false;
   
 }                
 
@@ -31,12 +31,13 @@ exports.Connection = function (size){
     this.array[i] = null;
 }
 
-var processes = [];
+
 var list = [];
 var queue = [];
 
 var tracing = false;
 var currentproc;
+var count; 
 
 exports.create = function(contents) {
    return new exports.IP(contents); 
@@ -46,11 +47,9 @@ exports.drop = function(contents) {
    var i = 0; 
 }
 
-exports.send = function(name, ip){
-           
-      var proc = getProc();
-      //console.log(proc);
-      var conn = proc.outports[name];
+exports.send = function(name, ip){           
+      
+      var conn = getOutport(name);
       if (tracing)
         console.log(proc.name + ' send to ' + name);
       while (true) {         
@@ -72,8 +71,8 @@ exports.send = function(name, ip){
 }
 
 exports.receive = function(name){
-      var proc = getProc();
-      var conn = proc.inports[name];
+      
+      var conn = getInport(name);
             
       if (conn.constructor == String)  {
         if (tracing)
@@ -112,8 +111,8 @@ exports.receive = function(name){
 }
 
 exports.close_out = function(name) {
-  var proc = getProc();
-  var conn = proc.outports[name];
+  
+  var conn = getoutport(name);
   if (tracing)
     console.log(proc.name + ' close out ' + name);
   if (conn.usedslots == 0)
@@ -125,37 +124,34 @@ exports.close_out = function(name) {
     console.log(proc.name + ' close out OK'); 
 }
 
+exports.close = function(name) {
+   var proc = getProc();
+   proc.closed = true;
+   count--;
+}
+
 function getProc() {  
-  //console.log(Fiber.current); 
-  //for (var i = 0; i < processes.length; i++) {
-    //console.log(processes[i][1].name); 
-   // if (processes[i][0] == Fiber.current) 
-   //   return processes[i][1];   
-  //} 
   return currentproc;
 }
 
+exports.getProc = getProc;
+
 function getInport(name) {
-  var ips = null;
-  for (var i = 0; i < processes.length; i++) {
-    if (processes[i][0] == Fiber.current){
-      ips = processes[i][1].inports;
-      return ips[name];
-      break;
-    }
+  var proc = getProc();
+  for (var i = 0; i < proc.inports.length; i++) {
+     if (proc.inports[i][0] == name)
+         return proc.inports[i][1];
   } 
+  return null;
 }
 
 function getOutport(name) {
-//console.log(processes.length);
-  var ops = null;
-  for (var i = 0; i < processes.length; i++) {
-    if (processes[i][0] == Fiber.current){
-      ops = processes[i][1].outports;
-      return ops[name];
-      break;
-    }
-  }  
+  var proc = getProc();
+  for (var i = 0; i < proc.outports.length; i++) {
+     if (proc.outports[i][0] == name)
+         return proc.outports[i][1];
+  } 
+  return null;
 }
 
 exports.initialize = function(proc, port, string) {
@@ -163,16 +159,22 @@ exports.initialize = function(proc, port, string) {
 }
 
 exports.connect = function(upproc, upport, downproc, downport, capacity) {
-   var cnxt = new exports.Connection(capacity);
-   upproc.outports[upport] = cnxt; 
-   downproc.inports[downport] = cnxt;
+   var cnxt = new exports.Connection(capacity);   
+   upproc.outports[upproc.outports.length] = [upport, cnxt];   
+   downproc.inports[downproc.inports.length] = [downport, cnxt]; 
    cnxt.up = upproc;
    cnxt.down = downproc;
 }
 
+function run(trace) {
+Fiber(function() {
+  run2(tracing);
+}).run();
+}
 
+exports.run = run;
 
-exports.run = function(trace) { 
+function run2(trace) { 
 
 //console.log('Run');
 //console.log(list.length);
@@ -182,25 +184,35 @@ console.log('Start time: ' + d.toISOString());
 //console.log(module.exports);
 tracing = trace;
 
-for (var i = 0; i < list.length; i++) {
-   list[i].fiber = Fiber(list[i].func);   //console.log(list[i]);
-   processes[i] = [list[i].fiber, list[i]];         
-      
-   var selfstarting = true;   
-   for (var i in processes[i].inports) {
-      if (inports[i].constructor != String)
+count = list.length;
+//console.log(count);
+for (var i = 0; i < list.length; i++) {  
+   list[i].fiber = new Fiber(list[i].func);
+   var selfstarting = true;      
+   for (var j = 0; j < list[i].inports.length; j++) {  
+      var k = list[i].inports[j];   
+      if (k[1].constructor != String)
          selfstarting = false;
    } 
+   //console.log(selfstarting);
    if (selfstarting)  
       queue.push(list[i])
 }
 
-var x = queue.shift();
-while (x != undefined) {  
-currentproc = x;  
-  x.fiber.run();
-  x = queue.shift();
-} 
+do {
+  //console.log(queue);
+  var x = queue.shift();
+  while (x != undefined){    
+   // console.log(x);
+    currentproc = x;   
+    x.fiber.run();
+    x = queue.shift();
+  } 
+  sleep(50);
+  Fiber.yield;
+  console.log('yield');
+} while (count > 0)
+
 
 d = new Date();
 var et = d.getTime();  
@@ -208,3 +220,12 @@ et -= st;
 et /= 1000;
 console.log('Elapsed time in secs: ' + et.toFixed(3)); 
 }  
+
+function sleep(milliseconds) {
+  var start = new Date().getTime();
+  for (var i = 0; i < 1e7; i++) {
+    if ((new Date().getTime() - start) > milliseconds){
+      break;
+    }
+  }
+}

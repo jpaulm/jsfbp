@@ -10,4 +10,5 @@ exports.receiver = function () {
       console.log(i); 
       fbp.drop(ip);
     }
+    fbp.close();
   }
