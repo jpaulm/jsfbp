@@ -20,9 +20,11 @@ Install & Run
 
 Install node-fibers via npm: just do `npm install fibers`.
 
-Create a folder called `jsfbp` in `node/node_modules/fibers`, and download the 5 JavaScript files from the JSFBP `script` directory into `jsfbp`.
+Create a folder called `jsfbp` in `node/node_modules/fibers`, and download all the JavaScript files from the JSFBP `script` directory into `jsfbp`.
 
-This network can now be run by positioning at this directory, and entering `node fbptest.js`.  If tracing is desired, change the value of the `trace` variable at the bottom of fbptest.js to `true`.
+This network can now be run by positioning at this directory, and entering `node fbptest1.js`.  If tracing is desired, change the value of the `trace` variable at the bottom of fbptest.js to `true`.
+
+There is another test (`fbptest`) which replaces `sender` with a "reader" component.  The latter uses the asynchronous `fs.readFile` function.
 
 Programming issues
 ---
