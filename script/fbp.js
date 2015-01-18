@@ -23,8 +23,8 @@ exports.Connection = function (size){
   this.array = [];
   this.nxtget = 0;
   this.nxtput = 0; 
-  this.up = null;
-  this.down = null;
+  this.up = null;    // upstream process
+  this.down = null;  // downstream process
   this.closed = false;
   this.usedslots = 0;
   for (var i = 0; i < size; i++)
@@ -48,7 +48,7 @@ exports.drop = function(contents) {
 }
 
 exports.send = function(name, ip){           
-      
+      var proc = getProc();
       var conn = getOutport(name);
       if (tracing)
         console.log(proc.name + ' send to ' + name);
@@ -71,9 +71,9 @@ exports.send = function(name, ip){
 }
 
 exports.receive = function(name){
-      
+      var proc = getProc();
       var conn = getInport(name);
-            
+                  
       if (conn.constructor == String)  {
         if (tracing)
           console.log(proc.name + ' recv IIP from ' + name + ': ' + conn);
@@ -111,26 +111,30 @@ exports.receive = function(name){
 }
 
 exports.close_out = function(name) {
-  
-  var conn = getoutport(name);
+  var proc = getProc();
+  var conn = getOutport(name);
   if (tracing)
     console.log(proc.name + ' close out ' + name);
-  if (conn.usedslots == 0)
+  if (conn.usedslots == 0 && !conn.down.closed)
     queue.push(conn.down); 
     //queue[conn.down.name] = queue.conn;
   conn.closed = true;
-  Fiber.yield(); 
   if (tracing)
     console.log(proc.name + ' close out OK'); 
+  Fiber.yield();   
 }
 
-exports.close = function(name) {
+exports.close = function() {
    var proc = getProc();
+   if (tracing)
+    console.log(proc.name + ' closing ');
    proc.closed = true;
+   console.log(count);
    count--;
 }
 
 function getProc() {  
+//console.log(currentproc);
   return currentproc;
 }
 
@@ -138,9 +142,12 @@ exports.getProc = getProc;
 
 function getInport(name) {
   var proc = getProc();
+  //console.log(proc);
+  
   for (var i = 0; i < proc.inports.length; i++) {
+     //console.log(proc.inports[i]);
      if (proc.inports[i][0] == name)
-         return proc.inports[i][1];
+         return proc.inports[i][1];  // return conn
   } 
   return null;
 }
@@ -155,7 +162,7 @@ function getOutport(name) {
 }
 
 exports.initialize = function(proc, port, string) {
-   proc.inports[port] = string;
+   proc.inports[proc.inports.length] = [port, string];
 }
 
 exports.connect = function(upproc, upport, downproc, downport, capacity) {
@@ -168,7 +175,7 @@ exports.connect = function(upproc, upport, downproc, downport, capacity) {
 
 function run(trace) {
 Fiber(function() {
-  run2(tracing);
+  run2(trace);
 }).run();
 }
 
@@ -177,7 +184,7 @@ exports.run = run;
 function run2(trace) { 
 
 //console.log('Run');
-//console.log(list.length);
+console.log(list);
 var d = new Date();
 var st = d.getTime(); 
 console.log('Start time: ' + d.toISOString());
@@ -185,7 +192,7 @@ console.log('Start time: ' + d.toISOString());
 tracing = trace;
 
 count = list.length;
-//console.log(count);
+console.log(count);
 for (var i = 0; i < list.length; i++) {  
    list[i].fiber = new Fiber(list[i].func);
    var selfstarting = true;      
@@ -199,19 +206,22 @@ for (var i = 0; i < list.length; i++) {
       queue.push(list[i])
 }
 
-do {
+while (true) {
   //console.log(queue);
   var x = queue.shift();
-  while (x != undefined){    
-   // console.log(x);
+  while (x != undefined){  
     currentproc = x;   
     x.fiber.run();
     x = queue.shift();
   } 
+  //console.log(x);
+  //console.log(count);
+  if (count <= 0)
+    break;
   sleep(50);
   Fiber.yield;
   console.log('yield');
-} while (count > 0)
+} 
 
 
 d = new Date();
