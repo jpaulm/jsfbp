@@ -8,7 +8,7 @@ exports.sender = function () {
       var ip = fbp.create(i + ''); 
       fbp.send('OUT', ip);
     }
-    fbp.close_out('OUT'); 
+    
     fbp.close();    
   }
   

@@ -110,7 +110,7 @@ exports.receive = function(name){
       return ip; 
 }
 
-exports.close_out = function(name) {
+close_out = function(name) {
   var proc = getProc();
   var conn = getOutport(name);
   if (tracing)
@@ -121,7 +121,7 @@ exports.close_out = function(name) {
   conn.closed = true;
   if (tracing)
     console.log(proc.name + ' close out OK'); 
-  Fiber.yield();   
+  //Fiber.yield();   
 }
 
 exports.close = function() {
@@ -129,8 +129,11 @@ exports.close = function() {
    if (tracing)
     console.log(proc.name + ' closing ');
    proc.closed = true;
-   console.log(count);
+   //console.log(count);
    count--;
+   for (var i = 0; i < proc.outports.length; i++) {
+      close_out(proc.outports[i][0]);
+   }
 }
 
 function getProc() {  
@@ -184,7 +187,7 @@ exports.run = run;
 function run2(trace) { 
 
 //console.log('Run');
-console.log(list);
+//console.log(list);
 var d = new Date();
 var st = d.getTime(); 
 console.log('Start time: ' + d.toISOString());
@@ -192,7 +195,7 @@ console.log('Start time: ' + d.toISOString());
 tracing = trace;
 
 count = list.length;
-console.log(count);
+//console.log(count);
 for (var i = 0; i < list.length; i++) {  
    list[i].fiber = new Fiber(list[i].func);
    var selfstarting = true;      
@@ -207,20 +210,18 @@ for (var i = 0; i < list.length; i++) {
 }
 
 while (true) {
-  //console.log(queue);
+  
   var x = queue.shift();
   while (x != undefined){  
     currentproc = x;   
-    x.fiber.run();
+    if (!x.closed)
+      x.fiber.run();
     x = queue.shift();
   } 
-  //console.log(x);
-  //console.log(count);
+  
   if (count <= 0)
     break;
-  sleep(50);
-  Fiber.yield;
-  console.log('yield');
+  sleep(100);
 } 
 
 
@@ -231,11 +232,11 @@ et /= 1000;
 console.log('Elapsed time in secs: ' + et.toFixed(3)); 
 }  
 
-function sleep(milliseconds) {
-  var start = new Date().getTime();
-  for (var i = 0; i < 1e7; i++) {
-    if ((new Date().getTime() - start) > milliseconds){
-      break;
-    }
-  }
+function sleep(ms) {
+  var fiber = Fiber.current;
+  console.log('sleep');
+  setTimeout(function() {
+      fiber.run();
+  }, ms);
+  Fiber.yield();
 }

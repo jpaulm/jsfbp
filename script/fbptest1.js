@@ -19,7 +19,7 @@ fbp.connect(senderp, 'OUT', copierp, 'IN', 5);
 //fbp.connect(readerp, 'OUT', copierp, 'IN', 5);
 fbp.connect(copierp, 'OUT', recvrp, 'IN', 5);
 
-var trace = true;
+var trace = false;
 // --- run ---  
 fbp.run(trace);
 

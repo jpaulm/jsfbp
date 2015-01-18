@@ -7,7 +7,7 @@ exports.reader = function () {
     console.log(data);   
     var ip = fbp.create(data); 
     fbp.send('OUT', ip);
-    fbp.close_out('OUT');           
+             
     fbp.close();   
     
   }

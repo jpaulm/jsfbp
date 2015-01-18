@@ -8,7 +8,7 @@ exports.copier = function () {
       var i = ip.contents; 
       fbp.send('OUT', ip);
     }
-    fbp.close_out('OUT'); 
+    
     fbp.close();    
   }
   
