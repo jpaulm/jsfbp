@@ -16,6 +16,8 @@ exports.Process = function (name, func) {
   this.outports = [];
   list[list.length] = this;
   this.closed = false;
+  //this.yielded = false;
+  //this.cbpending = false;
   
 }                
 
@@ -39,25 +41,36 @@ var tracing = false;
 var currentproc;
 var count; 
 
-exports.create = function(contents) {
+exports.create = function(contents) {   
+   if (tracing) {
+      var proc = currentproc;
+      console.log(proc.name + ' create IP');
+      }
    return new exports.IP(contents); 
 }
 
 exports.drop = function(contents) {
-   var i = 0; 
+   if (tracing) {
+      var proc = currentproc;
+      console.log(proc.name + ' drop IP'); 
+      }
 }
 
 exports.send = function(name, ip){           
-      var proc = getProc();
+      var proc = currentproc;
       var conn = getOutport(name);
+            
       if (tracing)
         console.log(proc.name + ' send to ' + name);
       while (true) {         
         if (conn.usedslots == 0) 
           queue.push(conn.down);  
           //queue[conn.down.name] = queue.conn;
-        if (conn.usedslots == conn.array.length)              
-          Fiber.yield(0);   
+        if (conn.usedslots == conn.array.length)  { 
+          //proc.yielded = true;           
+          Fiber.yield(0); 
+          //proc.yielded = false;
+          }
         else   
           break; 
       }        
@@ -71,7 +84,7 @@ exports.send = function(name, ip){
 }
 
 exports.receive = function(name){
-      var proc = getProc();
+      var proc = currentproc;
       var conn = getInport(name);
                   
       if (conn.constructor == String)  {
@@ -83,14 +96,17 @@ exports.receive = function(name){
         
       if (tracing)
         console.log(proc.name + ' recv from ' + name);
+        
       while (true) {             
         if (conn.usedslots == 0){
           if (conn.closed)  {
             if (tracing)
               console.log(proc.name + ' recv EOS from ' + name );
             return null; 
-            }             
+            } 
+          //proc.yielded = true;              
           Fiber.yield(0);
+          //proc.yielded = false;
         }
         else
           break;
@@ -110,43 +126,30 @@ exports.receive = function(name){
       return ip; 
 }
 
-close_out = function(name) {
-  var proc = getProc();
-  var conn = getOutport(name);
-  //if (tracing)
-  //  console.log(proc.name + ' close out ' + name);
-  if (conn.usedslots == 0 && !conn.down.closed)
-    queue.push(conn.down); 
-    //queue[conn.down.name] = queue.conn;
-  conn.closed = true;
-  //if (tracing)
-  //  console.log(proc.name + ' close out OK'); 
-  //Fiber.yield();   
-}
+
 
 exports.close = function() {
-   var proc = getProc();
+   var proc = currentproc;
    if (tracing)
     console.log(proc.name + ' closing');
    proc.closed = true;
    //console.log(count);
    count--;
    for (var i = 0; i < proc.outports.length; i++) {
-      close_out(proc.outports[i][0]);
+      //close_out(proc.outports[i][0]);
+      var conn = proc.outports[i][1];
+      if (conn.usedslots == 0 && !conn.down.closed)
+         queue.push(conn.down); 
+    
+      conn.closed = true;
    }
    if (tracing)
     console.log(proc.name + ' closed');
 }
 
-function getProc() {  
-//console.log(currentproc);
-  return currentproc;
-}
-
-exports.getProc = getProc;
 
 function getInport(name) {
-  var proc = getProc();
+  var proc = currentproc;;
   //console.log(proc);
   
   for (var i = 0; i < proc.inports.length; i++) {
@@ -158,7 +161,7 @@ function getInport(name) {
 }
 
 function getOutport(name) {
-  var proc = getProc();
+  var proc = currentproc;
   for (var i = 0; i < proc.outports.length; i++) {
      if (proc.outports[i][0] == name)
          return proc.outports[i][1];
@@ -216,8 +219,11 @@ while (true) {
   var x = queue.shift();
   while (x != undefined){  
     currentproc = x;   
-    if (!x.closed) {
-      x.fiber.run(-1);      
+    if (!x.closed) {      
+      x.fiber.run();  
+      //console.log(x.name + 'run finished');
+      //if (!x.yielded && !x.cbpending)
+      //   close(x);    
     }
     x = queue.shift();
   } 
