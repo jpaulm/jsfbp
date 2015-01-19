@@ -24,7 +24,7 @@ Create a folder called `jsfbp` in `node/node_modules/fibers`, and download all t
 
 This network can now be run by positioning at this directory, and entering `node fbptest1.js`.  If tracing is desired, change the value of the `trace` variable at the bottom of fbptest.js to `true`.
 
-There is another test (`fbptest`) which replaces `sender` with a "reader" component.  The latter uses the asynchronous `fs.readFile` function.
+Just added (Jan. 18, 2015) another test (`fbptest`) which replaces `sender` with a `reader` component.  The latter uses the asynchronous `fs.readFile` function.
 
 Programming issues
 ---
