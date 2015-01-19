@@ -57,7 +57,7 @@ exports.send = function(name, ip){
           queue.push(conn.down);  
           //queue[conn.down.name] = queue.conn;
         if (conn.usedslots == conn.array.length)              
-          Fiber.yield();   
+          Fiber.yield(0);   
         else   
           break; 
       }        
@@ -90,7 +90,7 @@ exports.receive = function(name){
               console.log(proc.name + ' recv EOS from ' + name );
             return null; 
             }             
-          Fiber.yield();
+          Fiber.yield(0);
         }
         else
           break;
@@ -113,27 +113,29 @@ exports.receive = function(name){
 close_out = function(name) {
   var proc = getProc();
   var conn = getOutport(name);
-  if (tracing)
-    console.log(proc.name + ' close out ' + name);
+  //if (tracing)
+  //  console.log(proc.name + ' close out ' + name);
   if (conn.usedslots == 0 && !conn.down.closed)
     queue.push(conn.down); 
     //queue[conn.down.name] = queue.conn;
   conn.closed = true;
-  if (tracing)
-    console.log(proc.name + ' close out OK'); 
+  //if (tracing)
+  //  console.log(proc.name + ' close out OK'); 
   //Fiber.yield();   
 }
 
 exports.close = function() {
    var proc = getProc();
    if (tracing)
-    console.log(proc.name + ' closing ');
+    console.log(proc.name + ' closing');
    proc.closed = true;
    //console.log(count);
    count--;
    for (var i = 0; i < proc.outports.length; i++) {
       close_out(proc.outports[i][0]);
    }
+   if (tracing)
+    console.log(proc.name + ' closed');
 }
 
 function getProc() {  
@@ -214,14 +216,15 @@ while (true) {
   var x = queue.shift();
   while (x != undefined){  
     currentproc = x;   
-    if (!x.closed)
-      x.fiber.run();
+    if (!x.closed) {
+      x.fiber.run(-1);      
+    }
     x = queue.shift();
   } 
   
   if (count <= 0)
     break;
-  sleep(100);
+  sleep(50);
 } 
 
 
