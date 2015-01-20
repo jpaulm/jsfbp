@@ -7,7 +7,7 @@ exports.receiver = function () {
       if (ip == null)
         break; 
       var i = ip.contents;  
-      console.log(i); 
+      console.log('data: ' + i); 
       fbp.drop(ip);
     }
     fbp.close();
