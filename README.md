@@ -6,14 +6,19 @@ Basic FBP implementation written in JavaScript, using Node-Fibers - https://gith
 General
 ---
 
-Very early feasibility study.
+Early feasibility study.
 
-Current test case has 3 processes:
- - `Sender`
- - `Copier`
- - `Recvr`
+Test cases so far:
+
+- `fbptest1` - 3 processes:
+    - `Sender`
+    - `Copier`
+    - `Recvr`
 
 ![JSFBP](https://github.com/jpaulm/jsfbp/blob/master/docs/JSFBP.png "Simple Test Network")
+
+- `fbptest2` - `sender` replaced with `reader`
+- `fbptest3` - `sender` and `reader` both feeding into `copier.IN`
 
 Install & Run
 ---
