@@ -5,7 +5,7 @@ var proc;
 exports.reader = function () {   
      proc = fbp.getCurrentProc();  
      //console.log('read started');
-     myReadFile('./readme.txt', "utf8", callback);
+     myReadFile('./text.txt', "utf8", callback);
      //console.log('read running');     
   }
   
