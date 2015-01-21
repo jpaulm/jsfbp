@@ -5,8 +5,7 @@ var proc;
 exports.reader = function () {   
      proc = fbp.getCurrentProc();  
      //console.log('read started');
-     myReadFile('./text.txt', "utf8", callback);
-     //console.log('read running');     
+     myReadFile('./readme.txt', "utf8", callback);     
   }
   
   function myReadFile(path, options, cb) {
@@ -16,10 +15,10 @@ exports.reader = function () {
     });
   }
    
-  function callback(err, data, proc) {
-     //console.log('read finished');    
-     fbp.setCurrentProc(proc); 
+  function callback(err, data, proc) {  
+     fbp.setCurrentProc(proc);      
      var ip = fbp.create(data); 
      fbp.send('OUT', ip);     
      fbp.close();  
+        
   }

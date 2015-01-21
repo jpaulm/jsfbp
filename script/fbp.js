@@ -15,15 +15,14 @@ exports.Process = function (name, func) {
   this.inports = [];
   this.outports = [];
   list[list.length] = this;
-  this.closed = false;
+  //this.closed = false;
   this.status = 
        'N'; // not initiated
     // 'A' active    (includes waiting on callback ...)
     // 'R' waiting to receive
     // 'S' waiting to send
     // 'D' dormant
-    // 'C' closed   
-  
+    // 'C' closed    
 }                
 
 exports.Connection = function (size){
@@ -77,9 +76,9 @@ exports.send = function(name, ip){
           //queue[conn.down.name] = queue.conn;
         if (conn.usedslots == conn.array.length)  { 
           proc.status = 'S';
-          Fiber.current = proc.fiber;
+          Fiber.current = proc.fiber;         
           Fiber.yield(0); 
-          proc.status = 'A';
+          proc.status = 'A';          
           }
         else   
           break; 
@@ -115,9 +114,9 @@ exports.receive = function(name){
             return null; 
             } 
           proc.status = 'R';
-          Fiber.current = proc.fiber;
+          Fiber.current = proc.fiber;          
           Fiber.yield();
-          proc.status = 'A';
+          proc.status = 'A';          
         }
         else
           break;
@@ -145,11 +144,11 @@ exports.close = function() {
    var proc = currentproc;
    if (tracing)
       console.log(proc.name + ' closing');
-   proc.closed = true;
+   //proc.closed = true;
    proc.status = 'C';
    count--;
    for (var i = 0; i < proc.outports.length; i++) {
-      //close_out(proc.outports[i][0]);
+      
       var conn = proc.outports[i][1];
       if (conn.usedslots == 0 &&  
           conn.down.status == 'R' || conn.down.status == 'N' || conn.down.status == 'A')
@@ -183,6 +182,7 @@ exports.setCurrentProc = function(proc) {
    //console.log('set ' + proc);
    currentproc = proc;
 }
+
  
 function getInport(proc, name) {
   //var proc = currentproc;;
@@ -279,10 +279,11 @@ while (true) {
   
   var x = queue.shift();
   while (x != undefined){  
-    currentproc = x;
+    currentproc = x;    
     //console.log(x.name);  
-    if (!x.closed) {      
-      x.fiber.run();        
+    if (x.status != 'C') {     
+      //console.log('Run ' + x.name);    
+      x.fiber.run();             
     }
     x = queue.shift();
   } 
