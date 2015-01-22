@@ -3,6 +3,7 @@ var Fiber = require('fibers');
 // --- classes and functions ---
 
 function IP(contents) {
+    this.owner = null;
     this.contents = contents;    
 }
 
@@ -22,7 +23,8 @@ exports.Process = function (name, func) {
     // 'R' waiting to receive
     // 'S' waiting to send
     // 'D' dormant
-    // 'C' closed    
+    // 'C' closed  
+   this.ownedIPs = 0;   
 }                
 
 exports.Connection = function (size){
@@ -48,18 +50,25 @@ var currentproc;
 var count; 
 
 exports.create = function(contents) {   
-   if (tracing) {
-      var proc = currentproc;
+   var proc = currentproc;
+   if (tracing) {      
       console.log(proc.name + ' create IP');
       }
-   return new exports.IP(contents); 
+   var ip = new exports.IP(contents); 
+   ip.owner = proc; 
+   proc.ownedIPs++; 
+   return ip; 
 }
 
-exports.drop = function(contents) {
-   if (tracing) {
-      var proc = currentproc;
+exports.drop = function(ip) {
+   var proc = currentproc;
+   if (tracing) {      
       console.log(proc.name + ' drop IP'); 
       }
+   if (ip.owner != proc)
+      console.log('IP not owned by this Process: ' + ip.contents);  
+   else 
+      proc.ownedIPs--;
 }
 
 exports.send = function(name, ip){           
@@ -68,6 +77,10 @@ exports.send = function(name, ip){
            
       if (tracing)
         console.log(proc.name + ' send to ' + name);
+      if (ip.owner != proc) {
+        console.log('IP not owned by this Process: ' + ip.contents); 
+        return;
+        }  
       while (true) {         
         if (conn.usedslots == 0) {
           if (conn.down.status == 'R' || conn.down.status == 'N' || conn.down.status == 'A')
@@ -87,7 +100,8 @@ exports.send = function(name, ip){
       conn.nxtput ++;
       if (conn.nxtput > conn.array.length - 1)
         conn.nxtput = 0;
-        conn.usedslots++;
+      conn.usedslots++;
+      proc.ownedIPs--;
       if (tracing)
         console.log(proc.name + ' send OK');  
 }
@@ -100,12 +114,14 @@ exports.receive = function(name){
         if (tracing)
           console.log(proc.name + ' recv IIP from ' + name + ': ' + conn);
         var ip = new IP(conn + '');
+        ip.owner = proc;
+        proc.ownedIPs++;
         return ip;
         }
         
       if (tracing)
         console.log(proc.name + ' recv from ' + name);
-        
+            
       while (true) {             
         if (conn.usedslots == 0){
           if (conn.closed)  {
@@ -135,6 +151,8 @@ exports.receive = function(name){
       if (tracing)
         console.log(proc.name + ' recv OK'); 
       conn.usedslots--;
+      ip.owner = proc; 
+      proc.ownedIPs++; 
       return ip; 
 }
 
@@ -150,8 +168,8 @@ exports.close = function() {
    for (var i = 0; i < proc.outports.length; i++) {
       
       var conn = proc.outports[i][1];
-      if (conn.usedslots == 0 &&  
-          conn.down.status == 'R' || conn.down.status == 'N' || conn.down.status == 'A')
+      if (conn.usedslots == 0 && ( 
+          conn.down.status == 'R' || conn.down.status == 'N' || conn.down.status == 'A'))
             queue.push(conn.down); 
     
       conn.upstreamProcsUnclosed--; 
@@ -169,6 +187,8 @@ exports.close = function() {
              queue.push(conn.up[j]); 
       }
    }
+   if (proc.ownedIPs != 0)
+      console.log(proc.name + ' closed without disposing of all IPs');
    if (tracing)
       console.log(proc.name + ' closed');
 }
@@ -184,7 +204,7 @@ exports.setCurrentProc = function(proc) {
 }
 
 exports.inArrayLength = function(name) {   // name up to and excluding left square bracket
-   var hi_index = 0;
+   var hi_index = -1;
    var proc = currentproc;
    var re = new RegExp(name + '\\[(\\d+)\\]');
    for (var i = 0; i < proc.inports.length; i++) {   
@@ -193,12 +213,13 @@ exports.inArrayLength = function(name) {   // name up to and excluding left squa
         hi_index = Math.max(hi_index, array[1]);
      }
      
-  } 
+  }if (hi_index == -1)
+     return null;  
    return hi_index + 1;
 }
  
  exports.outArrayLength = function(name) {   // name up to and excluding left square bracket
-   var hi_index = 0;
+   var hi_index = -1;
    var proc = currentproc;
    var re = new RegExp(name + '\\[(\\d+)\\]');
    console.log(proc.outports);
@@ -209,7 +230,9 @@ exports.inArrayLength = function(name) {   // name up to and excluding left squa
         hi_index = Math.max(hi_index, array[1]);
      }
      
-  } 
+  }
+   if (hi_index == -1)
+     return null;  
    return hi_index + 1;
 }
 function getInport(proc, name) {
@@ -221,6 +244,7 @@ function getInport(proc, name) {
      if (proc.inports[i][0] == name)
          return proc.inports[i][1];  // return conn
   } 
+  console.log('Port ' + proc.name + '.' + name + ' not found');
   return null;
 }
 
@@ -230,6 +254,7 @@ function getOutport(proc, name) {
      if (proc.outports[i][0] == name)
          return proc.outports[i][1];
   } 
+  console.log('Port ' + proc.name + '.' + name + ' not found');
   return null;
 }
 
