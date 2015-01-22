@@ -183,7 +183,35 @@ exports.setCurrentProc = function(proc) {
    currentproc = proc;
 }
 
+exports.inArrayLength = function(name) {   // name up to and excluding left square bracket
+   var hi_index = 0;
+   var proc = currentproc;
+   var re = new RegExp(name + '\\[(\\d+)\\]');
+   for (var i = 0; i < proc.inports.length; i++) {   
+     var array = re.exec(proc.inports[i][0]); 
+     if (array  != null && array.index == 0) {
+        hi_index = Math.max(hi_index, array[1]);
+     }
+     
+  } 
+   return hi_index + 1;
+}
  
+ exports.outArrayLength = function(name) {   // name up to and excluding left square bracket
+   var hi_index = 0;
+   var proc = currentproc;
+   var re = new RegExp(name + '\\[(\\d+)\\]');
+   console.log(proc.outports);
+   for (var i = 0; i < proc.outports.length; i++) {   
+     var array = re.exec(proc.outports[i][0]); 
+     console.log(array);
+     if (array  != null && array.index == 0) {
+        hi_index = Math.max(hi_index, array[1]);
+     }
+     
+  } 
+   return hi_index + 1;
+}
 function getInport(proc, name) {
   //var proc = currentproc;;
   //console.log(proc);
