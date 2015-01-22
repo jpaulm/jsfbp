@@ -112,7 +112,7 @@ exports.receive = function(name){
                   
       if (conn.constructor == String)  {
         if (tracing)
-          console.log(proc.name + ' recv IIP from ' + name + ': ' + conn);
+          console.log(proc.name + ' recv IIP from port ' + name + ': ' + conn);
         var ip = new IP(conn + '');
         ip.owner = proc;
         proc.ownedIPs++;
@@ -164,6 +164,7 @@ exports.close = function() {
       console.log(proc.name + ' closing');
    //proc.closed = true;
    proc.status = 'C';
+   //console.log('cl' + count);
    count--;
    for (var i = 0; i < proc.outports.length; i++) {
       
@@ -202,7 +203,7 @@ exports.setCurrentProc = function(proc, func) {
    //console.log('set ' + proc);
    currentproc = proc;
    proc.fiber = new Fiber(func);
-   proc.fiber.run(); 
+   queue.push(proc);
 }
 
 exports.inArrayLength = function(name) {   // name up to and excluding left square bracket
@@ -327,7 +328,7 @@ for (var i = 0; i < list.length; i++) {
    } 
    //console.log(selfstarting);
    if (selfstarting)  
-      queue.push(list[i])
+      queue.push(list[i]);
 }
 
 while (true) {
@@ -346,7 +347,7 @@ while (true) {
     }
     x = queue.shift();
   } 
-  
+  //console.log(count);
   if (count <= 0)
     break;
   sleep(50);
@@ -362,7 +363,7 @@ console.log('Elapsed time in secs: ' + et.toFixed(3));
 
 function sleep(ms) {
   var fiber = Fiber.current;
-  //console.log('sleep');
+  console.log('sleep');
   setTimeout(function() {
       fiber.run();
   }, ms);
