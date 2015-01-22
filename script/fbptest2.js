@@ -16,8 +16,8 @@ var recvrp = new fbp.Process('Recvr', recvrs.receiver);
 
 fbp.initialize(readerp, 'FILE', './text.txt');
 //fbp.connect(senderp, 'OUT', copierp, 'IN', 5);
-fbp.connect(readerp, 'OUT', copierp, 'IN', 5);
-fbp.connect(copierp, 'OUT', recvrp, 'IN', 5);
+fbp.connect(readerp, 'OUT', copierp, 'IN', 1);
+fbp.connect(copierp, 'OUT', recvrp, 'IN', 1);
 
 var trace = true;
 // --- run ---  

@@ -18,10 +18,17 @@ exports.reader = function () {
     });
   }
    
-  function callback(err, data, proc) {  
-     fbp.setCurrentProc(proc);      
-     var ip = fbp.create(data); 
-     fbp.send('OUT', ip);     
-     fbp.close();  
+  function callback(err, data, proc) { 
+     var savedata = data;
+     var saveerr = err; 
+     fbp.setCurrentProc(proc, function()
+     {       
+       var array = savedata.split('\n');
+       for (var i = 0; i < array.length; i++) {
+         var ip = fbp.create(array[i]); 
+         fbp.send('OUT', ip);   
+       }  
+       fbp.close(); 
+     }); 
         
   }

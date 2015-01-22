@@ -198,9 +198,11 @@ exports.getCurrentProc = function()  {
    return currentproc;
 }
 
-exports.setCurrentProc = function(proc) {
+exports.setCurrentProc = function(proc, func) {
    //console.log('set ' + proc);
    currentproc = proc;
+   proc.fiber = new Fiber(func);
+   proc.fiber.run(); 
 }
 
 exports.inArrayLength = function(name) {   // name up to and excluding left square bracket
@@ -316,7 +318,7 @@ tracing = trace;
 count = list.length;
 //console.log(count);
 for (var i = 0; i < list.length; i++) {  
-   list[i].fiber = new Fiber(list[i].func);
+   //list[i].fiber = new Fiber(list[i].func);
    var selfstarting = true;      
    for (var j = 0; j < list[i].inports.length; j++) {  
       var k = list[i].inports[j];   
@@ -332,7 +334,11 @@ while (true) {
   
   var x = queue.shift();
   while (x != undefined){  
-    currentproc = x;    
+    currentproc = x;   
+    if (x.status == 'N') {
+      x.fiber = new Fiber(x.func);
+      x.status = 'A';
+    } 
     //console.log(x.name);  
     if (x.status != 'C') {     
       //console.log('Run ' + x.name);    
