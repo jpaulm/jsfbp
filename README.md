@@ -6,8 +6,6 @@ Basic FBP implementation written in JavaScript, using Node-Fibers - https://gith
 General
 ---
 
-Early feasibility study.
-
 Test cases so far:
 
 - `fbptest1` - 3 processes:
@@ -17,8 +15,10 @@ Test cases so far:
 
 ![JSFBP](https://github.com/jpaulm/jsfbp/blob/master/docs/JSFBP.png "Simple Test Network")
 
-- `fbptest2` - `sender` replaced with `reader`
-- `fbptest3` - `sender` and `reader` both feeding into `copier.IN`
+- `fbptest2` - `Sender` replaced with `Reader`
+- `fbptest3` - `Sender` and `Reader` both feeding into `Copier.IN`
+- `fbptest4` - `Sender` feeding `Repl` which sends 3 copies of input IP (as specified in network), each copy going to each element of array port; all 3 copies then feeding into `Recvr.IN`
+- `fbptest5` - Two copies of `Reader` running concurrently
 
 Install & Run
 ---
