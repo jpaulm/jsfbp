@@ -7,24 +7,23 @@ exports.reader = function () {
      var ip = fbp.receive('FILE');
      var fname = ip.contents;
      fbp.drop(ip);
-     //console.log('read started');
-     myReadFile(fname, "utf8");     
+     fbp.setCallbackPending(true); 
+     myReadFile(fname, "utf8", proc);     
   }
   
-  function myReadFile(path, options) {
+  function myReadFile(path, options, proc) {
     //console.log(proc.name + ' started reading');
     fs.readFile(path, options, function(err, data) {
      var savedata = data;
-     var saveerr = err; 
-     //console.log(proc.name + ' started processing');
-     fbp.setProcCallback(proc, function()
-     {       
+     var saveerr = err;      
+     fbp.setProcCallback(proc, function(){  
+     fbp.setCallbackPending(false);     
        var array = savedata.split('\n');
        for (var i = 0; i < array.length; i++) {
          var ip = fbp.create(array[i]); 
          fbp.send('OUT', ip);   
-       }  
-       fbp.close(); 
-     }); 
-        
-  }
+       } 
+    }); 
+    });
+  }    
+ 

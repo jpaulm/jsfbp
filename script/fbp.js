@@ -24,7 +24,9 @@ exports.Process = function (name, func) {
     // 'S' waiting to send
     // 'D' dormant
     // 'C' closed  
-   this.ownedIPs = 0;   
+   this.ownedIPs = 0; 
+   this.cbpending = false;
+   this.yielded = false;  
 }                
 
 exports.Connection = function (size){
@@ -89,9 +91,10 @@ exports.send = function(name, ip){
           //queue[conn.down.name] = queue.conn;
         if (conn.usedslots == conn.array.length)  { 
           proc.status = 'S';
-          //Fiber.current = proc.fiber;         
+          proc.yielded = true;
           Fiber.yield(0); 
-          proc.status = 'A';          
+          proc.status = 'A'; 
+          proc.yielded = false;         
           }
         else   
           break; 
@@ -130,9 +133,10 @@ exports.receive = function(name){
             return null; 
             } 
           proc.status = 'R';
-          //Fiber.current = proc.fiber;          
+          proc.yielded = true; 
           Fiber.yield();
-          proc.status = 'A';          
+          proc.status = 'A';    
+          proc.yielded = false;     
         }
         else
           break;
@@ -158,8 +162,9 @@ exports.receive = function(name){
 
 
 
-exports.close = function() {
-   var proc = currentproc;
+//exports.close = function() {
+   function close(proc){
+   //var proc = currentproc;
    if (tracing)
       console.log(proc.name + ' closing');
    //proc.closed = true;
@@ -204,6 +209,10 @@ exports.setProcCallback = function(proc, func) {
    currentproc = proc;
    proc.fiber = new Fiber(func);
    queue.push(proc);
+}
+
+exports.setCallbackPending = function(b) {
+   currentproc.cbpending = b;
 }
 
 exports.inArrayLength = function(name) {   // name up to and excluding left square bracket
@@ -343,7 +352,9 @@ while (true) {
     //console.log(x.name);  
     if (x.status != 'C') {     
       //console.log('Run ' + x.name);    
-      x.fiber.run();             
+      x.fiber.run();   
+      if (!x.yielded && !x.cbpending) 
+         close(x);          
     }
     x = queue.shift();
   } 

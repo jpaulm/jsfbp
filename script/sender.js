@@ -10,6 +10,6 @@ exports.sender = function () {
       fbp.send('OUT', ip);
     }
     
-    fbp.close();    
+    //fbp.close();    
   }
   
