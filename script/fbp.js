@@ -89,7 +89,7 @@ exports.send = function(name, ip){
           //queue[conn.down.name] = queue.conn;
         if (conn.usedslots == conn.array.length)  { 
           proc.status = 'S';
-          Fiber.current = proc.fiber;         
+          //Fiber.current = proc.fiber;         
           Fiber.yield(0); 
           proc.status = 'A';          
           }
@@ -130,7 +130,7 @@ exports.receive = function(name){
             return null; 
             } 
           proc.status = 'R';
-          Fiber.current = proc.fiber;          
+          //Fiber.current = proc.fiber;          
           Fiber.yield();
           proc.status = 'A';          
         }
@@ -199,7 +199,7 @@ exports.getCurrentProc = function()  {
    return currentproc;
 }
 
-exports.setCurrentProc = function(proc, func) {
+exports.setProcCallback = function(proc, func) {
    //console.log('set ' + proc);
    currentproc = proc;
    proc.fiber = new Fiber(func);
