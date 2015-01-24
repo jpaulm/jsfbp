@@ -2,12 +2,29 @@ var Fiber = require('fibers');
 
 // --- classes and functions ---
 
-function IP(contents) {
+// http://stackoverflow.com/questions/7694501/class-static-method-in-javascript
+
+IP = function(contents) {
     this.owner = null;
-    this.contents = contents;    
+    this.contents = contents;       
 }
 
-exports.IP = IP;
+IP.create = function(x) {
+      var ip = new IP(x);
+      var proc = currentproc;
+      proc.ownedIPs++;
+      ip.owner = proc;
+      return ip;
+    } 
+    
+IP.drop = function(ip) {
+      var proc = currentproc;
+      proc.ownedIPs--;
+      ip.owner = null;
+    } 
+ 
+exports.IP = IP;   
+
 
 exports.Process = function (name, func) {
   this.name = name;  
@@ -43,6 +60,132 @@ exports.Connection = function (size){
     this.array[i] = null;
 }
 
+InputPort = function (){
+  this.name = null;
+  this.conn = null;   
+  this.closed = false;  
+}
+
+InputPort.openInputPort = function(name) {
+   var proc = currentproc;
+   for (var i = 0; i < proc.inports.length; i++) {
+     //console.log(proc.inports[i]);
+     if (proc.inports[i][0] == name)
+         return proc.inports[i][1];  // return inputport
+  } 
+  console.log('Port ' + proc.name + '.' + name + ' not found');
+  return null;
+}
+
+InputPort.prototype.receive = function(){
+      var proc = currentproc;
+      var conn = this.conn;
+                  
+      if (conn.constructor == String)  {
+        if (tracing)
+          console.log(proc.name + ' recv IIP from port ' + this.name + ': ' + conn);
+        //var ip = new exports.IP(conn + '');
+        var ip = exports.IP.create(conn + '');
+        //ip.owner = proc;
+       // proc.ownedIPs++;
+        return ip;
+        }
+        
+      if (tracing)
+        console.log(proc.name + ' recv from ' + this.name);
+            
+      while (true) {             
+        if (conn.usedslots == 0){
+          if (conn.closed)  {
+            if (tracing)
+              console.log(proc.name + ' recv EOS from ' + this.name );
+            return null; 
+            } 
+          proc.status = 'R';
+          proc.yielded = true; 
+          Fiber.yield();
+          proc.status = 'A';    
+          proc.yielded = false;     
+        }
+        else
+          break;
+      }
+      if (conn.usedslots == conn.array.length) 
+        for (var i = 0; i < conn.up.length; i ++) { 
+          if (conn.up[i].status == 'S')
+             queue.push(conn.up[i]); 
+        }
+                
+      var ip = conn.array[conn.nxtget];
+      conn.array[conn.nxtget] = null;
+      conn.nxtget ++;
+      if (conn.nxtget > conn.array.length - 1)
+        conn.nxtget = 0;    
+      if (tracing)
+        console.log(proc.name + ' recv OK'); 
+      conn.usedslots--;
+      ip.owner = proc; 
+      proc.ownedIPs++; 
+      return ip; 
+}
+
+exports.InputPort = InputPort;
+
+OutputPort = function (){
+  this.name = null;
+  this.conn = null;   
+  this.closed = false;  
+}
+
+OutputPort.openOutputPort = function(name) {
+   var proc = currentproc;
+   for (var i = 0; i < proc.outports.length; i++) {
+     //console.log(proc.inports[i]);
+     if (proc.outports[i][0] == name)
+         return proc.outports[i][1];  // return conn
+  } 
+  console.log('Port ' + proc.name + '.' + name + ' not found');
+  return null;
+}
+
+
+OutputPort.prototype.send = function(ip){
+   var proc = currentproc;
+      var conn = this.conn;
+           
+      if (tracing)
+        console.log(proc.name + ' send to ' + this.name);
+      if (ip.owner != proc) {
+        console.log('IP not owned by this Process: ' + ip.contents); 
+        return;
+        }  
+      while (true) {         
+        if (conn.usedslots == 0) {
+          if (conn.down.status == 'R' || conn.down.status == 'N' || conn.down.status == 'A')
+            queue.push(conn.down);
+        }  
+          //queue[conn.down.name] = queue.conn;
+        if (conn.usedslots == conn.array.length)  { 
+          proc.status = 'S';
+          proc.yielded = true;
+          Fiber.yield(0); 
+          proc.status = 'A'; 
+          proc.yielded = false;         
+          }
+        else   
+          break; 
+      }        
+      conn.array[conn.nxtput] = ip; 
+      conn.nxtput ++;
+      if (conn.nxtput > conn.array.length - 1)
+        conn.nxtput = 0;
+      conn.usedslots++;
+      proc.ownedIPs--;
+      if (tracing)
+        console.log(proc.name + ' send OK');  
+}
+
+exports.OutputPort = OutputPort;
 
 var list = [];
 var queue = [];
@@ -51,6 +194,7 @@ var tracing = false;
 var currentproc;
 var count; 
 
+/*
 exports.create = function(contents) {   
    var proc = currentproc;
    if (tracing) {      
@@ -72,6 +216,7 @@ exports.drop = function(ip) {
    else 
       proc.ownedIPs--;
 }
+ 
 
 exports.send = function(name, ip){           
       var proc = currentproc;
@@ -116,9 +261,10 @@ exports.receive = function(name){
       if (conn.constructor == String)  {
         if (tracing)
           console.log(proc.name + ' recv IIP from port ' + name + ': ' + conn);
-        var ip = new IP(conn + '');
-        ip.owner = proc;
-        proc.ownedIPs++;
+        //var ip = new exports.IP(conn + '');
+        var ip = exports.IP.create(conn + '');
+        //ip.owner = proc;
+       // proc.ownedIPs++;
         return ip;
         }
         
@@ -160,7 +306,7 @@ exports.receive = function(name){
       return ip; 
 }
 
-
+*/
 
 //exports.close = function() {
    function close(proc){
@@ -173,7 +319,7 @@ exports.receive = function(name){
    count--;
    for (var i = 0; i < proc.outports.length; i++) {
       
-      var conn = proc.outports[i][1];
+      var conn = proc.outports[i][1].conn;
       if (conn.usedslots == 0 && ( 
           conn.down.status == 'R' || conn.down.status == 'N' || conn.down.status == 'A'))
             queue.push(conn.down); 
@@ -185,7 +331,7 @@ exports.receive = function(name){
    }   
        
    for (var i = 0; i < proc.inports.length; i++) {
-      var conn = proc.inports[i][1];
+      var conn = proc.inports[i][1].conn;
       if (conn.constructor == String)
          continue;
       for (var j = 0; j < conn.up.length; j++) { 
@@ -247,6 +393,8 @@ exports.inArrayLength = function(name) {   // name up to and excluding left squa
      return null;  
    return hi_index + 1;
 }
+
+/*
 function getInport(proc, name) {
   //var proc = currentproc;;
   //console.log(proc);
@@ -259,7 +407,7 @@ function getInport(proc, name) {
   console.log('Port ' + proc.name + '.' + name + ' not found');
   return null;
 }
-
+ 
 function getOutport(proc, name) {
   //var proc = currentproc;
   for (var i = 0; i < proc.outports.length; i++) {
@@ -269,38 +417,55 @@ function getOutport(proc, name) {
   console.log('Port ' + proc.name + '.' + name + ' not found');
   return null;
 }
-
+*/
 exports.initialize = function(proc, port, string) {
-   proc.inports[proc.inports.length] = [port, string];
+   var inport = new exports.InputPort();  
+   inport.name = proc.name + "." + port; 
+   inport.conn = string;
+   proc.inports[proc.inports.length] = [port, inport];
 }
 
 exports.connect = function(upproc, upport, downproc, downport, capacity) {
-   var cnxtf = null;
-   var cnxt = null;
+   
+   var outport = null;
    for (var i = 0; i < upproc.outports.length; i++) {
-      cnxt = upproc.outports[i][1];
-      if (cnxt.name == upproc.name + "." + upport) {
-         console.log('Cannot connect one output port to multiple input ports');
+      outport = upproc.outports[i][1];
+      if (outport.name == upproc.name + "." + upport) {
+         console.log('Cannot connect one output port (' + outport.name + ') to multiple input ports');
          return;
       }
    }
+   
+   outport = new exports.OutputPort();  
+   outport.name = upproc.name + "." + upport; 
+     
+   var inportf = null;
+   var inport = null;
    for (var i = 0; i < downproc.inports.length; i++) {
-      cnxt = downproc.inports[i][1];
-      if (cnxt.name == downproc.name + "." + downport) {
-         cnxtf = cnxt;
+      inport = downproc.inports[i][1];
+      if (inport.name == downproc.name + "." + downport) {
+         inportf = inport;
          break;
       }
    }
-   if (cnxtf == null) {
-     cnxt = new exports.Connection(capacity);  
-     cnxt.name=downproc.name + "." + downport; 
+   if (inportf == null) {
+     inport = new exports.InputPort();  
+     inport.name = downproc.name + "." + downport; 
+     
+     var cnxt = new exports.Connection(capacity);  
+     cnxt.name = downproc.name + "." + downport; 
+     inport.conn = cnxt;
+     
    }
-   else {
-     cnxt = cnxtf;
-     //console.log('Connection found');
+   else { 
+     inport = inportf;
+     cnxt = inport.conn;
      }
-   upproc.outports[upproc.outports.length] = [upport, cnxt];   
-   downproc.inports[downproc.inports.length] = [downport, cnxt]; 
+   
+   outport.conn = cnxt;    
+      
+   upproc.outports[upproc.outports.length] = [upport, outport];   
+   downproc.inports[downproc.inports.length] = [downport, inport]; 
    cnxt.up[cnxt.up.length] = upproc;   
    cnxt.down = downproc;
    cnxt.upstreamProcsUnclosed++;
@@ -326,13 +491,13 @@ console.log('Start time: ' + d.toISOString());
 tracing = trace;
 
 count = list.length;
-//console.log(count);
+//console.log(list);
 for (var i = 0; i < list.length; i++) {  
    //list[i].fiber = new Fiber(list[i].func);
    var selfstarting = true;      
    for (var j = 0; j < list[i].inports.length; j++) {  
       var k = list[i].inports[j];   
-      if (k[1].constructor != String)
+      if (k[1].conn.constructor != String)
          selfstarting = false;
    } 
    //console.log(selfstarting);
@@ -374,7 +539,7 @@ console.log('Elapsed time in secs: ' + et.toFixed(3));
 
 function sleep(ms) {
   var fiber = Fiber.current;
-  console.log('sleep');
+  //console.log('sleep');
   setTimeout(function() {
       fiber.run();
   }, ms);
