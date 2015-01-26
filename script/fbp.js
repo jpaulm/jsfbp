@@ -191,18 +191,15 @@ OutputPort.prototype.send = function(ip){
 exports.OutputPort = OutputPort;
 
 
-OutputPortArray = function (){  
-  name = null;
-  array = [];
+OutputPortArray = function (){    
 }
 
 OutputPortArray.openOutputPortArray = function(name) {
    var proc = currentproc;
    var namey = proc.name + '.' + name;
    var hi_index = -1;  
-   var opa = new OutputPortArray; 
-   opa.array = new Array();
-   opa.name = namey;
+   var array = new Array();
+   //opa.name = namey;
    var re = new RegExp(namey + '\\[(\\d+)\\]');  
    //console.log(proc.outports);
    for (var i = 0; i < proc.outports.length; i++) {   
@@ -210,7 +207,7 @@ OutputPortArray.openOutputPortArray = function(name) {
      //console.log(namex[1]);   
      if (namex != null && namex.index == 0) {
         hi_index = Math.max(hi_index, namex[1]);
-        opa.array[namex[1]] = proc.outports[i][1];
+        array[namex[1]] = proc.outports[i][1];
      }     
    }
    if (hi_index == -1){
@@ -218,7 +215,7 @@ OutputPortArray.openOutputPortArray = function(name) {
      return null; 
    }
    //console.log(opa); 
-   return opa;
+   return array;
  
 }
 
@@ -300,49 +297,8 @@ exports.inArrayLength = function(name) {   // name up to and excluding left squa
      return null;  
    return hi_index + 1;
 }
-/* 
- exports.outArrayLength = function(name) {   // name up to and excluding left square bracket
-   var hi_index = -1;
-   var proc = currentproc;
-   var re = new RegExp(name + '\\[(\\d+)\\]');
-   console.log(proc.outports);
-   for (var i = 0; i < proc.outports.length; i++) {   
-     var array = re.exec(proc.outports[i][0]); 
-     console.log(array);
-     if (array  != null && array.index == 0) {
-        hi_index = Math.max(hi_index, array[1]);
-     }
-     
-  }
-   if (hi_index == -1)
-     return null;  
-   return hi_index + 1;
-}
 
  
-function getInport(proc, name) {
-  //var proc = currentproc;;
-  //console.log(proc);
-  
-  for (var i = 0; i < proc.inports.length; i++) {
-     //console.log(proc.inports[i]);
-     if (proc.inports[i][0] == name)
-         return proc.inports[i][1];  // return conn
-  } 
-  console.log('Port ' + proc.name + '.' + name + ' not found');
-  return null;
-}
- 
-function getOutport(proc, name) {
-  //var proc = currentproc;
-  for (var i = 0; i < proc.outports.length; i++) {
-     if (proc.outports[i][0] == name)
-         return proc.outports[i][1];
-  } 
-  console.log('Port ' + proc.name + '.' + name + ' not found');
-  return null;
-}
-*/
 exports.initialize = function(proc, port, string) {
    var inport = new exports.InputPort();  
    inport.name = proc.name + "." + port; 

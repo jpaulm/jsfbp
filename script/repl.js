@@ -1,10 +1,8 @@
 var fbp = require('./fbp.js');
 
 exports.repl = function () {
-    var inport = InputPort.openInputPort('IN'); 
-    //var count = fbp.outArrayLength('OUT');
-    var opa = OutputPortArray.openOutputPortArray('OUT');
-    var array = opa.array;
+    var inport = InputPort.openInputPort('IN');     
+    var array = OutputPortArray.openOutputPortArray('OUT');    
     
     while (true) {      
       var ip = inport.receive();         
