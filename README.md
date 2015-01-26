@@ -19,6 +19,8 @@ Test cases so far:
 - `fbptest3` - `Sender` and `Reader` both feeding into `Copier.IN`
 - `fbptest4` - `Sender` feeding `Repl` which sends 3 copies of input IP (as specified in network), each copy going to a separate element of array port `OUT`; all 3 copies then feeding into `Recvr.IN`
 - `fbptest5` - Two copies of `Reader` running concurrently
+- `fbptest6` - The output streams of the `Repl` (in `fbptest4`) are fed to an input array port
+- `fbptest7` - Creates a deadlock condition - the status of each process is displayed 
 
 Install & Run
 ---
