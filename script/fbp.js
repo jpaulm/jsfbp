@@ -132,6 +132,34 @@ InputPort.prototype.receive = function(){
 
 exports.InputPort = InputPort;
 
+InputPortArray = function (){    
+}
+
+InputPortArray.openInputPortArray = function(name) {
+   var proc = currentproc;
+   var namey = proc.name + '.' + name;
+   var hi_index = -1;  
+   var array = new Array();
+   
+   var re = new RegExp(namey + '\\[(\\d+)\\]');  
+   
+   for (var i = 0; i < proc.inports.length; i++) {   
+     var namex = re.exec(proc.inports[i][0]);   
+     
+     if (namex != null && namex.index == 0) {
+        hi_index = Math.max(hi_index, namex[1]);
+        array[namex[1]] = proc.inports[i][1];
+     }     
+   }
+   if (hi_index == -1){
+   console.log('Port ' + proc.name + '.' + name + ' not found');
+     return null; 
+   }
+  
+   return array; 
+}
+
+
 OutputPort = function (){
   this.name = null;
   this.conn = null;   
@@ -149,7 +177,6 @@ OutputPort.openOutputPort = function(name) {
   console.log('Port ' + proc.name + '.' + name + ' not found');
   return null;
 }
-
 
 OutputPort.prototype.send = function(ip){
       var proc = currentproc;
@@ -199,12 +226,12 @@ OutputPortArray.openOutputPortArray = function(name) {
    var namey = proc.name + '.' + name;
    var hi_index = -1;  
    var array = new Array();
-   //opa.name = namey;
+   
    var re = new RegExp(namey + '\\[(\\d+)\\]');  
-   //console.log(proc.outports);
+   
    for (var i = 0; i < proc.outports.length; i++) {   
      var namex = re.exec(proc.outports[i][0]);   
-     //console.log(namex[1]);   
+     
      if (namex != null && namex.index == 0) {
         hi_index = Math.max(hi_index, namex[1]);
         array[namex[1]] = proc.outports[i][1];
@@ -214,24 +241,18 @@ OutputPortArray.openOutputPortArray = function(name) {
    console.log('Port ' + proc.name + '.' + name + ' not found');
      return null; 
    }
-   //console.log(opa); 
-   return array;
- 
+   
+   return array; 
 }
 
-exports.OutputPort = OutputPort;
-
-
-var list = [];
-var queue = [];
+var list = [];   // list of processes
+var queue = [];  // list of processes ready to continue
 
 var tracing = false;
 var currentproc;
 var count; 
 
-
-//exports.close = function() {
-   function close(proc){
+function close(proc){
    //var proc = currentproc;
    if (tracing)
       console.log(proc.name + ' closing');
@@ -281,21 +302,6 @@ exports.setProcCallback = function(proc, func) {
 
 exports.setCallbackPending = function(b) {
    currentproc.cbpending = b;
-}
-
-exports.inArrayLength = function(name) {   // name up to and excluding left square bracket
-   var hi_index = -1;
-   var proc = currentproc;
-   var re = new RegExp(name + '\\[(\\d+)\\]');
-   for (var i = 0; i < proc.inports.length; i++) {   
-     var array = re.exec(proc.inports[i][0]); 
-     if (array  != null && array.index == 0) {
-        hi_index = Math.max(hi_index, array[1]);
-     }
-     
-  }if (hi_index == -1)
-     return null;  
-   return hi_index + 1;
 }
 
  
@@ -363,25 +369,24 @@ exports.run = run;
 
 function run2(trace) { 
 
-//console.log('Run');
-//console.log(list);
+
 var d = new Date();
 var st = d.getTime(); 
 console.log('Start time: ' + d.toISOString());
-//console.log(module.exports);
+
 tracing = trace;
 
 count = list.length;
 //console.log(list);
 for (var i = 0; i < list.length; i++) {  
-   //list[i].fiber = new Fiber(list[i].func);
+   
    var selfstarting = true;      
    for (var j = 0; j < list[i].inports.length; j++) {  
       var k = list[i].inports[j];   
       if (k[1].conn.constructor != String)
          selfstarting = false;
    } 
-   //console.log(selfstarting);
+   
    if (selfstarting)  
       queue.push(list[i]);
 }
@@ -395,19 +400,33 @@ while (true) {
       x.fiber = new Fiber(x.func);
       x.status = 'A';
     } 
-    //console.log(x.name);  
+      
     if (x.status != 'C') {     
-      //console.log('Run ' + x.name);    
+      
       x.fiber.run();   
       if (!x.yielded && !x.cbpending) 
          close(x);          
     }
     x = queue.shift();
   } 
-  //console.log(count);
+  
   if (count <= 0)
     break;
-  sleep(50);
+  var deadlock = true;  
+  for (var i = 0; i < list.length; i++) {
+    if (list[i].cbpending) {
+      deadlock = false; 
+      break;      
+      }
+  }  
+  if (deadlock) {
+     console.log('Deadlock detected');
+     for (var i = 0; i < list.length; i++) {
+       console.log('- Process status: ' + list[i].status + ' - ' + list[i].name);  
+     }
+     return;
+  }
+  sleep(100);   // 100 ms
 } 
 
 
@@ -420,7 +439,7 @@ console.log('Elapsed time in secs: ' + et.toFixed(3));
 
 function sleep(ms) {
   var fiber = Fiber.current;
-  //console.log('sleep');
+   //console.log('sleep');
   setTimeout(function() {
       fiber.run();
   }, ms);
