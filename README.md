@@ -17,7 +17,7 @@ Test cases so far:
 
 - `fbptest2` - `Sender` replaced with `Reader`
 - `fbptest3` - `Sender` and `Reader` both feeding into `Copier.IN`
-- `fbptest4` - `Sender` feeding `Repl` which sends 3 copies of input IP (as specified in network), each copy going to a separate element of array port; all 3 copies then feeding into `Recvr.IN`
+- `fbptest4` - `Sender` feeding `Repl` which sends 3 copies of input IP (as specified in network), each copy going to a separate element of array port `OUT`; all 3 copies then feeding into `Recvr.IN`
 - `fbptest5` - Two copies of `Reader` running concurrently
 
 Install & Run
