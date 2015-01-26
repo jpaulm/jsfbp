@@ -21,6 +21,17 @@ Test cases so far:
 - `fbptest5` - Two copies of `Reader` running concurrently
 - `fbptest6` - The output streams of the `Repl` (in `fbptest4`) are fed to an input array port
 - `fbptest7` - Creates a deadlock condition - the status of each process is displayed 
+ 
+Components
+---
+
+- `concat`  - concatenates all the streams that are sent to its array input port (size determined in network definition) 
+- `copier`  - copies its input stream to its output stream
+- `reader`  - does an asynchronous read on the file specified by its FILE IIP 
+- `recvr`   - receives its incoming stream and displays the contents on the console 
+- `repl`    - replicates the incoming IPs to the streams specified by an array output port (it does not handle tree structures)
+- `rrmerge` - "round robin" merge 
+- `sender`  - sends as many IPs to its output port as are specified by its COUNT IIP (each just contains the current count)
 
 Install & Run
 ---
