@@ -68,9 +68,10 @@ InputPort = function (){
 
 InputPort.openInputPort = function(name) {
    var proc = currentproc;
-   for (var i = 0; i < proc.inports.length; i++) {
-     //console.log(proc.inports[i]);
-     if (proc.inports[i][0] == name)
+   var namex = proc.name + '.' + name;   
+   //console.log(proc.inports);
+   for (var i = 0; i < proc.inports.length; i++) {     
+     if (proc.inports[i][0] == namex)
          return proc.inports[i][1];  // return inputport
   } 
   console.log('Port ' + proc.name + '.' + name + ' not found');
@@ -122,7 +123,7 @@ InputPort.prototype.receive = function(){
       if (conn.nxtget > conn.array.length - 1)
         conn.nxtget = 0;    
       if (tracing)
-        console.log(proc.name + ' recv OK'); 
+        console.log(proc.name + ' recv OK: ' + ip.contents); 
       conn.usedslots--;
       ip.owner = proc; 
       proc.ownedIPs++; 
@@ -139,9 +140,10 @@ OutputPort = function (){
 
 OutputPort.openOutputPort = function(name) {
    var proc = currentproc;
+   var namex = proc.name + '.' + name;
    for (var i = 0; i < proc.outports.length; i++) {
      //console.log(proc.inports[i]);
-     if (proc.outports[i][0] == name)
+     if (proc.outports[i][0] == namex)
          return proc.outports[i][1];  // return conn
   } 
   console.log('Port ' + proc.name + '.' + name + ' not found');
@@ -150,11 +152,11 @@ OutputPort.openOutputPort = function(name) {
 
 
 OutputPort.prototype.send = function(ip){
-   var proc = currentproc;
-      var conn = this.conn;
-           
+      var proc = currentproc;
+      var conn = this.conn;         
+          
       if (tracing)
-        console.log(proc.name + ' send to ' + this.name);
+        console.log(proc.name + ' send to ' + this.name + ': ' + ip.contents);
       if (ip.owner != proc) {
         console.log('IP not owned by this Process: ' + ip.contents); 
         return;
@@ -183,9 +185,45 @@ OutputPort.prototype.send = function(ip){
       proc.ownedIPs--;
       if (tracing)
         console.log(proc.name + ' send OK');  
+       
 }
 
 exports.OutputPort = OutputPort;
+
+
+OutputPortArray = function (){  
+  name = null;
+  array = [];
+}
+
+OutputPortArray.openOutputPortArray = function(name) {
+   var proc = currentproc;
+   var namey = proc.name + '.' + name;
+   var hi_index = -1;  
+   var opa = new OutputPortArray; 
+   opa.array = new Array();
+   opa.name = namey;
+   var re = new RegExp(namey + '\\[(\\d+)\\]');  
+   //console.log(proc.outports);
+   for (var i = 0; i < proc.outports.length; i++) {   
+     var namex = re.exec(proc.outports[i][0]);   
+     //console.log(namex[1]);   
+     if (namex != null && namex.index == 0) {
+        hi_index = Math.max(hi_index, namex[1]);
+        opa.array[namex[1]] = proc.outports[i][1];
+     }     
+   }
+   if (hi_index == -1){
+   console.log('Port ' + proc.name + '.' + name + ' not found');
+     return null; 
+   }
+   //console.log(opa); 
+   return opa;
+ 
+}
+
+exports.OutputPort = OutputPort;
+
 
 var list = [];
 var queue = [];
@@ -194,119 +232,6 @@ var tracing = false;
 var currentproc;
 var count; 
 
-/*
-exports.create = function(contents) {   
-   var proc = currentproc;
-   if (tracing) {      
-      console.log(proc.name + ' create IP');
-      }
-   var ip = new exports.IP(contents); 
-   ip.owner = proc; 
-   proc.ownedIPs++; 
-   return ip; 
-}
-
-exports.drop = function(ip) {
-   var proc = currentproc;
-   if (tracing) {      
-      console.log(proc.name + ' drop IP'); 
-      }
-   if (ip.owner != proc)
-      console.log('IP not owned by this Process: ' + ip.contents);  
-   else 
-      proc.ownedIPs--;
-}
- 
-
-exports.send = function(name, ip){           
-      var proc = currentproc;
-      var conn = getOutport(proc, name);
-           
-      if (tracing)
-        console.log(proc.name + ' send to ' + name);
-      if (ip.owner != proc) {
-        console.log('IP not owned by this Process: ' + ip.contents); 
-        return;
-        }  
-      while (true) {         
-        if (conn.usedslots == 0) {
-          if (conn.down.status == 'R' || conn.down.status == 'N' || conn.down.status == 'A')
-            queue.push(conn.down);
-        }  
-          //queue[conn.down.name] = queue.conn;
-        if (conn.usedslots == conn.array.length)  { 
-          proc.status = 'S';
-          proc.yielded = true;
-          Fiber.yield(0); 
-          proc.status = 'A'; 
-          proc.yielded = false;         
-          }
-        else   
-          break; 
-      }        
-      conn.array[conn.nxtput] = ip; 
-      conn.nxtput ++;
-      if (conn.nxtput > conn.array.length - 1)
-        conn.nxtput = 0;
-      conn.usedslots++;
-      proc.ownedIPs--;
-      if (tracing)
-        console.log(proc.name + ' send OK');  
-}
-
-exports.receive = function(name){
-      var proc = currentproc;
-      var conn = getInport(proc, name);
-                  
-      if (conn.constructor == String)  {
-        if (tracing)
-          console.log(proc.name + ' recv IIP from port ' + name + ': ' + conn);
-        //var ip = new exports.IP(conn + '');
-        var ip = exports.IP.create(conn + '');
-        //ip.owner = proc;
-       // proc.ownedIPs++;
-        return ip;
-        }
-        
-      if (tracing)
-        console.log(proc.name + ' recv from ' + name);
-            
-      while (true) {             
-        if (conn.usedslots == 0){
-          if (conn.closed)  {
-            if (tracing)
-              console.log(proc.name + ' recv EOS from ' + name );
-            return null; 
-            } 
-          proc.status = 'R';
-          proc.yielded = true; 
-          Fiber.yield();
-          proc.status = 'A';    
-          proc.yielded = false;     
-        }
-        else
-          break;
-      }
-      if (conn.usedslots == conn.array.length) 
-        for (var i = 0; i < conn.up.length; i ++) { 
-          if (conn.up[i].status == 'S')
-             queue.push(conn.up[i]); 
-        }
-                
-      var ip = conn.array[conn.nxtget];
-      conn.array[conn.nxtget] = null;
-      conn.nxtget ++;
-      if (conn.nxtget > conn.array.length - 1)
-        conn.nxtget = 0;    
-      if (tracing)
-        console.log(proc.name + ' recv OK'); 
-      conn.usedslots--;
-      ip.owner = proc; 
-      proc.ownedIPs++; 
-      return ip; 
-}
-
-*/
 
 //exports.close = function() {
    function close(proc){
@@ -375,7 +300,7 @@ exports.inArrayLength = function(name) {   // name up to and excluding left squa
      return null;  
    return hi_index + 1;
 }
- 
+/* 
  exports.outArrayLength = function(name) {   // name up to and excluding left square bracket
    var hi_index = -1;
    var proc = currentproc;
@@ -394,7 +319,7 @@ exports.inArrayLength = function(name) {   // name up to and excluding left squa
    return hi_index + 1;
 }
 
-/*
+ 
 function getInport(proc, name) {
   //var proc = currentproc;;
   //console.log(proc);
@@ -422,7 +347,7 @@ exports.initialize = function(proc, port, string) {
    var inport = new exports.InputPort();  
    inport.name = proc.name + "." + port; 
    inport.conn = string;
-   proc.inports[proc.inports.length] = [port, inport];
+   proc.inports[proc.inports.length] = [proc.name + '.' + port, inport];
 }
 
 exports.connect = function(upproc, upport, downproc, downport, capacity) {
@@ -464,8 +389,8 @@ exports.connect = function(upproc, upport, downproc, downport, capacity) {
    
    outport.conn = cnxt;    
       
-   upproc.outports[upproc.outports.length] = [upport, outport];   
-   downproc.inports[downproc.inports.length] = [downport, inport]; 
+   upproc.outports[upproc.outports.length] = [upproc.name + '.' + upport, outport];   
+   downproc.inports[downproc.inports.length] = [downproc.name + '.' + downport, inport]; 
    cnxt.up[cnxt.up.length] = upproc;   
    cnxt.down = downproc;
    cnxt.upstreamProcsUnclosed++;
