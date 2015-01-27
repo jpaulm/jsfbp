@@ -6,6 +6,9 @@ var Fiber = require('fibers');
 
 IP = function(contents) {
     this.owner = null;
+    this.type = 0;  //Normal 
+             // 1     Open Bracket
+             // 2     Close Bracket
     this.contents = contents;       
 }
 
@@ -14,6 +17,7 @@ IP.create = function(x) {
       var proc = currentproc;
       proc.ownedIPs++;
       ip.owner = proc;
+      ip.type = 0;
       return ip;
     } 
     
