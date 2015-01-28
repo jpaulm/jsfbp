@@ -20,7 +20,8 @@ Test cases so far:
 - `fbptest4` - `Sender` feeding `Repl` which sends 3 copies of input IP (as specified in network), each copy going to a separate element of array port `OUT`; all 3 copies then feeding into `Recvr.IN`
 - `fbptest5` - Two copies of `Reader` running concurrently
 - `fbptest6` - The output streams of the `Repl` (in `fbptest4`) are fed to an input array port
-- `fbptest7` - Creates a deadlock condition - the status of each process is displayed 
+- `fbptest7` - Creates a deadlock condition - the status of each process is displayed
+- `fbptest8` - reads text, reverses it twice and outputs it
  
 Components
 ---
@@ -36,17 +37,39 @@ Components
 Install & Run
 ---
 
+Install node.js - see http://nodejs.org/download/
+
 Install node-fibers via npm: just do `npm install fibers`.
 
 Create a folder called `jsfbp` in `node/node_modules/fibers`, and download all the JavaScript files from the JSFBP `script` directory into `jsfbp`.
 
-This network can now be run by positioning at this directory, and entering `node fbptest1.js`.  If tracing is desired, change the value of the `trace` variable at the bottom of fbptest.js to `true`.
+This network can now be run by positioning at this directory, and entering `node fbptestx.js`, where `fbptestx` is any of the tests listed above.  If tracing is desired, change the value of the `trace` variable at the bottom of fbptest.js to `true`.
 
-Just added (Jan. 18, 2015) another test (`fbptest`) which replaces `sender` with a `reader` component.  The latter uses the asynchronous `fs.readFile` function.
-
-Programming issues
+Tracing
 ---
-Objects are `Process` and `Connection`; currently we don't have any Port objects (Connections are attached directly to Process instances) - this may change.
+
+Here is a sample section of the trace output for `fbptest8.js`:
+```
+Reverse2 recv from Reverse2.IN
+Reverse2 recv OK:
+ deificeps era snoitcennoc eht erehw ,gnissap egassem yb snoitcennoc denifederp
+Reverse2 send to Reverse2.OUT: predefined connections by message passing, where
+the connections are specified
+Recvr recv OK: applications as networks of "black box" processes, which exchange
+ data across
+data: applications as networks of "black box" processes, which exchange data acr
+oss
+Recvr recv from Recvr.IN
+Reverse2 send OK
+Reverse2 recv from Reverse2.IN
+Reverse2 recv OK:
+ ylsseldne detcennocer eb nac sessecorp xob kcalb esehT .sessecorp eht ot yllanr
+etxe
+Reverse2 send to Reverse2.OUT: externally to the processes. These black box proc
+esses can be reconnected endlessly
+Recvr recv OK: predefined connections by message passing, where the connections
+are specified
+```
 
 Performance
 ---
