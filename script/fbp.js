@@ -297,7 +297,7 @@ exports.getCurrentProc = function()  {
    return currentproc;
 }
 
-exports.setProcCallback = function(proc, func) {
+exports.queueProcCallback = function(proc, func) {
    //console.log('set ' + proc);
    currentproc = proc;
    proc.fiber = new Fiber(func);
