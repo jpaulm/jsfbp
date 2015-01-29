@@ -9,7 +9,8 @@ exports.sender = function () {
     //console.log(count);
     for (var i = 0; i < count; i++) {
       var ip = IP.create(i + ''); 
-      outport.send(ip);
+      if (-1 == outport.send(ip))
+         return;;
     }
     
    

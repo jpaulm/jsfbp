@@ -146,6 +146,17 @@ InputPort.prototype.receive = function(){
       return ip; 
 }
 
+InputPort.prototype.close = function(){
+      var proc = currentproc;
+      var conn = this.conn;
+      conn.closed = true;
+      console.log(proc.name + ': ' + conn.usedslots + ' IPs dropped because of close on ' + conn.name);
+      for (var i = 0; i < conn.up.length; i ++) { 
+          if (conn.up[i].status == 'S')
+             queue.push(conn.up[i]); 
+        }
+}
+
 exports.InputPort = InputPort;
 
 InputPortArray = function (){    
@@ -201,9 +212,13 @@ OutputPort.prototype.send = function(ip){
       if (tracing)
         console.log(proc.name + ' send to ' + this.name + ': ' + ip.contents);
       if (ip.owner != proc) {
-        console.log('IP not owned by this Process: ' + ip.contents); 
+        console.log(proc.name + ' IP not owned by this Process: ' + ip.contents); 
         return;
         }  
+      if (conn.closed) {
+        console.log(proc.name + ' sending to closed connection: ' + conn.name);
+        return -1;
+      }  
       while (true) {         
         if (conn.usedslots == 0) {
           if (conn.down.status == 'R' || conn.down.status == 'N' || conn.down.status == 'A')
@@ -228,6 +243,7 @@ OutputPort.prototype.send = function(ip){
       proc.ownedIPs--;
       if (tracing)
         console.log(proc.name + ' send OK');  
+      return 0;  
        
 }
 
