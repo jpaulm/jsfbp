@@ -1,24 +1,18 @@
-var Fiber = require('fibers');
-var senders = require('./sender.js');
-var readers = require('./reader.js');
-var copiers = require('./copier.js');
-var recvrs = require('./recvr.js');
+
 var fbp = require('./fbp.js');
-
-
   
 // --- define network ---
 
-var senderp = new fbp.Process('Sender', senders.sender);
-var readerp = new fbp.Process('Reader', readers.reader);
-var copierp = new fbp.Process('Copier', copiers.copier);  
-var recvrp = new fbp.Process('Recvr', recvrs.receiver);  
+var sender = fbp.defProc('./sender.js', 'sender');
+var reader = fbp.defProc('./reader.js', 'reader');
+var copier = fbp.defProc('./copier.js', 'copier');
+var recvr = fbp.defProc('./recvr.js', 'recvr');;  
 
-fbp.initialize(senderp, 'COUNT', '20');
-fbp.connect(senderp, 'OUT', copierp, 'IN', 5);
-fbp.initialize(readerp, 'FILE', './text.txt');
-fbp.connect(readerp, 'OUT', copierp, 'IN', 5);
-fbp.connect(copierp, 'OUT', recvrp, 'IN', 5);
+fbp.initialize(sender, 'COUNT', '20');
+fbp.connect(sender, 'OUT', copier, 'IN', 5);
+fbp.initialize(reader, 'FILE', './text.txt');
+fbp.connect(reader, 'OUT', copier, 'IN', 5);
+fbp.connect(copier, 'OUT', recvr, 'IN', 5);
 
 var trace = false;
 // --- run ---  

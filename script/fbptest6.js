@@ -1,25 +1,18 @@
-var Fiber = require('fibers');
-var senders = require('./sender.js');
-var repls = require('./repl.js');
-var recvrs = require('./recvr.js');
-var rrmerges = require('./rrmerge.js');
+
 var fbp = require('./fbp.js');
-
-
   
 // --- define network ---
+var sender = fbp.defProc('./sender.js', 'sender');
+var repl = fbp.defProc('./repl.js', 'repl');
+var rrmerge = fbp.defProc('./rrmerge.js', 'rrmerge');
+var recvr = fbp.defProc('./recvr.js', 'recvr');
 
-var replp = new fbp.Process('Repl', repls.repl);
-var rrmergep = new fbp.Process('RRMerge', rrmerges.rrmerge);  
-var recvrp = new fbp.Process('Recvr', recvrs.receiver);  
-var senderp = new fbp.Process('Sender', senders.sender);  
-
-fbp.initialize(senderp, 'COUNT', '20');
-fbp.connect(senderp, 'OUT', replp, 'IN', 5);
-fbp.connect(replp, 'OUT[0]', rrmergep, 'IN[0]', 5);
-fbp.connect(replp, 'OUT[1]', rrmergep, 'IN[1]', 5);
-fbp.connect(replp, 'OUT[2]', rrmergep, 'IN[2]', 5);
-fbp.connect(rrmergep, 'OUT', recvrp, 'IN', 5);
+fbp.initialize(sender, 'COUNT', '20');
+fbp.connect(sender, 'OUT', repl, 'IN', 5);
+fbp.connect(repl, 'OUT[0]', rrmerge, 'IN[0]', 5);
+fbp.connect(repl, 'OUT[1]', rrmerge, 'IN[1]', 5);
+fbp.connect(repl, 'OUT[2]', rrmerge, 'IN[2]', 5);
+fbp.connect(rrmerge, 'OUT', recvr, 'IN', 5);
 
 var trace = false;
 // --- run ---  

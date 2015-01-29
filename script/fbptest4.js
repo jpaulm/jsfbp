@@ -1,22 +1,17 @@
-var Fiber = require('fibers');
-var senders = require('./sender.js');
-var repls = require('./repl.js');
-var recvrs = require('./recvr.js');
+
 var fbp = require('./fbp.js');
-
-
   
 // --- define network ---
 
-var replp = new fbp.Process('Repl', repls.repl);
-var recvrp = new fbp.Process('Recvr', recvrs.receiver);  
-var senderp = new fbp.Process('Sender', senders.sender);  
+var sender = fbp.defProc('./sender.js', 'sender');
+var repl = fbp.defProc('./repl.js', 'repl');
+var recvr = fbp.defProc('./recvr.js', 'recvr');
 
-fbp.initialize(senderp, 'COUNT', '20');
-fbp.connect(senderp, 'OUT', replp, 'IN', 5);
-fbp.connect(replp, 'OUT[0]', recvrp, 'IN', 5);
-fbp.connect(replp, 'OUT[1]', recvrp, 'IN', 5);
-fbp.connect(replp, 'OUT[2]', recvrp, 'IN', 5);
+fbp.initialize(sender, 'COUNT', '20');
+fbp.connect(sender, 'OUT', repl, 'IN', 5);
+fbp.connect(repl, 'OUT[0]', recvr, 'IN', 5);
+fbp.connect(repl, 'OUT[1]', recvr, 'IN', 5);
+fbp.connect(repl, 'OUT[2]', recvr, 'IN', 5);
 
 var trace = false;
 // --- run ---  

@@ -1,24 +1,16 @@
-var Fiber = require('fibers');
-
-var readers = require('./reader.js');
-var reverses = require('./reverse.js');
-var recvrs = require('./recvr.js');
 var fbp = require('./fbp.js');
-
-
   
 // --- define network ---
+var reader = fbp.defProc('./reader.js', 'reader');
+var reverse = fbp.defProc('./reverse.js', 'reverse');
+var reverse2 = fbp.defProc('./reverse.js', 'reverse', 2);
+var recvr = fbp.defProc('./recvr.js', 'recvr');
 
 
-var readerp = new fbp.Process('Reader', readers.reader);
-var reversep = new fbp.Process('Reverse', reverses.reverse);  
-var reversep2 = new fbp.Process('Reverse2', reverses.reverse);
-var recvrp = new fbp.Process('Recvr', recvrs.receiver);  
-
-fbp.initialize(readerp, 'FILE', './text.txt');
-fbp.connect(readerp, 'OUT', reversep, 'IN', 5);
-fbp.connect(reversep, 'OUT', reversep2, 'IN', 5);
-fbp.connect(reversep2, 'OUT', recvrp, 'IN', 1);
+fbp.initialize(reader, 'FILE', './text.txt');
+fbp.connect(reader, 'OUT', reverse, 'IN', 5);
+fbp.connect(reverse, 'OUT', reverse2, 'IN', 5);
+fbp.connect(reverse2, 'OUT', recvr, 'IN', 1);
 
 var trace = true;
 // --- run ---  

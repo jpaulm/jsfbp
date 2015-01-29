@@ -1,6 +1,6 @@
 var fbp = require('./fbp.js');
 
-exports.receiver = function () {
+exports.recvr = function () {
 
     var inport = InputPort.openInputPort('IN'); 
     while (true) {            

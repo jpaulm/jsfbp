@@ -2,8 +2,18 @@ var Fiber = require('fibers');
 
 // --- classes and functions ---
 
-// http://stackoverflow.com/questions/7694501/class-static-method-in-javascript
+exports.defProc = function(jsname, name, suff) {
+   var capname = capitalize(name);  
+   var procname = name;
+   if (suff != undefined)
+      procname += suff; 
+   return new Process(capitalize(procname), require(jsname)[name]);               
+}
 
+function capitalize(string){
+   return string.replace( /(^|\s)([a-z])/g , function(m,p1,p2){ return p1+p2.toUpperCase(); } );
+  };
+  
 IP = function(contents) {
     this.owner = null;
     this.type = 0;  //Normal 
@@ -30,7 +40,7 @@ IP.drop = function(ip) {
 exports.IP = IP;   
 
 
-exports.Process = function (name, func) {
+Process = function (name, func) {
   this.name = name;  
   this.func = func; 
   this.fiber = null;
@@ -49,6 +59,8 @@ exports.Process = function (name, func) {
    this.cbpending = false;
    this.yielded = false;  
 }                
+
+exports.Process = Process;
 
 exports.Connection = function (size){
   this.name = null; 
