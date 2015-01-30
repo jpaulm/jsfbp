@@ -33,6 +33,35 @@ Components
 - `repl`    - replicates the incoming IPs to the streams specified by an array output port (it does not handle tree structures)
 - `rrmerge` - "round robin" merge 
 - `sender`  - sends as many IPs to its output port as are specified by its COUNT IIP (each just contains the current count)
+ 
+API
+---
+Defining network:
+- start with `var fbp = require('./fbp.js');`
+- `fbp.defProc` - define Process
+- `fbp.connect` - connect output port to input port
+- `fbp.initialize` - specify IIP and the port it is connected to
+- `var trace = true;` specify if tracing desired
+- finish with
+- `fbp.run(trace);`
+  
+Component services:
+- `var ip = IP.create(contents);` - create an IP containing `contents`
+- `IP.drop(ip);` - drop IP
+  
+- `var inport = InputPort.openInputPort('IN');` - create InputPort variable  
+- `var array = InputPortArray.openInputPortArray('IN');` - create input array port array
+- `var outport = OutputPort.openOutputPort('OUT');` - create OutputPort variable 
+- `var array = OutputPortArray.openOutputPortArray('OUT');` - create output array port array   
+  
+- `var ip = inport.receive();` - returns null if end of stream 
+- `var ip = array[i].receive();` - receive to element of port array
+- `outport.send(ip);` - returns -1 if send unable to deliver
+- `array[i].send(ip);` - send from element of port array
+- `inport.close();` - close input port (or array port element)
+  
+-  `fbp.setCallbackPending(true);` - used when doing asynchronous I/O in component
+-  `fbp.queueProcCallback(proc, function(){...});` - specify callback for completion of async I/O
 
 Install & Run
 ---
