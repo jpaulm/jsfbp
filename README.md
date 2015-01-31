@@ -22,6 +22,8 @@ Test cases so far:
 - `fbptest6` - The output streams of the `Repl` (in `fbptest4`) are fed to an input array port
 - `fbptest7` - Creates a deadlock condition - the status of each process is displayed
 - `fbptest8` - reads text, reverses it twice and outputs it
+- `fbptest9` - `Copier` in `fbptest1` is replaced with a Copier which terminates prematurely and closes its input port, bringing the network down (ungracefully!)
+- `fbptest10` -  `Copier` in `fbptest1` is replaced with a non-looping Copier
  
 Components
 ---
