@@ -25,6 +25,8 @@ Test cases so far:
 - `fbptest9` - `Copier` in `fbptest1` is replaced with a Copier which terminates prematurely and closes its input port, bringing the network down (ungracefully!)
 - `fbptest10` -  `Copier` in `fbptest1` is replaced with a non-looping Copier
  
+Some of these have tracing set on, and some have it set off.
+ 
 Components
 ---
 
@@ -43,8 +45,9 @@ Defining network:
 - `fbp.defProc` - define Process
 - `fbp.connect` - connect output port to input port
 - `fbp.initialize` - specify IIP and the port it is connected to
-- `var trace = true;` specify if tracing desired
+ 
 - finish with
+- `var trace = true;`  or `... false` if tracing not desired
 - `fbp.run(trace);`
   
 Component services:
