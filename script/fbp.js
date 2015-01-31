@@ -53,11 +53,12 @@ Process = function (name, func) {
     // 'A' active    (includes waiting on callback ...)
     // 'R' waiting to receive
     // 'S' waiting to send
+    // 'K' ready to execute 
     // 'D' dormant
     // 'C' closed  
    this.ownedIPs = 0; 
    this.cbpending = false;
-   this.yielded = false;  
+   this.yielded = false; 
 }                
 
 exports.Process = Process;
@@ -74,6 +75,11 @@ exports.Connection = function (size){
   this.upstreamProcsUnclosed = 0; 
   for (var i = 0; i < size; i++)
     this.array[i] = null;
+}
+
+InitConn = function(contents) {    
+    this.contents = contents;
+    this.closed = false;       
 }
 
 InputPort = function (){
@@ -98,13 +104,14 @@ InputPort.prototype.receive = function(){
       var proc = currentproc;
       var conn = this.conn;
                   
-      if (conn.constructor == String)  {
+      if (conn.constructor == InitConn)  {
         if (tracing)
-          console.log(proc.name + ' recv IIP from port ' + this.name + ': ' + conn);
+          console.log(proc.name + ' recv IIP from port ' + this.name + ': ' + conn.contents);
         //var ip = new exports.IP(conn + '');
-        var ip = exports.IP.create(conn + '');
-        //ip.owner = proc;
-       // proc.ownedIPs++;
+        var ip = exports.IP.create(conn.contents);
+        conn.closed = true;
+        ip.user = proc;
+        //console.log(conn);
         return ip;
         }
         
@@ -127,10 +134,12 @@ InputPort.prototype.receive = function(){
         else
           break;
       }
-      if (conn.usedslots == conn.array.length) 
+      //if (conn.usedslots == conn.array.length) 
         for (var i = 0; i < conn.up.length; i ++) { 
-          if (conn.up[i].status == 'S')
+          if (conn.up[i].status == 'S'){
+             conn.up[i].status = 'K'; 
              queue.push(conn.up[i]); 
+          }   
         }
                 
       var ip = conn.array[conn.nxtget];
@@ -220,8 +229,9 @@ OutputPort.prototype.send = function(ip){
         return -1;
       }  
       while (true) {         
-        if (conn.usedslots == 0) {
-          if (conn.down.status == 'R' || conn.down.status == 'N' || conn.down.status == 'A')
+        //if (conn.usedslots == 0) {
+          if (conn.down.status == 'R' || conn.down.status == 'N' || conn.down.status == 'D') {
+            conn.down.status = 'K'; 
             queue.push(conn.down);
         }  
           //queue[conn.down.name] = queue.conn;
@@ -284,30 +294,27 @@ var tracing = false;
 var currentproc;
 var count; 
 
-function close(proc){
-   //var proc = currentproc;
+function close(proc){   
    if (tracing)
-      console.log(proc.name + ' closing');
-   //proc.closed = true;
+      console.log(proc.name + ' closing');   
    proc.status = 'C';
    //console.log('cl' + count);
    count--;
    for (var i = 0; i < proc.outports.length; i++) {
       
       var conn = proc.outports[i][1].conn;
-      if (conn.usedslots == 0 && ( 
-          conn.down.status == 'R' || conn.down.status == 'N' || conn.down.status == 'A'))
+      if (conn.down.status == 'R' || conn.down.status == 'N' /*|| conn.down.status == 'D' */) {
+            conn.down.status = 'K';
             queue.push(conn.down); 
-    
-      conn.upstreamProcsUnclosed--; 
-      
-      if (conn.upstreamProcsUnclosed <= 0)
-        conn.closed = true;
+      }          
+      conn.upstreamProcsUnclosed--;      
+      if ((conn.upstreamProcsUnclosed) <= 0) 
+        conn.closed = true;   
    }   
        
    for (var i = 0; i < proc.inports.length; i++) {
       var conn = proc.inports[i][1].conn;
-      if (conn.constructor == String)
+      if (conn.constructor == InitConn)
          continue;
       for (var j = 0; j < conn.up.length; j++) { 
           if (conn.up[j].status == 'S')
@@ -339,8 +346,8 @@ exports.setCallbackPending = function(b) {
  
 exports.initialize = function(proc, port, string) {
    var inport = new exports.InputPort();  
-   inport.name = proc.name + "." + port; 
-   inport.conn = string;
+   inport.name = proc.name + "." + port;
+   inport.conn = new InitConn(string);    
    proc.inports[proc.inports.length] = [proc.name + '.' + port, inport];
 }
 
@@ -387,7 +394,7 @@ exports.connect = function(upproc, upport, downproc, downport, capacity) {
    downproc.inports[downproc.inports.length] = [downproc.name + '.' + downport, inport]; 
    cnxt.up[cnxt.up.length] = upproc;   
    cnxt.down = downproc;
-   cnxt.upstreamProcsUnclosed++;
+   cnxt.upstreamProcsUnclosed++;   
    //console.log(cnxt);
 }
 
@@ -398,6 +405,8 @@ Fiber(function() {
 }
 
 exports.run = run;
+
+// Fibre running scheduler
 
 function run2(trace) { 
 
@@ -415,7 +424,7 @@ for (var i = 0; i < list.length; i++) {
    var selfstarting = true;      
    for (var j = 0; j < list[i].inports.length; j++) {  
       var k = list[i].inports[j];   
-      if (k[1].conn.constructor != String)
+      if (k[1].conn.constructor != InitConn)
          selfstarting = false;
    } 
    
@@ -428,16 +437,35 @@ while (true) {
   var x = queue.shift();
   while (x != undefined){  
     currentproc = x;   
-    if (x.status == 'N') {
+    if (x.fiber == null) {
       x.fiber = new Fiber(x.func);
       x.status = 'A';
     } 
       
-    if (x.status != 'C') {     
+    if (x.status != 'C') { 
+      if (x.status == 'D' && upconnsclosed(x)) 
+         close(x);
+      else {  
       
-      x.fiber.run();   
-      if (!x.yielded && !x.cbpending) 
-         close(x);          
+        x.fiber.run();   
+        
+        if (!x.yielded && !x.cbpending) {  
+        
+          if (!upconnsclosed(x)) {
+             x.status = 'D';
+             queue.push(x);
+             for (var j = 0; j < x.inports.length; j++) {  
+                var k = x.inports[j];
+                if (k[1].conn.constructor == InitConn)
+                   k[1].conn.closed = false;                   
+             }
+          } 
+          else        
+            close(x); 
+        } 
+        //else
+        //  close(x); 
+      }      
     }
     x = queue.shift();
   } 
@@ -468,6 +496,20 @@ et -= st;
 et /= 1000;
 console.log('Elapsed time in secs: ' + et.toFixed(3)); 
 }  
+
+function upconnsclosed(proc) {  
+  
+  for (var j = 0; j < proc.inports.length; j++) {  
+      var k = proc.inports[j];
+      if (k[1].conn.constructor == InitConn)
+         continue;
+      //console.log(k[1]);
+      if (!(k[1].conn.closed) || k[1].conn.usedslots > 0)
+         return false;         
+  }
+  return true; 
+}
+
 
 function sleep(ms) {
   var fiber = Fiber.current;
