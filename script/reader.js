@@ -17,7 +17,8 @@ exports.reader = function () {
     fs.readFile(path, options, function(err, data) {
       var savedata = data;
       var saveerr = err;      
-      fbp.queueProcCallback(proc, function(){  
+      fbp.queueCallback(proc, function(){ 
+        fbp.setCurrentProc(proc); 
         fbp.setCallbackPending(false);     
         var outport = OutputPort.openOutputPort('OUT'); 
         var array = savedata.split('\n');

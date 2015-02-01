@@ -33,6 +33,10 @@ IP.create = function(x) {
     
 IP.drop = function(ip) {
       var proc = currentproc;
+      if (ip.owner != proc) {
+        console.log(proc.name + ' IP being dropped not owned by this Process: ' + ip.contents); 
+        return;
+        }  
       proc.ownedIPs--;
       ip.owner = null;
     } 
@@ -221,7 +225,7 @@ OutputPort.prototype.send = function(ip){
       if (tracing)
         console.log(proc.name + ' send to ' + this.name + ': ' + ip.contents);
       if (ip.owner != proc) {
-        console.log(proc.name + ' IP not owned by this Process: ' + ip.contents); 
+        console.log(proc.name + ' IP being sent not owned by this Process: ' + ip.contents); 
         return;
         }  
       if (conn.closed) {
@@ -287,6 +291,20 @@ OutputPortArray.openOutputPortArray = function(name) {
    return array; 
 }
 
+exports.getElementWithSmallestBacklog = function(array){
+   var number = Number.MAX_VALUE; 
+   var element = 0;
+   for (var i = 0; i < array.length; i++) {
+      if (array[i] == null || array[i] == undefined)
+         continue;
+      if (number > array[i].conn.usedslots){
+         number = array[i].conn.usedslots;
+         element = i;
+      }   
+   }
+   return element;
+}
+
 var list = [];   // list of processes
 var queue = [];  // list of processes ready to continue
 
@@ -332,9 +350,14 @@ exports.getCurrentProc = function()  {
    return currentproc;
 }
 
-exports.queueProcCallback = function(proc, func) {
-   //console.log('set ' + proc);
+exports.setCurrentProc = function(proc)  {
+   //console.log('get ' + currentproc);
    currentproc = proc;
+}
+
+exports.queueCallback = function(proc, func) {
+   //console.log('set ' + proc);
+   //currentproc = proc;
    proc.fiber = new Fiber(func);
    queue.push(proc);
 }
@@ -352,7 +375,8 @@ exports.initialize = function(proc, port, string) {
 }
 
 exports.connect = function(upproc, upport, downproc, downport, capacity) {
-   
+   if (capacity == undefined)
+     capacity = 10;
    var outport = null;
    for (var i = 0; i < upproc.outports.length; i++) {
       outport = upproc.outports[i][1];
@@ -474,7 +498,7 @@ while (true) {
     break;
   var deadlock = true;  
   for (var i = 0; i < list.length; i++) {
-    if (list[i].cbpending) {
+    if (list[i].cbpending || list[i].status == 'A') {
       deadlock = false; 
       break;      
       }
