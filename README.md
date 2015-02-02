@@ -24,19 +24,28 @@ Test cases so far:
 - `fbptest8` - reads text, reverses it twice and outputs it
 - `fbptest9` - `Copier` in `fbptest1` is replaced with a Copier which terminates prematurely and closes its input port, bringing the network down (ungracefully!)
 - `fbptest10` -  `Copier` in `fbptest1` is replaced with a non-looping Copier
+- `fbptest11` -  Load balancer (`lbal`) feeding 3 instances of a random delay component (`randdelay`)
  
-Some of these have tracing set on, and some have it set off.
+Some of these have tracing set on, depending on what testing was being done when they were promoted!
+
+These tests can be run sequentially by running `fbptests.bat`.
  
 Components
 ---
 
 - `concat`  - concatenates all the streams that are sent to its array input port (size determined in network definition) 
 - `copier`  - copies its input stream to its output stream
+- `copier_closing` - forces close of input port after 20 IPs
+- `copier_nonlooper` - same as `copier`, except that it is written as a non-looper
+- `lbal`    - load balancer - sends output to output port array element with smallest number of IPs in transit
+- `randdelay` - sends incoming IPs to output port after random number of millisecs (between 0 and 400)
 - `reader`  - does an asynchronous read on the file specified by its FILE IIP 
 - `recvr`   - receives its incoming stream and displays the contents on the console 
 - `repl`    - replicates the incoming IPs to the streams specified by an array output port (it does not handle tree structures)
+- `reverse` - reverses the string contained in each incoming IP
 - `rrmerge` - "round robin" merge 
 - `sender`  - sends as many IPs to its output port as are specified by its COUNT IIP (each just contains the current count)
+
  
 API
 ---
@@ -47,7 +56,7 @@ Defining network:
 - `fbp.initialize` - specify IIP and the port it is connected to
  
 - finish with
-- `var trace = true;`  or `... false` if tracing not desired
+- `var trace = true;`  or `... false` - specify whether tracing desired
 - `fbp.run(trace);`
   
 Component services:
@@ -66,7 +75,8 @@ Component services:
 - `inport.close();` - close input port (or array port element)
   
 -  `fbp.setCallbackPending(true);` - used when doing asynchronous I/O in component
--  `fbp.queueProcCallback(proc, function(){...});` - specify callback for completion of async I/O
+-  `fbp.queueProcCallback(proc, function(){...});` - specify callback for completion of async I/O (function may be null)
+-  `fbp.getElementWithSmallestBacklog(array);` - used by `lbal` - not for general use
 
 Install & Run
 ---
