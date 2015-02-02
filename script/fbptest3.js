@@ -10,7 +10,7 @@ var recvr = fbp.defProc('./recvr.js', 'recvr');;
 
 fbp.initialize(sender, 'COUNT', '20');
 fbp.connect(sender, 'OUT', copier, 'IN', 5);
-fbp.initialize(reader, 'FILE', './text.txt');
+fbp.initialize(reader, 'FILE', './data/text.txt');
 fbp.connect(reader, 'OUT', copier, 'IN', 5);
 fbp.connect(copier, 'OUT', recvr, 'IN', 5);
 

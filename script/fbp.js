@@ -357,8 +357,8 @@ exports.setCurrentProc = function(proc)  {
 
 exports.queueCallback = function(proc, func) {
    //console.log('set ' + proc);
-   //currentproc = proc;
-   proc.fiber = new Fiber(func);
+   if (func != null)
+      proc.fiber = new Fiber(func);
    queue.push(proc);
 }
 
@@ -493,22 +493,24 @@ while (true) {
     }
     x = queue.shift();
   } 
-  
+  //console.log(count);
   if (count <= 0)
     break;
   var deadlock = true;  
   for (var i = 0; i < list.length; i++) {
-    if (list[i].cbpending || list[i].status == 'A') {
+    if (list[i].cbpending /*|| list[i].status == 'A' */) {
       deadlock = false; 
       break;      
       }
   }  
   if (deadlock) {
      console.log('Deadlock detected');
+     console.log(list);
      for (var i = 0; i < list.length; i++) {
-       console.log('- Process status: ' + list[i].status + ' - ' + list[i].name);  
+       console.log('- Process status: ' + list[i].status + ' - ' + list[i].name);        
      }
-     return;
+     throw '';
+     //return;
   }
   sleep(100);   // 100 ms
 } 
@@ -537,7 +539,7 @@ function upconnsclosed(proc) {
 
 function sleep(ms) {
   var fiber = Fiber.current;
-   //console.log('sleep');
+  //console.log('sleep');
   setTimeout(function() {
       fiber.run();
   }, ms);
