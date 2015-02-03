@@ -25,6 +25,8 @@ IP = function(contents) {
 IP.create = function(x) {
       var ip = new IP(x);
       var proc = currentproc;
+      if (tracing)
+          console.log(proc.name + ' Create IP with: ' + x);
       proc.ownedIPs++;
       ip.owner = proc;
       ip.type = 0;
@@ -33,6 +35,8 @@ IP.create = function(x) {
     
 IP.drop = function(ip) {
       var proc = currentproc;
+      if (tracing)
+          console.log(proc.name + ' IP dropped with: ' + ip.contents);
       if (ip.owner != proc) {
         console.log(proc.name + ' IP being dropped not owned by this Process: ' + ip.contents); 
         return;
@@ -471,24 +475,28 @@ while (true) {
          close(x);
       else {  
       
-        if (tracing)
+        if (tracing) {
           if (x.yielded)  
             console.log(x.name + ' fiber resumed');
-          else 
+          else {
             if (x.cbpending)           
                console.log(x.name + ' fiber callback run');
             else   
                console.log(x.name + ' fiber started');
+            }   
+        }       
         x.fiber.run(); 
         //Fiber.yield();
-        if (tracing)
+        if (tracing) {
          if (x.yielded)  
             console.log(x.name + ' fiber yielded');
-          else 
+          else {
             if (x.cbpending)
                console.log(x.name + ' fiber awaiting callback');               
             else   
                console.log(x.name + ' fiber ended');
+          }     
+        }
         if (!x.yielded && !x.cbpending) {  
         
           if (!upconnsclosed(x)) {
@@ -551,7 +559,6 @@ function upconnsclosed(proc) {
   }
   return true; 
 }
-
 
 function sleep(ms) {
   var fiber = Fiber.current;
