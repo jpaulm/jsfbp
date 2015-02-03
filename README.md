@@ -25,6 +25,8 @@ Test cases so far:
 - `fbptest9` - `Copier` in `fbptest1` is replaced with a Copier which terminates prematurely and closes its input port, bringing the network down (ungracefully!)
 - `fbptest10` -  `Copier` in `fbptest1` is replaced with a non-looping Copier
 - `fbptest11` -  Load balancer (`lbal`) feeding 3 instances of a random delay component (`randdelay`)
+  
+![Fbptest11](https://github.com/jpaulm/jsfbp/blob/master/docs/Fbptest11.png "Diagram of fbptest11 above")
  
 Some of these have tracing set on, depending on what testing was being done when they were promoted!
 
@@ -75,7 +77,7 @@ Component services:
 - `inport.close();` - close input port (or array port element)
   
 -  `fbp.setCallbackPending(true);` - used when doing asynchronous I/O in component
--  `fbp.queueProcCallback(proc, function(){...});` - specify callback for completion of async I/O (function may be null)
+ 
 -  `fbp.getElementWithSmallestBacklog(array);` - used by `lbal` - not for general use
 
 Install & Run
