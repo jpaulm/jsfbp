@@ -1,6 +1,8 @@
+var Fiber = require('fibers');
 var fbp = require('./fbp.js');
 var fs = require('fs'); 
  
+ // Reader based on Bruno's code
 
 exports.reader = function () {   
      var proc = fbp.getCurrentProc();  
@@ -9,24 +11,29 @@ exports.reader = function () {
      var fname = ip.contents;
      IP.drop(ip);
      fbp.setCallbackPending(true); 
-     myReadFile(fname, "utf8", proc);     
+     
+     var data = myReadFile(fname, "utf8", proc);   
+     console.log('read complete: ' + proc.name);    
+     
+     fbp.setCallbackPending(false);     
+     var outport = OutputPort.openOutputPort('OUT'); 
+     var array = data.split('\n');
+     for (var i = 0; i < array.length; i++) {
+        var ip = IP.create(array[i]); 
+        outport.send(ip);           
+     }   
   }
   
   function myReadFile(path, options, proc) {
-    //console.log(proc.name + ' started reading');
+    var fiber =  Fiber.current;
+    console.log('read started: ' + proc.name);
     fs.readFile(path, options, function(err, data) {
-      var savedata = data;
-      var saveerr = err;      
-      fbp.queueCallback(proc, function(){ 
-        fbp.setCurrentProc(proc); 
-        fbp.setCallbackPending(false);     
-        var outport = OutputPort.openOutputPort('OUT'); 
-        var array = savedata.split('\n');
-        for (var i = 0; i < array.length; i++) {
-          var ip = IP.create(array[i]); 
-          outport.send(ip);           
-        } 
+      fbp.setCurrentProc(proc);
+      console.log('callback for: ' + proc.name); 
+      fiber.run(data);
        }); 
-    });
+   console.log('read pending: ' + proc.name);   
+   //console.log('yielded: ' + proc.name ); 
+   return Fiber.yield();
   }    
  

@@ -355,12 +355,12 @@ exports.setCurrentProc = function(proc)  {
    currentproc = proc;
 }
 
-exports.queueCallback = function(proc, func) {
-   //console.log('set ' + proc);
-   if (func != null)
-      proc.fiber = new Fiber(func);
-   queue.push(proc);
-}
+//exports.queueCallback = function(proc, func) {
+//   //console.log('set ' + proc);
+//   if (func != null)
+//      proc.fiber = new Fiber(func);
+//   queue.push(proc);
+//}
 
 exports.setCallbackPending = function(b) {
    currentproc.cbpending = b;
@@ -471,8 +471,24 @@ while (true) {
          close(x);
       else {  
       
-        x.fiber.run();   
-        
+        if (tracing)
+          if (x.yielded)  
+            console.log(x.name + ' fiber resumed');
+          else 
+            if (x.cbpending)           
+               console.log(x.name + ' fiber callback run');
+            else   
+               console.log(x.name + ' fiber started');
+        x.fiber.run(); 
+        //Fiber.yield();
+        if (tracing)
+         if (x.yielded)  
+            console.log(x.name + ' fiber yielded');
+          else 
+            if (x.cbpending)
+               console.log(x.name + ' fiber awaiting callback');               
+            else   
+               console.log(x.name + ' fiber ended');
         if (!x.yielded && !x.cbpending) {  
         
           if (!upconnsclosed(x)) {
@@ -505,7 +521,7 @@ while (true) {
   }  
   if (deadlock) {
      console.log('Deadlock detected');
-     console.log(list);
+     //console.log(list);
      for (var i = 0; i < list.length; i++) {
        console.log('- Process status: ' + list[i].status + ' - ' + list[i].name);        
      }

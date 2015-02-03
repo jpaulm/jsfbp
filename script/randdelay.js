@@ -6,28 +6,27 @@ exports.randdelay = function () {
     //var fiber = Fiber.current;
     var proc = fbp.getCurrentProc();
     var inport = InputPort.openInputPort('IN'); 
+    var intvlport = InputPort.openInputPort('INTVL'); 
     var outport = OutputPort.openOutputPort('OUT'); 
+    var intvl_ip = intvlport.receive();
+    var intvl = intvl_ip.contents;
+    IP.drop(intvl_ip);
     while (true) {      
       var ip = inport.receive();         
       if (ip == null)
         break;   
       fbp.setCallbackPending(true);        
-      sleep(proc, Math.random() * 400);   
-                     
+      sleep(proc, Math.random() * intvl);   
+      fbp.setCallbackPending(false);                     
       outport.send(ip);
     }       
   }
   
   function sleep(proc, ms) {     
-    //console.log('start sleep'); //var fiber = Fiber.current; 
-    var id = setTimeout(function() {
-        fbp.queueCallback(proc, null); 
-        fbp.setCurrentProc(proc); 
-        //console.log('end sleep');
-        fbp.setCallbackPending(false);      
-     //}); 
-    }, ms);
-    Fiber.yield();
+    console.log(proc.name + ' start sleep: ' + ms + ' msecs'); 
+    return setTimeout(function() {     
+       fbp.setCurrentProc(proc);            
+       }, ms);  
 }
   
  
