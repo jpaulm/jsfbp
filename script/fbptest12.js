@@ -12,7 +12,7 @@ fbp.connect(reader, 'OUT', copier, 'IN', 1);
 fbp.initialize(writer, 'FILE', './data/text_new.txt');
 fbp.connect(copier, 'OUT', writer, 'IN', 1);
 
-var trace = true;
+var trace = false;
 // --- run ---  
 fbp.run(trace);
 
