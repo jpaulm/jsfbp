@@ -492,6 +492,7 @@ while (true) {
         x.fiber.run(x.data); 
         //------------------
         
+        x.data = null;
         if (tracing) {
          console.log(x.name + ' yielded: ' + x.yielded + ', cbpending: ' + x.cbpending);  
          if (x.yielded)  
