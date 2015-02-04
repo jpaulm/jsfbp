@@ -25,9 +25,10 @@ Test cases so far:
 - `fbptest9` - `Copier` in `fbptest1` is replaced with a Copier which terminates prematurely and closes its input port, bringing the network down (ungracefully!)
 - `fbptest10` -  `Copier` in `fbptest1` is replaced with a non-looping Copier
 - `fbptest11` -  Load balancer (`lbal`) feeding 3 instances of a random delay component (`randdelay`)
-- `fbptest12` -  `Reader -> Copier -> Writer`
   
 ![Fbptest11](https://github.com/jpaulm/jsfbp/blob/master/docs/Fbptest11.png "Diagram of fbptest11 above")
+
+- `fbptest12` -  `Reader -> Copier -> Writer`
  
 Some of these have tracing set on, depending on what testing was being done when they were promoted!
 
