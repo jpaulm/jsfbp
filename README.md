@@ -77,7 +77,7 @@ Component services:
 - `inport.close();` - close input port (or array port element)
   
 -  `fbp.setCallbackPending(true);` - used when doing asynchronous I/O in component
--  `queueCallback(proc [,data]);` - queue the callback to the JSFBP future events queue
+-  `queueCallback(proc[,data]);` - queue the callback to the JSFBP future events queue
 -  `fbp.getElementWithSmallestBacklog(array);` - used by `lbal` - not for general use
 
 Install & Run
