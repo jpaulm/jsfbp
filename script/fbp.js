@@ -64,9 +64,10 @@ Process = function (name, func) {
     // 'K' ready to execute 
     // 'D' dormant
     // 'C' closed  
-   this.ownedIPs = 0; 
-   this.cbpending = false;
-   this.yielded = false; 
+  this.ownedIPs = 0; 
+  this.cbpending = false;
+  this.yielded = false; 
+  this.data = null;
 }                
 
 exports.Process = Process;
@@ -359,12 +360,13 @@ exports.setCurrentProc = function(proc)  {
    currentproc = proc;
 }
 
-//exports.queueCallback = function(proc, func) {
-//   //console.log('set ' + proc);
-//   if (func != null)
-//      proc.fiber = new Fiber(func);
-//   queue.push(proc);
-//}
+exports.queueCallback = function(proc, data) {
+   if (tracing)
+      console.log('queue ' + proc.name);
+   if (data != undefined)
+      proc.data = data;   
+   queue.push(proc);
+}
 
 exports.setCallbackPending = function(b) {
    currentproc.cbpending = b;
@@ -484,10 +486,14 @@ while (true) {
             else   
                console.log(x.name + ' fiber started');
             }   
-        }       
-        x.fiber.run(); 
-        //Fiber.yield();
+        }  
+        
+        //------------------     
+        x.fiber.run(x.data); 
+        //------------------
+        
         if (tracing) {
+         console.log(x.name + ' yielded: ' + x.yielded + ', cbpending: ' + x.cbpending);  
          if (x.yielded)  
             console.log(x.name + ' fiber yielded');
           else {
@@ -522,7 +528,7 @@ while (true) {
     break;
   var deadlock = true;  
   for (var i = 0; i < list.length; i++) {
-    if (list[i].cbpending /*|| list[i].status == 'A' */) {
+    if (list[i].cbpending || list[i].status == 'A' ) {
       deadlock = false; 
       break;      
       }
@@ -533,7 +539,7 @@ while (true) {
      for (var i = 0; i < list.length; i++) {
        console.log('- Process status: ' + list[i].status + ' - ' + list[i].name);        
      }
-     throw '';
+     throw '';   
      //return;
   }
   sleep(100);   // 100 ms

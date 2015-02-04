@@ -30,7 +30,8 @@ exports.reader = function () {
     fs.readFile(path, options, function(err, data) {
       fbp.setCurrentProc(proc);
       console.log('callback for: ' + proc.name); 
-      fiber.run(data);
+      fbp.queueCallback(proc, data);
+      // fiber.run(data);
        }); 
    console.log('read pending: ' + proc.name);   
    //console.log('yielded: ' + proc.name ); 

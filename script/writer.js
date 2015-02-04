@@ -25,12 +25,13 @@ exports.writer = function () {
   }
   
   function myWriteFile(path, data, options, proc) {
-    var fiber =  Fiber.current;
+    var fiber =  Fiber.current;   
     console.log('write started: ' + proc.name);
     fs.writeFile(path, data, options, function(err, data) {
-      fbp.setCurrentProc(proc);
-      console.log('callback for: ' + proc.name); 
-      fiber.run();
+      fbp.setCurrentProc(proc);      
+      console.log('running callback for: ' + proc.name); 
+      fbp.queueCallback(proc);
+      //fiber.run();
        }); 
     console.log('write pending: ' + proc.name);   
    //console.log('yielded: ' + proc.name ); 
