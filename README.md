@@ -27,6 +27,8 @@ Test cases so far:
 - `fbptest11` -  Load balancer (`lbal`) feeding 3 instances of a random delay component (`randdelay`)
   
 ![Fbptest11](https://github.com/jpaulm/jsfbp/blob/master/docs/Fbptest11.png "Diagram of fbptest11 above")
+
+- `fbptest12` -  `Reader -> Copier -> Writer`
  
 Some of these have tracing set on, depending on what testing was being done when they were promoted!
 
@@ -47,6 +49,7 @@ Components
 - `reverse` - reverses the string contained in each incoming IP
 - `rrmerge` - "round robin" merge 
 - `sender`  - sends as many IPs to its output port as are specified by its COUNT IIP (each just contains the current count)
+- `writer`  - does an asynchronous write to the file specified by its FILE IIP 
 
  
 API
