@@ -29,6 +29,7 @@ Test cases so far:
 ![Fbptest11](https://github.com/jpaulm/jsfbp/blob/master/docs/Fbptest11.png "Diagram of fbptest11 above")
 
 - `fbptest12` -  `Reader -> Copier -> Writer`
+- `fbptestws` -  Schematic web socket server (portion of diagram on cover of "Flow-Based Programming", 2nd ed.)
  
 Some of these have tracing set on, depending on what testing was being done when they were promoted!
 
@@ -49,7 +50,11 @@ Components
 - `reverse` - reverses the string contained in each incoming IP
 - `rrmerge` - "round robin" merge 
 - `sender`  - sends as many IPs to its output port as are specified by its COUNT IIP (each just contains the current count)
-- `writer`  - does an asynchronous write to the file specified by its FILE IIP 
+- `writer`  - does an asynchronous write to the file specified by its FILE IIP
+  
+- `wsrecv`  - general web socket "receive" component for web socket server - outputs substream 
+- `wsresp`  - general web socket "respond" component sending data from web socket server to client - takes substream as input
+- `wssimproc` - "simulated" processing for web socket server - actually just outputs 3 names
 
  
 API
@@ -66,6 +71,7 @@ Defining network:
   
 Component services:
 - `var ip = IP.create(contents);` - create an IP containing `contents`
+- `var ip = IP.createBracket(IP.OPEN|CLOSE[, contents])` - create an open or close bracket IP
 - `IP.drop(ip);` - drop IP
   
 - `var inport = InputPort.openInputPort('IN');` - create InputPort variable  
