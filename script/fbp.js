@@ -2,8 +2,7 @@ var Fiber = require('fibers');
 
 // --- classes and functions ---
 
-exports.defProc = function(jsname, name, suff) {
-   var capname = capitalize(name);  
+exports.defProc = function(jsname, name, suff) {     
    var procname = name;
    if (suff != undefined)
       procname += suff; 
@@ -15,10 +14,11 @@ function capitalize(string){
   };
   
 IP = function(contents) {
+    this.NORMAL = 0;
+    this.OPEN = 1;
+    this.CLOSE = 2;
     this.owner = null;
-    this.type = 0;  //Normal 
-             // 1     Open Bracket
-             // 2     Close Bracket
+    this.type = this.NORMAL;  
     this.contents = contents;       
 }
 
@@ -29,7 +29,21 @@ IP.create = function(x) {
           console.log(proc.name + ' Create IP with: ' + x);
       proc.ownedIPs++;
       ip.owner = proc;
-      ip.type = 0;
+      //ip.type = IP.NORMAL;
+      //console.log(ip);
+      return ip;
+    } 
+    
+IP.createBracket = function(bktType, x) {
+      if (x == undefined)
+         x = null; 
+      var ip = new IP(x);      
+      ip.type = bktType;         
+      var proc = currentproc;
+      if (tracing)
+          console.log(proc.name + ' Create bracket with ' + bktType + ', ' + x);
+      proc.ownedIPs++;
+      ip.owner = proc;     
       return ip;
     } 
     

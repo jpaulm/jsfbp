@@ -7,8 +7,8 @@ exports.recvr = function () {
       var ip = inport.receive();    
       if (ip == null)
         break; 
-      var i = ip.contents;  
-      console.log('data: ' + i); 
+      var data = ip.contents;  
+      console.log('data: ' + data); 
       IP.drop(ip);
     }
     
