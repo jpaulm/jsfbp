@@ -3,9 +3,12 @@ var fbp = require('./fbp.js');
 var WebSocketServer = require('ws').Server
 
 exports.wsrecv = function () {   
-     var proc = fbp.getCurrentProc();  
-     var wss = new WebSocketServer({ port: 9003 });  
-     var ws = null;      
+     var proc = fbp.getCurrentProc();             
+     var inport = InputPort.openInputPort('PORTNO'); 
+     var ip = inport.receive(); 
+     var portno = ip.contents;
+     var wss = new WebSocketServer({ port: portno });  
+     var ws = null;
      while (true) {    
        fbp.setCallbackPending(true);      
      
