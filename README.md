@@ -74,7 +74,7 @@ Defining network:
   
 Component services:
 - `var ip = IP.create(contents);` - create an IP containing `contents`
-- `var ip = IP.createBracket(IP.OPEN|CLOSE[, contents])` - create an open or close bracket IP
+- `var ip = IP.createBracket(IP.OPEN|IP.CLOSE[, contents])` - create an open or close bracket IP
 - `IP.drop(ip);` - drop IP
   
 - `var inport = InputPort.openInputPort('IN');` - create InputPort variable  
@@ -110,25 +110,38 @@ Tracing
 
 Here is a sample section of the trace output for `fbptest8.js`:
 ```
-Reverse2 recv from Reverse2.IN
-Reverse2 recv OK:
- deificeps era snoitcennoc eht erehw ,gnissap egassem yb snoitcennoc denifederp
-Reverse2 send to Reverse2.OUT: predefined connections by message passing, where
-the connections are specified
-Recvr recv OK: applications as networks of "black box" processes, which exchange
- data across
-data: applications as networks of "black box" processes, which exchange data acr
-oss
 Recvr recv from Recvr.IN
+Recvr yielded: true, cbpending: false
+Recvr fiber yielded
+Reverse2 fiber resumed
 Reverse2 send OK
+Reverse2 IP dropped with:
+ si PBF .yllanretni degnahc eb ot gnivah tuohtiw snoitacilppa tnereffid mrof ot
 Reverse2 recv from Reverse2.IN
-Reverse2 recv OK:
- ylsseldne detcennocer eb nac sessecorp xob kcalb esehT .sessecorp eht ot yllanr
-etxe
-Reverse2 send to Reverse2.OUT: externally to the processes. These black box proc
-esses can be reconnected endlessly
-Recvr recv OK: predefined connections by message passing, where the connections
-are specified
+Reverse2 recv OK: .detneiro-tnenopmoc yllarutan suht
+Reverse2 Create IP with: thus naturally component-oriented.
+Reverse2 send to Reverse2.OUT: thus naturally component-oriented.
+Reverse2 yielded: true, cbpending: false
+Reverse2 fiber yielded
+Recvr fiber resumed
+Recvr recv OK: to form different applications without having to be changed inter
+nally. FBP is
+data: to form different applications without having to be changed internally. FB
+P is
+Recvr IP dropped with: to form different applications without having to be chang
+ed internally. FBP is
+Recvr recv from Recvr.IN
+Recvr yielded: true, cbpending: false
+Recvr fiber yielded
+Reverse2 fiber resumed
+Reverse2 send OK
+Reverse2 IP dropped with: .detneiro-tnenopmoc yllarutan suht
+Reverse2 recv from Reverse2.IN
+Reverse2 recv EOS from Reverse2.IN
+Reverse2 yielded: false, cbpending: false
+Reverse2 fiber ended
+Reverse2 closing
+Reverse2 closed
 ```
 
 Performance
