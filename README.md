@@ -29,11 +29,14 @@ Test cases so far:
 ![Fbptest11](https://github.com/jpaulm/jsfbp/blob/master/docs/Fbptest11.png "Diagram of fbptest11 above")
 
 - `fbptest12` -  `Reader -> Copier -> Writer`
-- `fbptestws` -  Schematic web socket server (portion of diagram on cover of "Flow-Based Programming", 2nd ed.)
+  
+- `fbptestws` -  Schematic web socket server (simple processing component shown would normally be more complex)
+ 
+![Fbptestws](https://github.com/jpaulm/jsfbp/blob/master/docs/Fbptestws.png "Diagram of fbptestws above")
  
 Some of these have tracing set on, depending on what testing was being done when they were promoted!
 
-These tests can be run sequentially by running `fbptests.bat`.
+These tests (except for `fbptestws`) can be run sequentially by running `fbptests.bat`.
  
 Components
 ---
