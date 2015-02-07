@@ -103,7 +103,7 @@ Create a folder called `jsfbp` in `node/node_modules/fibers`, and download all t
 
 This network can now be run by positioning at this directory, and entering `node fbptestx.js`, where `fbptestx` is any of the tests listed above.  If tracing is desired, change the value of the `trace` variable at the bottom of fbptest.js to `true`.
 
-`chat1.html` is intended as a simple client for testing with the prototype web sockets server network `fbptestws.js`.
+`chat1.html` is intended as a simple client for testing with the prototype web sockets server network `fbptestws.js`. By the way, if Firefox doesn't work for you, Chrome will work.
 
 Tracing
 ---
