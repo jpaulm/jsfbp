@@ -1,7 +1,9 @@
 jsfbp
 =====
 
-Basic FBP implementation written in JavaScript, using Node-Fibers - https://github.com/laverdet/node-fibers .
+"Classical" FBP implementation written in JavaScript, using Node-Fibers - https://github.com/laverdet/node-fibers .  
+
+JSFBP takes advantage of JavaScript's concept of functions as first-degree objects to allow applications to be built using "green threads".  In addition to JavaScript's event queue, JSFBP makes use of a "Future Events Queue" which supports the green threads, and provides quite good performance (see below).
 
 General
 ---
@@ -9,28 +11,28 @@ General
 Test cases so far:
 
 - `fbptest1` - 3 processes:
-    - `Sender`
-    - `Copier`
-    - `Recvr`
+    - `sender` (generates ascending numeric values)
+    - `copier` (copies)
+    - `recvr`  (displays incoming values to console)
 
 ![JSFBP](https://github.com/jpaulm/jsfbp/blob/master/docs/JSFBP.png "Simple Test Network")
 
-- `fbptest2` - `Sender` replaced with `Reader`
-- `fbptest3` - `Sender` and `Reader` both feeding into `Copier.IN`
-- `fbptest4` - `Sender` feeding `Repl` which sends 3 copies of input IP (as specified in network), each copy going to a separate element of array port `OUT`; all 3 copies then feeding into `Recvr.IN`
-- `fbptest5` - Two copies of `Reader` running concurrently
-- `fbptest6` - The output streams of the `Repl` (in `fbptest4`) are fed to an input array port
-- `fbptest7` - Creates a deadlock condition - the status of each process is displayed
+- `fbptest2` - `sender` replaced with `reader`
+- `fbptest3` - `sender` and `reader` both feeding into `copier.IN`
+- `fbptest4` - `sender` feeding `repl` which sends 3 copies of input IP (as specified in network), each copy going to a separate element of array port `OUT`; all 3 copies then feeding into `recvr.IN`
+- `fbptest5` - Two copies of `reader` running concurrently, one feeds direct to `rrmerge` input port element 0; other one into `copier` and then into `rrmerge` input port element 1; from `rrmerge.OUT` to `recvr.IN` 
+- `fbptest6` - The output streams of the `repl` (in `fbptest4`) are fed to an input array port
+- `fbptest7` - Creates a deadlock condition - the status of each Process is displayed
 - `fbptest8` - reads text, reverses it twice and outputs it
-- `fbptest9` - `Copier` in `fbptest1` is replaced with a Copier which terminates prematurely and closes its input port, bringing the network down (ungracefully!)
-- `fbptest10` -  `Copier` in `fbptest1` is replaced with a non-looping Copier
+- `fbptest9` - `copier` in `fbptest1` is replaced with a version of `copier` which terminates prematurely and closes its input port, bringing the network down (ungracefully!)
+- `fbptest10` -  `copier` in `fbptest1` is replaced with a non-looping version of `copier`
 - `fbptest11` -  Load balancer (`lbal`) feeding 3 instances of a random delay component (`randdelay`)
   
 ![Fbptest11](https://github.com/jpaulm/jsfbp/blob/master/docs/Fbptest11.png "Diagram of fbptest11 above")
 
-- `fbptest12` -  `Reader -> Copier -> Writer`
+- `fbptest12` -  `reader OUT -> IN copier OUT -> IN writer`
   
-- `fbptestws` -  Schematic web socket server (simple processing component shown would normally be more complex)
+- `fbptestws` -  Schematic web socket server (simple Process shown can be replaced by any structure of Processes, provided interfaces are adhered to)
  
 ![Fbptestws](https://github.com/jpaulm/jsfbp/blob/master/docs/Fbptestws.png "Diagram of fbptestws above")
  
@@ -103,7 +105,21 @@ Create a folder called `jsfbp` in `node/node_modules/fibers`, and download all t
 
 This network can now be run by positioning at this directory, and entering `node fbptestx.js`, where `fbptestx` is any of the tests listed above.  If tracing is desired, change the value of the `trace` variable at the bottom of fbptest.js to `true`.
 
-`chat1.html` is intended as a simple client for testing with the prototype web sockets server network `fbptestws.js`.
+Testing Web Socket Server
+---
+
+Run `node fbptestws.js`, which is a simple web socket server.  It responds to any request (except `@kill`) by returning 3 names.
+
+`chat1.html` is intended as a simple client for testing with `fbptestws.js`. If Firefox doesn't work for you, Chrome should work.
+Just enter any string into the input field, and it will return the strings 
+
+- Server: Frankie Tomatto
+- Server: Joe Fresh
+- Server: Aunt Jemima
+
+Enter the string `@kill` in the input field (once or twice), and the network will come down (ungracefully).
+
+
 
 Tracing
 ---
@@ -147,5 +163,5 @@ Reverse2 closed
 Performance
 ---
 
-This first test case (Jan. 16, 2015) with 2000 IPs running through three processes takes 200 ms, giving approx. 50 microsecs per send/receive pair.  
+The first test case (`fbptest1`) with 2000 IPs running through three processes takes 350 ms, giving approx. 88 microsecs per send/receive pair.  
 
