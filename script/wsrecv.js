@@ -27,14 +27,14 @@ exports.wsrecv = function () {
   }
   
   function wsReceive(wss, ws, proc) {
-    var fiber =  Fiber.current;    
+    //var fiber =  Fiber.current;    
     wss.on('connection', function connection(ws) {
        ws.on('message', function incoming(message) {       
-       fbp.setCurrentProc(proc);
+       //fbp.setCurrentProc(proc);
        console.log('running callback for: ' + proc.name); 
        fbp.queueCallback(proc, [ws, message]);      
        }); 
-    ws.send('connected'); 
+    ws.send('connected!'); 
     });
    console.log('wsReceive pending: ' + proc.name);     
    return Fiber.yield();
