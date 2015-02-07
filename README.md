@@ -1,7 +1,9 @@
 jsfbp
 =====
 
-"Classical" FBP implementation written in JavaScript, using Node-Fibers - https://github.com/laverdet/node-fibers .  JSFBP takes advantage of JavaScript's concept of functions as first-degree objects to allow applications to be built using "green threads".  In addition to JavaScript's event queue, JSFBP makes use of a "Future Events Queue" which supports the green threads.
+"Classical" FBP implementation written in JavaScript, using Node-Fibers - https://github.com/laverdet/node-fibers .  
+
+JSFBP takes advantage of JavaScript's concept of functions as first-degree objects to allow applications to be built using "green threads".  In addition to JavaScript's event queue, JSFBP makes use of a "Future Events Queue" which supports the green threads, and provides quite good performance (see below).
 
 General
 ---
@@ -147,5 +149,5 @@ Reverse2 closed
 Performance
 ---
 
-This first test case (Jan. 16, 2015) with 2000 IPs running through three processes takes 200 ms, giving approx. 50 microsecs per send/receive pair.  
+The first test case (`fbptest1`) with 2000 IPs running through three processes takes 350 ms, giving approx. 88 microsecs per send/receive pair.  
 
