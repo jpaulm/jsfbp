@@ -1,8 +1,11 @@
 var Fiber = require('fibers');
 
+Fiber.prototype.fbpProc = null;
+
 // --- classes and functions ---
 
-exports.defProc = function(jsname, name, suff) {     
+exports.defProc = function(jsname, name, suff) {
+   var capname = capitalize(name);  
    var procname = name;
    if (suff != undefined)
       procname += suff; 
@@ -24,7 +27,7 @@ IP = function(contents) {
 
 IP.create = function(x) {
       var ip = new IP(x);
-      var proc = currentproc;
+      var proc = Fiber.current.fbpProc;
       if (tracing)
           console.log(proc.name + ' Create IP with: ' + x);
       proc.ownedIPs++;
@@ -39,7 +42,7 @@ IP.createBracket = function(bktType, x) {
          x = null; 
       var ip = new IP(x);      
       ip.type = bktType;         
-      var proc = currentproc;
+      var proc = Fiber.current.fbpProc;
       if (tracing)
           console.log(proc.name + ' Create bracket with ' + bktType + ', ' + x);
       proc.ownedIPs++;
@@ -47,8 +50,9 @@ IP.createBracket = function(bktType, x) {
       return ip;
     } 
     
+    
 IP.drop = function(ip) {
-      var proc = currentproc;
+      var proc = Fiber.current.fbpProc; 
       if (tracing)
           console.log(proc.name + ' IP dropped with: ' + ip.contents);
       if (ip.owner != proc) {
@@ -112,7 +116,7 @@ InputPort = function (){
 }
 
 InputPort.openInputPort = function(name) {
-   var proc = currentproc;
+   var proc = Fiber.current.fbpProc;
    var namex = proc.name + '.' + name;   
    //console.log(proc.inports);
    for (var i = 0; i < proc.inports.length; i++) {     
@@ -124,7 +128,7 @@ InputPort.openInputPort = function(name) {
 }
 
 InputPort.prototype.receive = function(){
-      var proc = currentproc;
+      var proc = Fiber.current.fbpProc; 
       var conn = this.conn;
                   
       if (conn.constructor == InitConn)  {
@@ -179,7 +183,7 @@ InputPort.prototype.receive = function(){
 }
 
 InputPort.prototype.close = function(){
-      var proc = currentproc;
+      var proc = Fiber.current.fbpProc; 
       var conn = this.conn;
       conn.closed = true;
       console.log(proc.name + ': ' + conn.usedslots + ' IPs dropped because of close on ' + conn.name);
@@ -195,7 +199,7 @@ InputPortArray = function (){
 }
 
 InputPortArray.openInputPortArray = function(name) {
-   var proc = currentproc;
+   var proc = Fiber.current.fbpProc; 
    var namey = proc.name + '.' + name;
    var hi_index = -1;  
    var array = new Array();
@@ -226,7 +230,7 @@ OutputPort = function (){
 }
 
 OutputPort.openOutputPort = function(name) {
-   var proc = currentproc;
+   var proc = Fiber.current.fbpProc; 
    var namex = proc.name + '.' + name;
    for (var i = 0; i < proc.outports.length; i++) {
      //console.log(proc.inports[i]);
@@ -238,7 +242,7 @@ OutputPort.openOutputPort = function(name) {
 }
 
 OutputPort.prototype.send = function(ip){
-      var proc = currentproc;
+      var proc = Fiber.current.fbpProc; 
       var conn = this.conn;         
           
       if (tracing)
@@ -261,7 +265,7 @@ OutputPort.prototype.send = function(ip){
         if (conn.usedslots == conn.array.length)  { 
           proc.status = 'S';
           proc.yielded = true;
-          Fiber.yield(0); 
+          Fiber.yield(); 
           proc.status = 'A'; 
           proc.yielded = false;         
           }
@@ -287,7 +291,7 @@ OutputPortArray = function (){
 }
 
 OutputPortArray.openOutputPortArray = function(name) {
-   var proc = currentproc;
+   var proc = Fiber.current.fbpProc; 
    var namey = proc.name + '.' + name;
    var hi_index = -1;  
    var array = new Array();
@@ -328,7 +332,7 @@ var list = [];   // list of processes
 var queue = [];  // list of processes ready to continue
 
 var tracing = false;
-var currentproc;
+//var currentproc;
 var count; 
 
 function close(proc){   
@@ -366,13 +370,13 @@ function close(proc){
 
 exports.getCurrentProc = function()  {
    //console.log('get ' + currentproc);
-   return currentproc;
+   return Fiber.current.fbpProc; 
 }
 
-exports.setCurrentProc = function(proc)  {
+//exports.setCurrentProc = function(proc)  {
    //console.log('get ' + currentproc);
-   currentproc = proc;
-}
+//   currentproc = proc;
+//}
 
 exports.queueCallback = function(proc, data) {
    if (tracing)
@@ -383,7 +387,7 @@ exports.queueCallback = function(proc, data) {
 }
 
 exports.setCallbackPending = function(b) {
-   currentproc.cbpending = b;
+   Fiber.current.fbpProc.cbpending = b;
 }
 
  
@@ -455,6 +459,8 @@ exports.run = run;
 function run2(trace) { 
 
 
+
+
 var d = new Date();
 var st = d.getTime(); 
 console.log('Start time: ' + d.toISOString());
@@ -480,9 +486,11 @@ while (true) {
   
   var x = queue.shift();
   while (x != undefined){  
-    currentproc = x;   
+    //currentproc = x;   
     if (x.fiber == null) {
       x.fiber = new Fiber(x.func);
+      x.fiber.fbpProc = x;
+      //console.log(x.fiber.fbpProc);
       x.status = 'A';
     } 
       

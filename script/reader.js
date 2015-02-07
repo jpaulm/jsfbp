@@ -2,7 +2,7 @@ var Fiber = require('fibers');
 var fbp = require('./fbp.js');
 var fs = require('fs'); 
  
- // Reader based on Bruno's code
+ // Reader based on Bruno Jouhier's code
 
 exports.reader = function () {   
      var proc = fbp.getCurrentProc();  
@@ -24,11 +24,10 @@ exports.reader = function () {
      }   
   }
   
-  function myReadFile(path, options, proc) {
-    var fiber =  Fiber.current;
+  function myReadFile(path, options, proc) {    
     console.log('read started: ' + proc.name);
     fs.readFile(path, options, function(err, data) {
-      fbp.setCurrentProc(proc);
+      //fbp.setCurrentProc(proc);
       console.log('callback for: ' + proc.name); 
       fbp.queueCallback(proc, data);
       // fiber.run(data);

@@ -24,11 +24,10 @@ exports.writer = function () {
      fbp.setCallbackPending(false);     
   }
   
-  function myWriteFile(path, data, options, proc) {
-    var fiber =  Fiber.current;   
+  function myWriteFile(path, data, options, proc) {    
     console.log('write started: ' + proc.name);
     fs.writeFile(path, data, options, function(err, data) {
-      fbp.setCurrentProc(proc);      
+      //fbp.setCurrentProc(proc);      
       console.log('running callback for: ' + proc.name); 
       fbp.queueCallback(proc);
       //fiber.run();
