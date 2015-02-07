@@ -9,28 +9,28 @@ General
 Test cases so far:
 
 - `fbptest1` - 3 processes:
-    - `Sender`
-    - `Copier`
-    - `Recvr`
+    - `sender` (generates ascending numeric values)
+    - `copier` (copies)
+    - `recvr`  (displays incoming values to console)
 
 ![JSFBP](https://github.com/jpaulm/jsfbp/blob/master/docs/JSFBP.png "Simple Test Network")
 
-- `fbptest2` - `Sender` replaced with `Reader`
-- `fbptest3` - `Sender` and `Reader` both feeding into `Copier.IN`
-- `fbptest4` - `Sender` feeding `Repl` which sends 3 copies of input IP (as specified in network), each copy going to a separate element of array port `OUT`; all 3 copies then feeding into `Recvr.IN`
-- `fbptest5` - Two copies of `Reader` running concurrently
-- `fbptest6` - The output streams of the `Repl` (in `fbptest4`) are fed to an input array port
-- `fbptest7` - Creates a deadlock condition - the status of each process is displayed
+- `fbptest2` - `sender` replaced with `reader`
+- `fbptest3` - `sender` and `reader` both feeding into `copier.IN`
+- `fbptest4` - `sender` feeding `repl` which sends 3 copies of input IP (as specified in network), each copy going to a separate element of array port `OUT`; all 3 copies then feeding into `recvr.IN`
+- `fbptest5` - Two copies of `reader` running concurrently, one feeds direct to `rrmerge` input port element 0; other one into `copier` and then into `rrmerge` input port element 1; from `rrmerge.OUT` to `recvr.IN` 
+- `fbptest6` - The output streams of the `repl` (in `fbptest4`) are fed to an input array port
+- `fbptest7` - Creates a deadlock condition - the status of each Process is displayed
 - `fbptest8` - reads text, reverses it twice and outputs it
-- `fbptest9` - `Copier` in `fbptest1` is replaced with a Copier which terminates prematurely and closes its input port, bringing the network down (ungracefully!)
-- `fbptest10` -  `Copier` in `fbptest1` is replaced with a non-looping Copier
+- `fbptest9` - `copier` in `fbptest1` is replaced with a version of `copier` which terminates prematurely and closes its input port, bringing the network down (ungracefully!)
+- `fbptest10` -  `copier` in `fbptest1` is replaced with a non-looping version of `copier`
 - `fbptest11` -  Load balancer (`lbal`) feeding 3 instances of a random delay component (`randdelay`)
   
 ![Fbptest11](https://github.com/jpaulm/jsfbp/blob/master/docs/Fbptest11.png "Diagram of fbptest11 above")
 
-- `fbptest12` -  `Reader -> Copier -> Writer`
+- `fbptest12` -  `reader OUT -> IN copier OUT -> IN writer`
   
-- `fbptestws` -  Schematic web socket server (simple processing component shown would normally be more complex)
+- `fbptestws` -  Schematic web socket server (simple Process shown can be replaced by any structure of Processes, provided interfaces are adhered to)
  
 ![Fbptestws](https://github.com/jpaulm/jsfbp/blob/master/docs/Fbptestws.png "Diagram of fbptestws above")
  
