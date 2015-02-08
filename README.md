@@ -3,7 +3,7 @@ jsfbp
 
 "Classical" FBP implementation written in JavaScript, using Node-Fibers - https://github.com/laverdet/node-fibers .  
 
-JSFBP takes advantage of JavaScript's concept of functions as first-degree objects to allow applications to be built using "green threads".  JSFBP makes use of a "Future Events Queue" which supports the green threads, and provides quite good performance (see below) - the JavaScript events queue is only used for JavaScript aynchronous functions, as before.
+JSFBP takes advantage of JavaScript's concept of functions as first-degree objects to allow applications to be built using "green threads".  JSFBP makes use of a "Future Events Queue" which supports the green threads, and provides quite good performance (see below) - the JavaScript events queue is only used for JavaScript asynchronous functions, as before.
 
 General
 ---
