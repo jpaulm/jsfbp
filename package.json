@@ -1,0 +1,24 @@
+{
+  "name": "jsfbp",
+  "version": "0.1.0",
+  "description": "FBP implementation written using node-fibers ",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/jpaulm/jsfbp.git"
+  },
+  "keywords": [
+    "fbp",
+    "flow-based-programming",
+    "node-fibers",
+    "javascript"
+  ],
+  "author": "J. Paul Morrison",
+	"license": "MIT"
+  "bugs": {
+    "url": "https://github.com/jpaulm/jsfbp/issues"
+  },
+  "homepage": "https://github.com/jpaulm/jsfbp",
+  "dependencies": {
+    "fibers": "^1.0.5"
+  }
+}
