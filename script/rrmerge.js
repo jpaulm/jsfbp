@@ -8,9 +8,8 @@ exports.rrmerge = function () {
     while (true) {  
       for (var i = 0; i < array.length; i++) {
          ip = array[i].receive();
-         if (ip == null)
-           break;
-         outport.send(ip);  
+         if (ip != null)          
+           outport.send(ip);  
       } 
       if (ip == null)
         break;         
