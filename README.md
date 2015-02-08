@@ -163,5 +163,7 @@ Reverse2 closed
 Performance
 ---
 
-The first test case (`fbptest1`) with 2000 IPs running through three processes takes 350 ms, giving approx. 88 microsecs per send/receive pair.  
+The first test case (`fbptest1`) with 100,000,000 IPs running through three processes takes 170 seconds.  Since there are two connections, giving a total of 200,000,000 send/receive pairs, this works out to approx. 0.85 microsecs per send/receive pair. 
+
+My machine has 4 AMD Phenom(tm) II X4 925 processors, and this test appeared to be using 2 of them (not sure why!).
 
