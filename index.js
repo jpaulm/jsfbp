@@ -4,19 +4,14 @@ Fiber.prototype.fbpProc = null;
 
 // --- classes and functions ---
 
-exports.defProc = function(jsname, name, suff) {
-   var capname = capitalize(name);  
-   var procname = name;
-   if (suff != undefined)
-      procname += suff; 
-   return new Process(capitalize(procname), require(jsname)[name]);               
+exports.defProc = function(func, name) {
+  if (typeof func === "string") {
+    func = require(func);
+  }
+  return new Process(name || func.name, func);
 }
-
-function capitalize(string){
-   return string.replace( /(^|\s)([a-z])/g , function(m,p1,p2){ return p1+p2.toUpperCase(); } );
-  };
   
-IP = function(contents) {
+var IP = exports.IP = function(contents) {
     this.NORMAL = 0;
     this.OPEN = 1;
     this.CLOSE = 2;
@@ -66,7 +61,7 @@ IP.drop = function(ip) {
 exports.IP = IP;   
 
 
-Process = function (name, func) {
+var Process = exports.Process = function (name, func) {
   this.name = name;  
   this.func = func; 
   this.fiber = null;
@@ -104,12 +99,12 @@ exports.Connection = function (size){
     this.array[i] = null;
 }
 
-InitConn = function(contents) {    
+var InitConn = exports.InitConn = function(contents) {    
     this.contents = contents;
     this.closed = false;       
 }
 
-InputPort = function (){
+var InputPort = exports.InputPort = function (){
   this.name = null;
   this.conn = null;   
   this.closed = false;  
@@ -193,9 +188,7 @@ InputPort.prototype.close = function(){
         }
 }
 
-exports.InputPort = InputPort;
-
-InputPortArray = function (){    
+var InputPortArray = exports.InputPortArray = function (){    
 }
 
 InputPortArray.openInputPortArray = function(name) {
@@ -223,7 +216,7 @@ InputPortArray.openInputPortArray = function(name) {
 }
 
 
-OutputPort = function (){
+var OutputPort = exports.OutputPort = function (){
   this.name = null;
   this.conn = null;   
   this.closed = false;  
@@ -284,10 +277,8 @@ OutputPort.prototype.send = function(ip){
        
 }
 
-exports.OutputPort = OutputPort;
 
-
-OutputPortArray = function (){    
+var OutputPortArray = exports.OutputPortArray = function (){    
 }
 
 OutputPortArray.openOutputPortArray = function(name) {
@@ -446,10 +437,11 @@ exports.connect = function(upproc, upport, downproc, downport, capacity) {
    //console.log(cnxt);
 }
 
-function run(trace) {
-Fiber(function() {
-  run2(trace);
-}).run();
+function run(options) {
+  options = options || {};
+  Fiber(function() {
+    run2(options.trace);
+  }).run();
 }
 
 exports.run = run;
