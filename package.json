@@ -13,12 +13,13 @@
     "javascript"
   ],
   "author": "J. Paul Morrison",
-  "license": "MIT"
+  "license": "MIT",
   "bugs": {
     "url": "https://github.com/jpaulm/jsfbp/issues"
   },
   "homepage": "https://github.com/jpaulm/jsfbp",
   "dependencies": {
     "fibers": "^1.0.5"
-  }
+  },
+  "main": "index.js"
 }
