@@ -97,18 +97,20 @@ Component services:
 Install & Run
 ---
 
-1. Install node.js - see http://nodejs.org/download/
+1. Install node.js - see http://nodejs.org/download/  .  Node 12.0 has a problem (at least in Windows) - for now, use node 11.16.
 
 2. Clone or download this project
 
 3. Run `npm install` in the project directory
 
-4. Run `node script/fbptestx.js`, where `fbptestx` is any of the tests listed above. If tracing is desired, change the value of the `trace` variable at the bottom of fbptest.js to `true`.
+4. Run `node script/fbptestx.js`, where `fbptestx` is any of the tests listed above. If tracing is desired, change the value of the `trace` variable at the bottom of fbptest.js to `true`. 
+ 
+Run examples are in process of being moved to `examples`, so you may have to enter `node examples\fbptestx.js` .
 
 Testing Web Socket Server
 ---
 
-Run `node fbptestws.js`, which is a simple web socket server.  It responds to any request (except `@kill`) by returning 3 names.
+Run `node [script|examples]\fbptestws.js`, which is a simple web socket server.  It responds to any request (except `@kill`) by returning 3 names.
 
 `chat1.html` is intended as a simple client for testing with `fbptestws.js`. If Firefox doesn't work for you, Chrome should work.
 Just enter any string into the input field, and it will return the strings 
@@ -118,8 +120,6 @@ Just enter any string into the input field, and it will return the strings
 - Server: Aunt Jemima
 
 Enter the string `@kill` in the input field (once or twice), and the network will come down (ungracefully).
-
-
 
 Tracing
 ---
