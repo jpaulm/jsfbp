@@ -1,8 +1,11 @@
-var fbp = require('..');
+var fbp = require('..')
+  , InputPort = require('../core/InputPort')
+  , IP = require('../core/IP')
+  , OutputPortArray = require('../core/OutputPortArray');
 
 module.exports = function repl() {
-  var inport = fbp.InputPort.openInputPort('IN');
-  var array = fbp.OutputPortArray.openOutputPortArray('OUT');
+  var inport = InputPort.openInputPort('IN');
+  var array = OutputPortArray.openOutputPortArray('OUT');
 
   while (true) {
     var ip = inport.receive();
@@ -10,8 +13,8 @@ module.exports = function repl() {
       break;
     }
     for (var i = 0; i < array.length; i++) {
-      array[i].send(fbp.IP.create(ip.contents));
+      array[i].send(IP.create(ip.contents));
     }
-    fbp.IP.drop(ip);
+    IP.drop(ip);
   }
 }

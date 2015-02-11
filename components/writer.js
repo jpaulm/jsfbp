@@ -1,14 +1,18 @@
-var fbp = require('..');
-var Fiber = require('fibers');
-var fs = require('fs');
+'use strict';
+
+var fbp = require('..')
+  , Fiber = require('fibers')
+  , fs = require('fs')
+  , InputPort = require('../core/InputPort')
+  , IP = require('../core/IP');
 
 module.exports = function writer() {
    var proc = fbp.getCurrentProc();
-   var inport = fbp.InputPort.openInputPort('FILE');
-   var dataport = fbp.InputPort.openInputPort('IN');
+   var inport = InputPort.openInputPort('FILE');
+   var dataport = InputPort.openInputPort('IN');
    var ip = inport.receive();
    var fname = ip.contents;
-   fbp.IP.drop(ip);
+   IP.drop(ip);
    var string = '';
    while (true) {
       ip = dataport.receive();
@@ -16,7 +20,7 @@ module.exports = function writer() {
         break;
       }
       string += ip.contents + '\n';
-      fbp.IP.drop(ip);
+      IP.drop(ip);
    }
    fbp.setCallbackPending(true);
    myWriteFile(fname, string, "utf8", proc);

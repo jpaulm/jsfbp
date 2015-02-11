@@ -1,7 +1,8 @@
-var fbp = require('..');
+var InputPort = require('../core/InputPort')
+  , IP = require('../core/IP');
 
 module.exports = function recvr() {
-  var inport = fbp.InputPort.openInputPort('IN');
+  var inport = InputPort.openInputPort('IN');
   while (true) {
     var ip = inport.receive();
     if (ip === null) {
@@ -9,6 +10,6 @@ module.exports = function recvr() {
     }
     var data = ip.contents;
     console.log('data: ' + data);
-    fbp.IP.drop(ip);
+    IP.drop(ip);
   }
 }

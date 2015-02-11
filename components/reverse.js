@@ -1,16 +1,18 @@
-var fbp = require('..');
+var InputPort = require('../core/InputPort')
+  , IP = require('../core/IP')
+  , OutputPort = require('../core/OutputPort');
 
 module.exports = function reverse() {
-  var inport = fbp.InputPort.openInputPort('IN');
-  var outport = fbp.OutputPort.openOutputPort('OUT');
+  var inport = InputPort.openInputPort('IN');
+  var outport = OutputPort.openOutputPort('OUT');
   while (true) {
     var ip = inport.receive();
     if (ip === null) {
       break;
     }
     var s = ip.contents;
-    outport.send(fbp.IP.create(StringReverse(s)));
-    fbp.IP.drop(ip);
+    outport.send(IP.create(StringReverse(s)));
+    IP.drop(ip);
   }
 }
 

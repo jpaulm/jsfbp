@@ -1,14 +1,17 @@
-var fbp = require('..');
-var Fiber = require('fibers');
+var fbp = require('..')
+  , Fiber = require('fibers')
+  , InputPort = require('../core/InputPort')
+  , IP = require('../core/IP')
+  , OutputPort = require('../core/OutputPort');
 
 module.exports = function randdelay() {
   var proc = fbp.getCurrentProc();
-  var inport = fbp.InputPort.openInputPort('IN');
-  var intvlport = fbp.InputPort.openInputPort('INTVL');
-  var outport = fbp.OutputPort.openOutputPort('OUT');
+  var inport = InputPort.openInputPort('IN');
+  var intvlport = InputPort.openInputPort('INTVL');
+  var outport = OutputPort.openOutputPort('OUT');
   var intvl_ip = intvlport.receive();
   var intvl = intvl_ip.contents;
-  fbp.IP.drop(intvl_ip);
+  IP.drop(intvl_ip);
   while (true) {
     var ip = inport.receive();
     if (ip === null) {

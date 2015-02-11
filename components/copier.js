@@ -1,8 +1,9 @@
-var fbp = require('..');
+var InputPort = require('../core/InputPort')
+  , OutputPort = require('../core/OutputPort');
 
 module.exports = function copier() {
-  var inport = fbp.InputPort.openInputPort('IN');
-  var outport = fbp.OutputPort.openOutputPort('OUT');
+  var inport = InputPort.openInputPort('IN');
+  var outport = OutputPort.openOutputPort('OUT');
   while (true) {
     var ip = inport.receive();
     if (ip === null) {

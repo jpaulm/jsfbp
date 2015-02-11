@@ -1,8 +1,10 @@
-var fbp = require('..');
+var InputPort = require('../core/InputPort')
+  , IP = require('../core/IP')
+  , OutputPort = require('../core/OutputPort');
 
 module.exports = function copier_closing() {
-  var inport = fbp.InputPort.openInputPort('IN');
-  var outport = fbp.OutputPort.openOutputPort('OUT');
+  var inport = InputPort.openInputPort('IN');
+  var outport = OutputPort.openOutputPort('OUT');
   var count = 0;
   while (true) {
     var ip = inport.receive();
@@ -12,7 +14,7 @@ module.exports = function copier_closing() {
     count++;
     if (count === 20) {
       inport.close();
-      fbp.IP.drop(ip);
+      IP.drop(ip);
       return;
     }
     var i = ip.contents;
