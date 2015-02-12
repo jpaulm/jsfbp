@@ -1,13 +1,18 @@
 # node stuff
-
 node_modules/
 
 
 # Eclipse project
-
 .settings/
 .project
 
-#Windows stuff
-
+# Windows stuff
 Thumbs.db
+
+# Fibers doesn't work with the latest Node.js version
+# Therefore, we are using an older version on a per-project basis
+# See https://gist.github.com/ComFreek/c341bacfaae3aca887df for installation
+old-node/
+start-old-node.bat
+start-old-node-ps.bat
+start-old-node.ps1
