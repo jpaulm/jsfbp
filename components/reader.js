@@ -1,3 +1,5 @@
+'use strict';
+
 var fbp = require('..')
   , Fiber = require('fibers')
   , fs = require('fs')
@@ -5,8 +7,7 @@ var fbp = require('..')
   , IP = require('../core/IP')
 	, OutputPort = require('../core/OutputPort');
 
- // Reader based on Bruno Jouhier's code
-
+// Reader based on Bruno Jouhier's code
 module.exports = function reader() {
   var proc = fbp.getCurrentProc();
   var inport = InputPort.openInputPort('FILE');

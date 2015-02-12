@@ -1,7 +1,8 @@
+'use strict';
+
 var Fiber = require('fibers');
 
-var OutputPortArray = module.exports = function (){   
-}
+var OutputPortArray = module.exports = {};
 
 OutputPortArray.openOutputPortArray = function(name) {
   var proc = Fiber.current.fbpProc; 

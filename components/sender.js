@@ -1,5 +1,7 @@
 'use strict';
 
+'use strict';
+
 var fbp = require('..')
   , InputPort = require('../core/InputPort')
   , IP = require('../core/IP')

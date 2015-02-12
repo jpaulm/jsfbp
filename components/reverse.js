@@ -1,3 +1,5 @@
+'use strict';
+
 var InputPort = require('../core/InputPort')
   , IP = require('../core/IP')
   , OutputPort = require('../core/OutputPort');

@@ -1,5 +1,7 @@
 'use strict';
 
+'use strict';
+
 var fbp = require('..')
   , Fiber = require('fibers')
   , fs = require('fs')

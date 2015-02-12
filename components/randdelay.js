@@ -1,3 +1,5 @@
+'use strict';
+
 var fbp = require('..')
   , Fiber = require('fibers')
   , InputPort = require('../core/InputPort')
