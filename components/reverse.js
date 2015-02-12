@@ -1,21 +1,22 @@
-var fbp = require('./fbp.js');
+var fbp = require('..');
 
-exports.reverse = function () {
-    var inport = InputPort.openInputPort('IN'); 
-    var outport = OutputPort.openOutputPort('OUT'); 
-    while (true) {      
-      var ip = inport.receive();         
-      if (ip == null)
-        break;
-      var s = ip.contents; 
-      outport.send(IP.create(StringReverse(s)));
-      IP.drop(ip);
-    }  
+module.exports = function reverse() {
+  var inport = fbp.InputPort.openInputPort('IN');
+  var outport = fbp.OutputPort.openOutputPort('OUT');
+  while (true) {
+    var ip = inport.receive();
+    if (ip === null) {
+      break;
+    }
+    var s = ip.contents;
+    outport.send(fbp.IP.create(StringReverse(s)));
+    fbp.IP.drop(ip);
   }
-  
+}
+
   function StringReverse (str)
-  
-  // Thanks to Scott Gartner - Jun 28 '13 - 
+
+  // Thanks to Scott Gartner - Jun 28 '13 -
   //  http://stackoverflow.com/questions/958908/how-do-you-reverse-a-string-in-place-in-javascript
 {
   var charArray = [];
@@ -41,4 +42,4 @@ exports.reverse = function () {
 
   return charArray.join('');
 }
-  
+

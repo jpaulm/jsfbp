@@ -65,7 +65,7 @@ Components
 API
 ---
 Defining network:
-- start with `var fbp = require('./fbp.js');`
+- start with `var fbp = require('fbp');`
 - `fbp.defProc` - define Process
 - `fbp.connect` - connect output port to input port
 - `fbp.initialize` - specify IIP and the port it is connected to
