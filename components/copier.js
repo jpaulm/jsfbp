@@ -14,4 +14,4 @@ module.exports = function copier() {
     var i = ip.contents;
     outport.send(ip);
   }
-}
+};

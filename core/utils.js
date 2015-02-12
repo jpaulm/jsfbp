@@ -3,7 +3,7 @@
 module.exports.InitConn = function(contents) {
   this.contents = contents;
   this.closed = false;       
-}
+};
 
 module.exports.getElementWithSmallestBacklog = function(array){
   var number = Number.MAX_VALUE; 
@@ -17,4 +17,4 @@ module.exports.getElementWithSmallestBacklog = function(array){
      }   
   }
   return element;
-}
+};

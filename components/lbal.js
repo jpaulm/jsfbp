@@ -16,4 +16,4 @@ module.exports = function lbal() {
     var i = Utils.getElementWithSmallestBacklog(array);
     array[i].send(ip);
   }
-}
+};

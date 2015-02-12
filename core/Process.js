@@ -20,4 +20,4 @@ var Process = module.exports = function(name, func, list) {
   this.cbpending = false;
   this.yielded = false; 
   this.data = null;
-}
+};

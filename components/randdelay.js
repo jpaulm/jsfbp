@@ -14,6 +14,7 @@ module.exports = function randdelay() {
   var intvl_ip = intvlport.receive();
   var intvl = intvl_ip.contents;
   IP.drop(intvl_ip);
+
   while (true) {
     var ip = inport.receive();
     if (ip === null) {
@@ -24,10 +25,9 @@ module.exports = function randdelay() {
     fbp.setCallbackPending(false);
     outport.send(ip);
   }
-}
+};
 
 function sleep(proc, ms) {
   console.log(proc.name + ' start sleep: ' + ms + ' msecs');
-  return setTimeout(function() {
-  }, ms);
+  return setTimeout(function() {}, ms);
 }

@@ -19,4 +19,4 @@ module.exports = function repl() {
     }
     IP.drop(ip);
   }
-}
+};

@@ -9,7 +9,7 @@ var InputPort = module.exports = function(queue){
   this.conn = null;
   this.closed = false;
 	this.queue = queue;
-}
+};
 
 InputPort.openInputPort = function(name) {
   var proc = Fiber.current.fbpProc;
@@ -21,7 +21,7 @@ InputPort.openInputPort = function(name) {
   } 
   console.log('Port ' + proc.name + '.' + name + ' not found');
   return null;
-}
+};
 
 InputPort.prototype.receive = function(){
   var proc = Fiber.current.fbpProc; 
@@ -76,7 +76,7 @@ InputPort.prototype.receive = function(){
   ip.owner = proc; 
   proc.ownedIPs++; 
   return ip; 
-}
+};
 
 InputPort.prototype.close = function(){
   var proc = Fiber.current.fbpProc; 
@@ -87,4 +87,4 @@ InputPort.prototype.close = function(){
     if (conn.up[i].status == 'S')
     this.queue.push(conn.up[i]); 
    }
-}
+};

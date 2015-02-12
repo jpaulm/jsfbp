@@ -26,17 +26,14 @@ module.exports = function reader() {
     var ip = IP.create(array[i]);
     outport.send(ip);
   }
-}
+};
 
 function myReadFile(path, options, proc) {
   console.log('read started: ' + proc.name);
   fs.readFile(path, options, function(err, data) {
-    // fbp.setCurrentProc(proc);
     console.log('callback for: ' + proc.name);
     fbp.queueCallback(proc, data);
-    // fiber.run(data);
   });
   console.log('read pending: ' + proc.name);
-  // console.log('yielded: ' + proc.name );
   return Fiber.yield();
 }

@@ -1,11 +1,9 @@
 'use strict';
 
-'use strict';
-
 var fbp = require('..')
   , InputPort = require('../core/InputPort')
   , IP = require('../core/IP')
-	, OutputPort = require('../core/OutputPort');
+  , OutputPort = require('../core/OutputPort');
 
 module.exports = function sender() {
   var inport = InputPort.openInputPort('COUNT');
@@ -20,4 +18,4 @@ module.exports = function sender() {
       return;
     }
   }
-}
+};

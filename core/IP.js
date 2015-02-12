@@ -9,7 +9,7 @@ var IP = module.exports = function IP(contents) {
   this.owner = null;
   this.type = this.NORMAL;  
   this.contents = contents;     
-}
+};
 
 IP.create = function(x) {
   var ip = new IP(x);
@@ -21,29 +21,32 @@ IP.create = function(x) {
   //ip.type = IP.NORMAL;
   //console.log(ip);
   return ip;
-}
+};
   
 IP.createBracket = function(bktType, x) {
-  if (x == undefined)
-    x = null; 
+  if (x == undefined) {
+    x = null;
+  }
   var ip = new IP(x);    
   ip.type = bktType;     
   var proc = Fiber.current.fbpProc;
-  if (tracing)
+  if (tracing) {
     console.log(proc.name + ' Create bracket with ' + bktType + ', ' + x);
+  }
   proc.ownedIPs++;
   ip.owner = proc;   
   return ip;
-} 
+};
   
 IP.drop = function(ip) {
   var proc = Fiber.current.fbpProc; 
-  if (tracing)
+  if (tracing) {
     console.log(proc.name + ' IP dropped with: ' + ip.contents);
+  }
   if (ip.owner != proc) {
     console.log(proc.name + ' IP being dropped not owned by this Process: ' + ip.contents); 
     return;
   }  
   proc.ownedIPs--;
   ip.owner = null;
-}
+};

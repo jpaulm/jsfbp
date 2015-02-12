@@ -22,4 +22,4 @@ module.exports = function copier_closing() {
     var i = ip.contents;
     outport.send(ip);
   }
-}
+};

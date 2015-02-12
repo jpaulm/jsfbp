@@ -14,4 +14,4 @@ module.exports = function recvr() {
     console.log('data: ' + data);
     IP.drop(ip);
   }
-}
+};

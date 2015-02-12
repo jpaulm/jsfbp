@@ -1,7 +1,5 @@
 'use strict';
 
-'use strict';
-
 var fbp = require('..')
   , Fiber = require('fibers')
   , fs = require('fs')
@@ -28,17 +26,14 @@ module.exports = function writer() {
    myWriteFile(fname, string, "utf8", proc);
    console.log('write complete: ' + proc.name);
    fbp.setCallbackPending(false);
-}
+};
 
 function myWriteFile(path, data, options, proc) {
   console.log('write started: ' + proc.name);
   fs.writeFile(path, data, options, function(err, data) {
-    //fbp.setCurrentProc(proc);
     console.log('running callback for: ' + proc.name);
     fbp.queueCallback(proc);
-    //fiber.run();
-     });
+  });
   console.log('write pending: ' + proc.name);
- //console.log('yielded: ' + proc.name );
   return Fiber.yield();
 }
