@@ -1,5 +1,6 @@
 'use strict';
-var Fiber = require('fibers');
+var Fiber = require('fibers')
+  , ProcessStatus = require('./Process').Status;
 
 var OutputPort = module.exports = function(queue){
   this.name = null;
@@ -36,15 +37,17 @@ OutputPort.prototype.send = function(ip){
     return -1;
   }
   while (true) {    
-    if (conn.down.status == 'R' || conn.down.status == 'N' || conn.down.status == 'D') {
-      conn.down.status = 'K'; 
+    if (conn.down.status == ProcessStatus.WAITING_TO_RECEIVE ||
+        conn.down.status == ProcessStatus.NOT_INITIALIZED ||
+        conn.down.status == ProcessStatus.DORMANT) {
+      conn.down.status = ProcessStatus.READY_TO_EXECUTE; 
       this.queue.push(conn.down);
     }
     if (conn.usedslots == conn.array.length) { 
-      proc.status = 'S';
+      proc.status = ProcessStatus.WAITING_TO_SEND;
       proc.yielded = true;
       Fiber.yield(); 
-      proc.status = 'A'; 
+      proc.status = ProcessStatus.ACTIVE; 
       proc.yielded = false;    
     }
     else {

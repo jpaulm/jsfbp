@@ -7,17 +7,19 @@ var Process = module.exports = function(name, func, list) {
   this.inports = [];
   this.outports = [];
   list[list.length] = this;
-  //this.closed = false;
-  this.status = 
-       'N'; // not initiated
-    // 'A' active    (includes waiting on callback ...)
-    // 'R' waiting to receive
-    // 'S' waiting to send
-    // 'K' ready to execute 
-    // 'D' dormant
-    // 'C' closed  
+  this.status = Process.Status.NOT_INITIALIZED;  
   this.ownedIPs = 0; 
   this.cbpending = false;
   this.yielded = false; 
   this.data = null;
+};
+
+Process.Status = {
+  NOT_INITIALIZED: 1,
+  ACTIVE: 2, // (includes waiting on callback ...)
+  WAITING_TO_RECEIVE: 3,
+  WAITIN_TO_SEND: 4,
+  READY_TO_EXECUTE: 5,
+  DORMANT: 6,
+  CLOSED: 8
 };

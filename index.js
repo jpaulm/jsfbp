@@ -32,13 +32,14 @@ function close(proc) {
   if (tracing) {
     console.log(proc.name + ' closing');
   }
-  proc.status = 'C';
+  proc.status = Process.Status.CLOSED;
   //console.log('cl' + count);
   count--;
   for (var i = 0; i < proc.outports.length; i++) {
     var conn = proc.outports[i][1].conn;
-    if (conn.down.status == 'R' || conn.down.status == 'N' /*|| conn.down.status == 'D' */ ) {
-      conn.down.status = 'K';
+    if (conn.down.status == Process.Status.WAITING_TO_RECEIVE ||
+        conn.down.status == Process.Status.NOT_INITIALIZED) {
+      conn.down.status = Process.Status.READY_TO_EXECUTE;
       queue.push(conn.down);
     }
     conn.upstreamProcsUnclosed--;
@@ -53,7 +54,7 @@ function close(proc) {
       continue;
     }
     for (var j = 0; j < conn.up.length; j++) {
-      if (conn.up[j].status == 'S') {
+      if (conn.up[j].status == Process.Status.CLOSED) {
         queue.push(conn.up[j]);
       }
     }
@@ -179,11 +180,11 @@ function run2(trace) {
       if (x.fiber == null) {
         x.fiber = new Fiber(x.func);
         x.fiber.fbpProc = x;
-        x.status = 'A';
+        x.status = Process.Status.ACTIVE;
       }
 
-      if (x.status != 'C') {
-        if (x.status == 'D' && upconnsclosed(x)) {
+      if (x.status != Process.Status.CLOSED) {
+        if (x.status == Process.Status.DORMANT && upconnsclosed(x)) {
           close(x);
         }
         else {
@@ -222,7 +223,7 @@ function run2(trace) {
           }
           if (!x.yielded && !x.cbpending) {
             if (!upconnsclosed(x)) {
-              x.status = 'D';
+              x.status = Process.Status.DORMANT;
               queue.push(x);
               for (var j = 0; j < x.inports.length; j++) {
                 var k = x.inports[j];
@@ -245,7 +246,7 @@ function run2(trace) {
     }
     var deadlock = true;
     for (var i = 0; i < list.length; i++) {
-      if (list[i].cbpending || list[i].status == 'A') {
+      if (list[i].cbpending || list[i].status == Process.Status.ACTIVE) {
         deadlock = false;
         break;
       }

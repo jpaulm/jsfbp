@@ -2,6 +2,7 @@
 
 var IP = require('./IP')
   , Fiber = require('fibers')
+  , ProcessStatus = require('./Process').Status
   , Utils = require('./utils');
 
 var InputPort = module.exports = function(queue){
@@ -48,10 +49,10 @@ InputPort.prototype.receive = function(){
     console.log(proc.name + ' recv EOS from ' + this.name );
    return null; 
    } 
-    proc.status = 'R';
+    proc.status = ProcessStatus.WAITING_TO_RECEIVE;
     proc.yielded = true; 
     Fiber.yield();
-    proc.status = 'A';   
+    proc.status = ProcessStatus.ACTIVE;   
     proc.yielded = false;    
    }
    else
@@ -59,8 +60,8 @@ InputPort.prototype.receive = function(){
   }
   //if (conn.usedslots == conn.array.length) 
    for (var i = 0; i < conn.up.length; i ++) { 
-    if (conn.up[i].status == 'S'){
-    conn.up[i].status = 'K'; 
+    if (conn.up[i].status == ProcessStatus.WAITING_TO_SEND) {
+    conn.up[i].status = ProcessStatus.READY_TO_EXECUTE; 
     this.queue.push(conn.up[i]); 
     }  
    }
@@ -84,7 +85,7 @@ InputPort.prototype.close = function(){
   conn.closed = true;
   console.log(proc.name + ': ' + conn.usedslots + ' IPs dropped because of close on ' + conn.name);
   for (var i = 0; i < conn.up.length; i ++) { 
-    if (conn.up[i].status == 'S')
+    if (conn.up[i].status == ProcessStatus.WAITING_TO_SEND)
     this.queue.push(conn.up[i]); 
    }
 };
