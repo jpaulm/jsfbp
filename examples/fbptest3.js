@@ -1,4 +1,5 @@
-var fbp = require('..');
+var fbp = require('..')
+  , path = require('path');
 
 // --- define network ---
 var sender = fbp.defProc('./components/sender.js');
@@ -8,7 +9,7 @@ var recvr  = fbp.defProc('./components/recvr.js');
 
 fbp.initialize(sender, 'COUNT', '20');
 fbp.connect(sender, 'OUT', copier, 'IN', 5);
-fbp.initialize(reader, 'FILE', './examples/data/text.txt');
+fbp.initialize(reader, 'FILE', path.resolve(__dirname, 'data/text.txt'));
 fbp.connect(reader, 'OUT', copier, 'IN', 5);
 fbp.connect(copier, 'OUT', recvr, 'IN', 5);
 

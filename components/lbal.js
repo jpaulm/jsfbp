@@ -1,15 +1,19 @@
-var fbp = require('..');
+'use strict';
+
+var InputPort = require('../core/InputPort')
+  , OutputPortArray = require('../core/OutputPortArray')
+  , Utils = require('../core/Utils');
 
 module.exports = function lbal() {
-  var inport = fbp.InputPort.openInputPort('IN');
-  var array = fbp.OutputPortArray.openOutputPortArray('OUT');
+  var inport = InputPort.openInputPort('IN');
+  var array = OutputPortArray.openOutputPortArray('OUT');
 
   while (true) {
     var ip = inport.receive();
     if (ip === null) {
       break;
     }
-    var i = fbp.getElementWithSmallestBacklog(array);
+    var i = Utils.getElementWithSmallestBacklog(array);
     array[i].send(ip);
   }
-}
+};

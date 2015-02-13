@@ -1,6 +1,7 @@
 var fbp = require('../..');
-var Fiber = require('fibers');
-var WebSocketServer = require('ws').Server
+  , Fiber = require('fibers')
+  , IP = require('../../core/IP')
+  , WebSocketServer = require('ws').Server;
 
 module.exports = function wsrecv() {
   var proc = fbp.getCurrentProc();
@@ -20,10 +21,10 @@ module.exports = function wsrecv() {
     }
     fbp.setCallbackPending(false);
     var outport = fbp.OutputPort.openOutputPort('OUT');
-    outport.send(fbp.IP.createBracket(fbp.IP.OPEN));
-    outport.send(fbp.IP.create(result[0]));
-    outport.send(fbp.IP.create(result[1]));
-    outport.send(fbp.IP.createBracket(fbp.IP.CLOSE));
+    outport.send(IP.createBracket(fbp.IP.OPEN));
+    outport.send(IP.create(result[0]));
+    outport.send(IP.create(result[1]));
+    outport.send(IP.createBracket(fbp.IP.CLOSE));
   }
 }
 

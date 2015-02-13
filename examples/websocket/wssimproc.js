@@ -1,8 +1,10 @@
-var fbp = require('../..');
+var InputPort = require('../../core/InputPort')
+  , IP = require('../../core/IP')
+  , OutputPort = require('../../core/OutputPort');
 
 module.exports = function wssimproc() {
-  var inport = fbp.InputPort.openInputPort('IN');
-  var outport = fbp.OutputPort.openOutputPort('OUT');
+  var inport = InputPort.openInputPort('IN');
+  var outport = OutputPort.openOutputPort('OUT');
   while (true) {
     var ip = inport.receive();
     if (ip == null) {
@@ -12,10 +14,10 @@ module.exports = function wssimproc() {
     ip = inport.receive();
     outport.send(ip);      // connection
     ip = inport.receive();
-    outport.send(fbp.IP.create('Frankie Tomatto'));
-    outport.send(fbp.IP.create('Joe Fresh'));
-    outport.send(fbp.IP.create('Aunt Jemima'));
-    fbp.IP.drop(ip);
+    outport.send(IP.create('Frankie Tomatto'));
+    outport.send(IP.create('Joe Fresh'));
+    outport.send(IP.create('Aunt Jemima'));
+    IP.drop(ip);
     ip = inport.receive();
     outport.send(ip);
   }
