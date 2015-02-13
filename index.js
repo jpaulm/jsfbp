@@ -254,7 +254,7 @@ function run2(trace) {
     if (deadlock) {
       console.log('Deadlock detected');
       for (var i = 0; i < list.length; i++) {
-        console.log('- Process status: ' + list[i].status + ' - ' + list[i].name);
+        console.log('- Process status: ' + Process.statusString(list[i].status) + ' - ' + list[i].name);
       }
       throw '';
     }

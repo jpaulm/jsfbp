@@ -9,6 +9,9 @@ node_modules/
 # Windows stuff
 Thumbs.db
 
+#JSFBP stuff
+examples/data/text_new.txt
+
 # Fibers doesn't work with the latest Node.js version
 # Therefore, we are using an older version on a per-project basis
 # See https://gist.github.com/ComFreek/c341bacfaae3aca887df for installation

@@ -18,8 +18,20 @@ Process.Status = {
   NOT_INITIALIZED: 1,
   ACTIVE: 2, // (includes waiting on callback ...)
   WAITING_TO_RECEIVE: 3,
-  WAITIN_TO_SEND: 4,
+  WAITING_TO_SEND: 4,
   READY_TO_EXECUTE: 5,
   DORMANT: 6,
   CLOSED: 8
 };
+
+module.exports.statusString = function(value) {
+   var list = ['',
+  'NOT_INITIALIZED', 
+  'ACTIVE', 
+  'WAITING_TO_RECEIVE', 
+  'WAITING_TO_SEND', 
+  'READY_TO_EXECUTE', 
+  'DORMANT', 
+  'CLOSED'];
+  return list[value];
+  };
