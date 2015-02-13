@@ -28,6 +28,10 @@ module.exports = function randdelay() {
 };
 
 function sleep(proc, ms) {
-  console.log(proc.name + ' start sleep: ' + ms + ' msecs');
-  return setTimeout(function() {}, ms);
+  console.log(proc.name + ' start sleep: ' + Math.round(ms * 100) / 100 + ' msecs');  
+    var fiber = Fiber.current;
+    setTimeout(function() {
+        fbp.queueCallback(proc);
+    }, ms);
+    return Fiber.yield();
 }
