@@ -1,12 +1,15 @@
-var fbp = require('..');
+var InputPort = require('../core/InputPort')
+  , InputPortArray = require('../core/InputPortArray')
+  , IP = require('../core/IP')
+  , OutputPort = require('../core/OutputPort');
 
 module.exports = function collate() {
-  var ctlfields = fbp.InputPort.openInputPort('CTLFIELDS');
-  var inportArray = fbp.InputPortArray.openInputPortArray('IN');
-  var outport = fbp.OutputPort.openOutputPort('OUT');
+  var ctlfields = InputPort.openInputPort('CTLFIELDS');
+  var inportArray = InputPortArray.openInputPortArray('IN');
+  var outport = OutputPort.openOutputPort('OUT');
 
   var ctlfieldsP = ctlfields.receive();
-  fbp.IP.drop(ctlfieldsP);
+  IP.drop(ctlfieldsP);
 
   var fields = ctlfieldsP.contents.split(',').map(function(str) { return parseInt(str); });
   var totalFieldLength = fields.reduce(function(acc, n) { return acc + n; }, 0);
