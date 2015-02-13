@@ -103,17 +103,16 @@ Install & Run
 
 3. Run `npm install` in the project directory
 
-4. Run `node script/fbptestx.js`, where `fbptestx` is any of the tests listed above. If tracing is desired, change the value of the `trace` variable at the bottom of fbptest.js to `true`. 
- 
-Run examples are in process of being moved to `examples`, so you may have to enter `node examples\fbptestx.js` .
+4. Run `node examples/fbptestx.js`, where `fbptestx` is any of the tests listed above. If tracing is desired, change the value of the `trace` variable at the bottom of fbptest.js to `true`. 
 
 Testing Web Socket Server
 ---
 
-Run `node [script|examples]\fbptestws.js`, which is a simple web socket server.  It responds to any request (except `@kill`) by returning 3 names.
+Run `node examples\websocket\fbptestws.js`, which is a simple web socket server.  It responds to any request (except `@kill`) by returning 3 names.
 
-`chat1.html` is intended as a simple client for testing with `fbptestws.js`. If Firefox doesn't work for you, Chrome should work.
-Just enter any string into the input field, and it will return the strings 
+`examples\websocket\chat1.html` is intended as a simple client for testing with `fbptestws.js`. If Firefox doesn't work for you, Chrome should work.
+
+Just enter any string (except `@kill`) into the input field, and click on `Send`, and it will return the strings: 
 
 - Server: Frankie Tomatto
 - Server: Joe Fresh
