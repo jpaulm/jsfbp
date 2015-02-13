@@ -31,6 +31,7 @@ Test cases so far:
 ![Fbptest11](https://github.com/jpaulm/jsfbp/blob/master/docs/Fbptest11.png "Diagram of fbptest11 above")
 
 - `fbptest12` -  `reader OUT -> IN copier OUT -> IN writer`
+- `fbptest13` -  Simple network to demonstrate functioning of random delay component (`randdelay`)
   
 - `fbptestws` -  Schematic web socket server (simple Process shown can be replaced by any structure of Processes, provided interfaces are adhered to)
  
