@@ -176,8 +176,10 @@ function run2(trace) {
 
   while (true) {
     var x = queue.shift();
-    while (x != undefined) {
+    while (x != undefined) {      
       if (x.fiber == null) {
+        if (tracing)
+           console.log('creating new fiber for ' + x.name);
         x.fiber = new Fiber(x.func);
         x.fiber.fbpProc = x;
         x.status = Process.Status.ACTIVE;
@@ -254,7 +256,7 @@ function run2(trace) {
     if (deadlock) {
       console.log('Deadlock detected');
       for (var i = 0; i < list.length; i++) {
-        console.log('- Process status: ' + list[i].getStatusString() + ' - ' + list[i].name);
+        console.log('- Process status: ' + Process.statusString(list[i].status) + ' - ' + list[i].name);
       }
       throw '';
     }
