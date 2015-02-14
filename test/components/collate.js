@@ -1,3 +1,7 @@
+
+
+var fbp = require('../../index.js');
+
 describe('collate', function() {
   it('should collate based on a single field', function(){
     var result = [];

@@ -1,3 +1,5 @@
+'use strict';
+
 var chai = require('chai');
 
 var InputPort = require('../core/InputPort')
@@ -5,7 +7,13 @@ var InputPort = require('../core/InputPort')
   , OutputPort = require('../core/OutputPort');
 
 global.expect = chai.expect;
-global.fbp = require('..');
+
+var InputPort = require('../core/InputPort')
+  , InputPortArray = require('../core/InputPortArray')
+  , OutputPort = require('../core/OutputPort')
+  , OutputPortArray = require('../core/OutputPortArray')
+  , IP = require('../core/IP');
+
 
 
 global.MockSender = function(inputArray) {

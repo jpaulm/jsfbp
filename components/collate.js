@@ -1,3 +1,5 @@
+'use strict';
+
 var InputPort = require('../core/InputPort')
   , InputPortArray = require('../core/InputPortArray')
   , IP = require('../core/IP')
