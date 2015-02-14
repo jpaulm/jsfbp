@@ -84,6 +84,16 @@ InputPort.prototype.close = function(){
   var conn = this.conn;
   conn.closed = true;
   console.log(proc.name + ': ' + conn.usedslots + ' IPs dropped because of close on ' + conn.name);
+  while (true) {
+    var ip = conn.array[conn.nxtget];
+    conn.array[conn.nxtget] = null;
+    conn.nxtget ++;
+    if (conn.nxtget > conn.array.length - 1)
+      conn.nxtget = 0; 
+    conn.usedslots--;  
+    if (conn.usedslots <= 0)
+    break;  
+  }
   for (var i = 0; i < conn.up.length; i ++) { 
     if (conn.up[i].status == ProcessStatus.WAITING_TO_SEND)
     this.queue.push(conn.up[i]); 
