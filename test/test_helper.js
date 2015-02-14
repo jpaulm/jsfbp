@@ -2,6 +2,10 @@
 
 var chai = require('chai');
 
+var InputPort = require('../core/InputPort')
+  , IP = require('../core/IP')
+  , OutputPort = require('../core/OutputPort');
+
 global.expect = chai.expect;
 
 var InputPort = require('../core/InputPort')
@@ -9,6 +13,7 @@ var InputPort = require('../core/InputPort')
   , OutputPort = require('../core/OutputPort')
   , OutputPortArray = require('../core/OutputPortArray')
   , IP = require('../core/IP');
+
 
 
 global.MockSender = function(inputArray) {

@@ -1,9 +1,9 @@
 'use strict';
 
 var InputPort = require('../core/InputPort')
-, InputPortArray = require('../core/InputPortArray')
-, OutputPort = require('../core/OutputPort') 
-, IP = require('../core/IP');
+  , InputPortArray = require('../core/InputPortArray')
+  , IP = require('../core/IP')
+  , OutputPort = require('../core/OutputPort');
 
 module.exports = function collate() {
   var ctlfields = InputPort.openInputPort('CTLFIELDS');
