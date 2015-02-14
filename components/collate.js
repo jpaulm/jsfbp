@@ -10,7 +10,7 @@ module.exports = function collate() {
   var outport = OutputPort.openOutputPort('OUT');
 
   var ctlfieldsP = ctlfields.receive();
-  fbp.IP.drop(ctlfieldsP);
+  IP.drop(ctlfieldsP);
 
   var fields = ctlfieldsP.contents.split(',').map(function(str) { return parseInt(str); });
   var totalFieldLength = fields.reduce(function(acc, n) { return acc + n; }, 0);
