@@ -32,7 +32,9 @@ Test cases so far:
 
 - `fbptest12` -  `reader OUT -> IN copier OUT -> IN writer`
 - `fbptest13` -  Simple network to demonstrate functioning of random delay component (`randdelay`)
-  
+- `fbptest14` -  Network demonstrating parallelism using two instances of `reader` and two fixed delay components (`delay`)
+ 
+WebSockets 
 - `fbptestws` -  Schematic web socket server (simple Process shown can be replaced by any structure of Processes, provided interfaces are adhered to)
  
 ![Fbptestws](https://github.com/jpaulm/jsfbp/blob/master/docs/Fbptestws.png "Diagram of fbptestws above")
