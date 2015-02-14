@@ -2,7 +2,8 @@
 
 var InputPort = require('../core/InputPort')
 , InputPortArray = require('../core/InputPortArray')
-, OutputPort = require('../core/OutputPort');
+, OutputPort = require('../core/OutputPort') 
+, IP = require('../core/IP');
 
 module.exports = function collate() {
   var ctlfields = InputPort.openInputPort('CTLFIELDS');

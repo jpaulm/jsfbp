@@ -7,7 +7,8 @@ global.expect = chai.expect;
 var InputPort = require('../core/InputPort')
   , InputPortArray = require('../core/InputPortArray')
   , OutputPort = require('../core/OutputPort')
-  , OutputPortArray = require('../core/OutputPortArray');
+  , OutputPortArray = require('../core/OutputPortArray')
+  , IP = require('../core/IP');
 
 
 global.MockSender = function(inputArray) {
