@@ -1,5 +1,5 @@
-var InputPort = require('../../core/InputPort')
-  , IP = require('../../core/IP');
+var InputPort = require('../core/InputPort')
+  , IP = require('../core/IP');
 
 module.exports = function wsresp() {
   var ip;

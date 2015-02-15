@@ -1,8 +1,8 @@
-var fbp = require('../..') 
+var fbp = require('..') 
   , Fiber = require('fibers')
-  , IP = require('../../core/IP')
-  , InputPort = require('../../core/InputPort')
-  , OutputPort = require('../../core/OutputPort')
+  , IP = require('../core/IP')
+  , InputPort = require('../core/InputPort')
+  , OutputPort = require('../core/OutputPort')
   , WebSocketServer = require('ws').Server;
 
 module.exports = function wsrecv() {

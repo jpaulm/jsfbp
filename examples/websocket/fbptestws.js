@@ -1,9 +1,9 @@
 var fbp = require('../..');
 
 // --- define network ---
-var respond  = fbp.defProc(require('./wsresp'));
+var respond  = fbp.defProc(require('../../components/wsresp'));
 var simproc  = fbp.defProc(require('./wssimproc'));
-var receiver = fbp.defProc(require('./wsrecv'));
+var receiver = fbp.defProc(require('../../components/wsrecv'));
 
 fbp.initialize(receiver, 'PORTNO', '9003');
 fbp.connect(receiver, 'OUT', simproc, 'IN', 6);
