@@ -1,11 +1,13 @@
 var fbp = require('../..');
   , Fiber = require('fibers')
   , IP = require('../../core/IP')
+  , InputPort = require('../../core/InputPort')
+  , OutputPort = require('../../core/OutputPort')
   , WebSocketServer = require('ws').Server;
 
 module.exports = function wsrecv() {
   var proc = fbp.getCurrentProc();
-  var inport = fbp.InputPort.openInputPort('PORTNO');
+  var inport = InputPort.openInputPort('PORTNO');
   var ip = inport.receive();
   var portno = ip.contents;
   var wss = new WebSocketServer({ port: portno });
@@ -20,11 +22,11 @@ module.exports = function wsrecv() {
       break;
     }
     fbp.setCallbackPending(false);
-    var outport = fbp.OutputPort.openOutputPort('OUT');
-    outport.send(IP.createBracket(fbp.IP.OPEN));
+    var outport = OutputPort.openOutputPort('OUT');
+    outport.send(IP.createBracket(IP.OPEN));
     outport.send(IP.create(result[0]));
     outport.send(IP.create(result[1]));
-    outport.send(IP.createBracket(fbp.IP.CLOSE));
+    outport.send(IP.createBracket(IP.CLOSE));
   }
 }
 
