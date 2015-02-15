@@ -34,6 +34,6 @@
     "test": "test"
   },
   "scripts": {
-    "test": "./node_modules/.bin/mocha --ui mocha-fibers --recursive -R spec --require test/test_helper.js"
+    "test": "mocha --ui mocha-fibers --recursive -R spec --require test/test_helper.js"
   }
 }
