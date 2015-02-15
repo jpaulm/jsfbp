@@ -1,4 +1,4 @@
-var fbp = require('../..');
+var fbp = require('../..') 
   , Fiber = require('fibers')
   , IP = require('../../core/IP')
   , InputPort = require('../../core/InputPort')
