@@ -2,8 +2,8 @@
 
 var IP = require('./IP')
   , Fiber = require('fibers')
+  , IIPConnection = require('./IIPConnection')
   , ProcessStatus = require('./Process').Status
-  , Utils = require('./utils');
 
 var InputPort = module.exports = function(queue){
   this.name = null;
@@ -28,7 +28,7 @@ InputPort.prototype.receive = function(){
   var proc = Fiber.current.fbpProc; 
   var conn = this.conn;
     
-  if (conn.constructor == Utils.InitConn)  {
+  if (conn instanceof IIPConnection)  {
    if (tracing)
     console.log(proc.name + ' recv IIP from port ' + this.name + ': ' + conn.contents);
    //var ip = new exports.IP(conn + '');

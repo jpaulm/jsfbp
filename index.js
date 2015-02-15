@@ -3,7 +3,8 @@
 var Fiber = require('fibers')
   , IP = require('./core/IP')
   , Process = require('./core/Process')
-  , Connection = require('./core/Connection')
+  , ProcessConnection = require('./core/ProcessConnection')
+  , IIPConnection = require('./core/IIPConnection')
   , InputPort = require('./core/InputPort')
   , InputPortArray = require('./core/InputPortArray')
   , OutputPort = require('./core/OutputPort')
@@ -50,7 +51,7 @@ function close(proc) {
 
   for (var i = 0; i < proc.inports.length; i++) {
     var conn = proc.inports[i][1].conn;
-    if (conn.constructor == Utils.InitConn) {
+    if (conn instanceof IIPConnection) {
       continue;
     }
     for (var j = 0; j < conn.up.length; j++) {
@@ -88,7 +89,7 @@ module.exports.setCallbackPending = function(b) {
 module.exports.initialize = function(proc, port, string) {
   var inport = new InputPort(queue);
   inport.name = proc.name + "." + port;
-  inport.conn = new Utils.InitConn(string);
+  inport.conn = new IIPConnection(string);
   proc.inports[proc.inports.length] = [proc.name + '.' + port, inport];
 };
 
@@ -121,7 +122,7 @@ exports.connect = function(upproc, upport, downproc, downport, capacity) {
     inport = new InputPort(queue);
     inport.name = downproc.name + "." + downport;
 
-    var cnxt = new Connection(capacity);
+    var cnxt = new ProcessConnection(capacity);
     cnxt.name = downproc.name + "." + downport;
     inport.conn = cnxt;
 
@@ -164,7 +165,7 @@ function run2(trace) {
     var selfstarting = true;
     for (var j = 0; j < list[i].inports.length; j++) {
       var k = list[i].inports[j];
-      if (k[1].conn.constructor != Utils.InitConn) {
+      if (!k[1].conn instanceof IIPConnection) {
         selfstarting = false;
       }
     }
@@ -229,7 +230,7 @@ function run2(trace) {
               queue.push(x);
               for (var j = 0; j < x.inports.length; j++) {
                 var k = x.inports[j];
-                if (k[1].conn.constructor == Utils.InitConn) {
+                if (k[1].conn instanceof IIPConnection) {
                   k[1].conn.closed = false;
                 }
               }
@@ -256,7 +257,7 @@ function run2(trace) {
     if (deadlock) {
       console.log('Deadlock detected');
       for (var i = 0; i < list.length; i++) {
-        console.log('- Process status: ' + Process.statusString(list[i].status) + ' - ' + list[i].name);
+        console.log('- Process status: ' + list[i].getStatusString() + ' - ' + list[i].name);
       }
       throw '';
     }
@@ -273,7 +274,7 @@ function run2(trace) {
 function upconnsclosed(proc) {
   for (var j = 0; j < proc.inports.length; j++) {
     var k = proc.inports[j];
-    if (k[1].conn.constructor == Utils.InitConn) {
+    if (k[1].conn instanceof IIPConnection) {
       continue;
     }
     if (!(k[1].conn.closed) || k[1].conn.usedslots > 0) {
