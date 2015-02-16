@@ -76,7 +76,22 @@ Defining network:
 - finish with
 - `var trace = true;`  or `... false` - specify whether tracing desired
 - `fbp.run(trace);`
-  
+
+Component headers:
+`'use strict';`
+
+Use some subset of the following (as needed by component code):
+```
+var fbp = require('..')
+  , Fiber = require('fibers')
+  , IP = require('../core/IP')
+  , InputPort = require('../core/InputPort')
+  , InputPortArray = require('../core/InputPortArray')
+  , OutputPort = require('../core/OutputPort') 
+  , OutputPortArray = require('../core/OutputPortArray')
+  , Utils = require('../core/Utils');
+```
+
 Component services:
 - `var ip = IP.create(contents);` - create an IP containing `contents`
 - `var ip = IP.createBracket(IP.OPEN|IP.CLOSE[, contents])` - create an open or close bracket IP
@@ -94,7 +109,7 @@ Component services:
 - `inport.close();` - close input port (or array port element)
   
 -  `fbp.setCallbackPending(true);` - used when doing asynchronous I/O in component
--  `queueCallback(proc[,data]);` - queue the callback to the JSFBP future events queue
+-  `fbp.queueCallback(proc[,data]);` - queue the callback to the JSFBP future events queue
 -  `utils.getElementWithSmallestBacklog(array);` - used by `lbal` - not for general use
 
 Install & Run
