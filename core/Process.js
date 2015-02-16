@@ -13,7 +13,7 @@ var Process = module.exports = function(name, func, list) {
   this.ownedIPs = 0; 
   this.cbpending = false;
   this.yielded = false; 
-  this.data = null;
+  this.result = null; // [data, err]
 };
 
 Process.Status = Enum([

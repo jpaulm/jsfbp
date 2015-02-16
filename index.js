@@ -72,12 +72,12 @@ module.exports.getCurrentProc = function() {
   return Fiber.current.fbpProc;
 };
 
-module.exports.queueCallback = function(proc, data) {
+module.exports.queueCallback = function(proc, result) {
   if (tracing) {
     console.log('queue ' + proc.name);
   }
-  if (data != undefined) {
-    proc.data = data;
+  if (result != undefined) {
+    proc.result = result;
   }
   queue.push(proc);
 };
@@ -206,7 +206,7 @@ function run2(trace) {
           }
 
           //------------------    
-          x.fiber.run(x.data);
+          x.fiber.run(x.result);
           //------------------
 
           x.data = null;

@@ -12,3 +12,4 @@ fbp.connect(copier, 'OUT', recvr, 'IN', 1);
 
 // --- run ---
 fbp.run({ trace: true });
+//fbp.run();
