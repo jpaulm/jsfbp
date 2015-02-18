@@ -5,23 +5,23 @@ var fbp = require('..')
   , OutputPort = require('../core/OutputPort')
   , WebSocketServer = require('ws').Server;
 
-module.exports = function wsrecv() {
-  var proc = fbp.getCurrentProc();
+module.exports = function wsrecv(runtime) {
+  var proc = runtime.getCurrentProc();
   var inport = InputPort.openInputPort('PORTNO');
   var ip = inport.receive();
   var portno = ip.contents;
   var wss = new WebSocketServer({ port: portno });
   var ws = null;
   while (true) {
-    fbp.setCallbackPending(true);
+    runtime.setCallbackPending(true);
 
-    var result = wsReceive(wss, ws, proc);
+    var result = wsReceive(runtime, wss, ws, proc);
     console.log('wsReceive complete: ' + proc.name);
     //console.log(result);
     if (result[1].endsWith('@kill')) {
       break;
     }
-    fbp.setCallbackPending(false);
+    runtime.setCallbackPending(false);
     var outport = OutputPort.openOutputPort('OUT');
     outport.send(IP.createBracket(IP.OPEN));
     outport.send(IP.create(result[0]));
@@ -30,13 +30,11 @@ module.exports = function wsrecv() {
   }
 }
 
-function wsReceive(wss, ws, proc) {
-  //var fiber =  Fiber.current;
+function wsReceive(runtime, wss, ws, proc) {
   wss.on('connection', function connection(ws) {
     ws.on('message', function incoming(message) {
-      //fbp.setCurrentProc(proc);
       console.log('running callback for: ' + proc.name);
-      fbp.queueCallback(proc, [ws, message]);
+      runtime.queueCallback(proc, [ws, message]);
     });
     ws.send('connected!');
   });
