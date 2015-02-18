@@ -15,7 +15,7 @@ module.exports = function reader(runtime) {
   IP.drop(ip);
   runtime.setCallbackPending(true);
 
-  var data = myReadFile(runtime, fname, "utf8", proc);
+  var result = myReadFile(runtime, fname, "utf8", proc);
   console.log('read complete: ' + proc.name);
 
   runtime.setCallbackPending(false);
@@ -36,7 +36,6 @@ module.exports = function reader(runtime) {
 function myReadFile(runtime, path, options, proc) {
   console.log('read started: ' + proc.name);
   fs.readFile(path, options, function(err, data) {
-<<<<<<< HEAD
     console.log('running callback for: ' + proc.name);
     runtime.queueCallback(proc, [data, err]);
   });
