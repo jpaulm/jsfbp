@@ -1,7 +1,6 @@
 'use strict';
 
-var fbp = require('..')
-  , InputPort = require('../core/InputPort')
+var InputPort = require('../core/InputPort')
   , IP = require('../core/IP')
   , OutputPortArray = require('../core/OutputPortArray');
 

@@ -1,15 +1,18 @@
 var fbp = require('..');
 
 // --- define network ---
-var sender = fbp.defProc('./components/sender.js');
-var repl   = fbp.defProc('./components/repl.js');
-var recvr  = fbp.defProc('./components/recvr.js');
+var network = new fbp.Network();
 
-fbp.initialize(sender, 'COUNT', '20');
-fbp.connect(sender, 'OUT', repl, 'IN', 5);
-fbp.connect(repl, 'OUT[0]', recvr, 'IN', 5);
-fbp.connect(repl, 'OUT[1]', recvr, 'IN', 5);
-fbp.connect(repl, 'OUT[2]', recvr, 'IN', 5);
+var sender = network.defProc('./components/sender.js');
+var repl   = network.defProc('./components/repl.js');
+var recvr  = network.defProc('./components/recvr.js');
+
+network.initialize(sender, 'COUNT', '20');
+network.connect(sender, 'OUT', repl, 'IN', 5);
+network.connect(repl, 'OUT[0]', recvr, 'IN', 5);
+network.connect(repl, 'OUT[1]', recvr, 'IN', 5);
+network.connect(repl, 'OUT[2]', recvr, 'IN', 5);
 
 // --- run ---
-fbp.run({ trace: false });
+var fiberRuntime = new fbp.FiberRuntime();
+network.run(fiberRuntime, { trace: true });

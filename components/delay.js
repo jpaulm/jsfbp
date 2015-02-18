@@ -2,12 +2,11 @@
 
 var InputPort = require('../core/InputPort')
   , OutputPort = require('../core/OutputPort')
-  , fbp = require('..')
   , Fiber = require('fibers')
   , IP = require('../core/IP');
 
-module.exports = function delay() {
-  var proc = fbp.getCurrentProc();
+module.exports = function delay(runtime) {
+  var proc = runtime.getCurrentProc();
   var inport = InputPort.openInputPort('IN');
   var intvlport = InputPort.openInputPort('INTVL');
   var outport = OutputPort.openOutputPort('OUT');
@@ -20,18 +19,18 @@ module.exports = function delay() {
     if (ip === null) {
       break;
     }
-    fbp.setCallbackPending(true);
-    sleep(proc, intvl);
-    fbp.setCallbackPending(false);
+    runtime.setCallbackPending(true);
+    sleep(runtime, proc, intvl);
+    runtime.setCallbackPending(false);
     outport.send(ip);
   }
 } 
 
-function sleep(proc, ms) {
+function sleep(runtime, proc, ms) {
   console.log(proc.name + ' start sleep: ' + Math.round(ms * 100) / 100 + ' msecs');  
     var fiber = Fiber.current;
     setTimeout(function() {
-        fbp.queueCallback(proc);
+        runtime.queueCallback(proc);
     }, ms);
     return Fiber.yield();
 }
