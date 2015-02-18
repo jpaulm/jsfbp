@@ -21,6 +21,7 @@ module.exports = function delay() {
       break;
     }
     fbp.setCallbackPending(true);
+    console.log('start wait for ' + Math.round(intvl * 100) / 100 + ' msecs: ' + ip.contents);
     sleep(proc, intvl);
     fbp.setCallbackPending(false);
     outport.send(ip);
@@ -28,9 +29,10 @@ module.exports = function delay() {
 } 
 
 function sleep(proc, ms) {
-  console.log(proc.name + ' start sleep: ' + Math.round(ms * 100) / 100 + ' msecs');  
+    // console.log(proc.name + ' start sleep: ' + Math.round(ms * 100) / 100 + ' msecs');  
     var fiber = Fiber.current;
     setTimeout(function() {
+        console.log('end wait for ' + Math.round(ms * 100) / 100 + ' msecs');
         fbp.queueCallback(proc);
     }, ms);
     return Fiber.yield();
