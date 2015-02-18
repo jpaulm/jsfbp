@@ -64,12 +64,12 @@ FiberRuntime.prototype.getCurrentProc = function() {
   return Fiber.current.fbpProc;
 };
 
-FiberRuntime.prototype.queueCallback = function(proc, data) {
+FiberRuntime.prototype.queueCallback = function(proc, result) {
   if (this._tracing) {
     console.log('queue ' + proc.name);
   }
-  if (data != undefined) {
-    proc.data = data;
+  if (result != undefined) {
+    proc.result = result;
   }
   this._queue.push(proc);
 };
@@ -145,7 +145,7 @@ FiberRuntime.prototype._actualRun = function (trace) {
           }
 
           //------------------    
-          x.fiber.run(x.data);
+          x.fiber.run(x.result);
           //------------------
 
           x.data = null;
