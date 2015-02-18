@@ -2,20 +2,23 @@ var fbp = require('..')
 , path = require('path');
 
 // --- define network ---
-var reader0     = fbp.defProc('./components/reader', 'reader0');
-var delay0      = fbp.defProc('./components/delay', 'delay0');
-var reader1     = fbp.defProc('./components/reader', 'reader1');
-var delay1      = fbp.defProc('./components/delay', 'delay1');
-var recvr      = fbp.defProc('./components/recvr');
+var network = new fbp.Network();
 
-fbp.initialize(delay0, 'INTVL', '2000');   // 2000 msecs
-fbp.initialize(delay1, 'INTVL', '1000');   // 1000 msecs
-fbp.initialize(reader0, 'FILE', path.resolve(__dirname, 'data/text.txt'));
-fbp.connect(reader0, 'OUT', delay0, 'IN', 2);
-fbp.initialize(reader1, 'FILE', path.resolve(__dirname, 'data/zzzs.txt'));
-fbp.connect(reader1, 'OUT', delay1, 'IN', 2);
-fbp.connect(delay0, 'OUT', recvr, 'IN', 2);
-fbp.connect(delay1, 'OUT', recvr, 'IN', 2);
-               // --- run ---
-//fbp.run({ trace: true });
-fbp.run();
+var reader0     = network.defProc('./components/reader', 'reader0');
+var delay0      = network.defProc('./components/delay', 'delay0');
+var reader1     = network.defProc('./components/reader', 'reader1');
+var delay1      = network.defProc('./components/delay', 'delay1');
+var recvr       = network.defProc('./components/recvr');
+
+network.initialize(delay0, 'INTVL', '2000');   // 2000 msecs
+network.initialize(delay1, 'INTVL', '1000');   // 1000 msecs
+network.initialize(reader0, 'FILE', path.resolve(__dirname, 'data/text.txt'));
+network.connect(reader0, 'OUT', delay0, 'IN', 2);
+network.initialize(reader1, 'FILE', path.resolve(__dirname, 'data/zzzs.txt'));
+network.connect(reader1, 'OUT', delay1, 'IN', 2);
+network.connect(delay0, 'OUT', recvr, 'IN', 2);
+network.connect(delay1, 'OUT', recvr, 'IN', 2);
+
+// --- run ---
+var fiberRuntime = new fbp.FiberRuntime();
+network.run(fiberRuntime, { trace: false });

@@ -1,13 +1,12 @@
 'use strict';
 
-var fbp = require('..')
-  , Fiber = require('fibers')
+var Fiber = require('fibers')
   , fs = require('fs')
   , InputPort = require('../core/InputPort')
   , IP = require('../core/IP');
 
-module.exports = function writer() {
-   var proc = fbp.getCurrentProc();
+module.exports = function writer(runtime) {
+   var proc = runtime.getCurrentProc();
    var inport = InputPort.openInputPort('FILE');
    var dataport = InputPort.openInputPort('IN');
    var ip = inport.receive();
@@ -22,17 +21,17 @@ module.exports = function writer() {
       string += ip.contents + '\n';
       IP.drop(ip);
    }
-   fbp.setCallbackPending(true);
-   myWriteFile(fname, string, "utf8", proc);
+   runtime.setCallbackPending(true);
+   myWriteFile(runtime, fname, string, "utf8", proc);
    console.log('write complete: ' + proc.name);
-   fbp.setCallbackPending(false);
+   runtime.setCallbackPending(false);
 };
 
-function myWriteFile(path, data, options, proc) {
+function myWriteFile(runtime, path, data, options, proc) {
   console.log('write started: ' + proc.name);
   fs.writeFile(path, data, options, function(err, data) {
     console.log('running callback for: ' + proc.name);
-    fbp.queueCallback(proc);
+    runtime.queueCallback(proc);
   });
   console.log('write pending: ' + proc.name);
   return Fiber.yield();

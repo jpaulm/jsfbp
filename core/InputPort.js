@@ -5,11 +5,10 @@ var IP = require('./IP')
   , IIPConnection = require('./IIPConnection')
   , ProcessStatus = require('./Process').Status
 
-var InputPort = module.exports = function(queue){
+var InputPort = module.exports = function(){
   this.name = null;
   this.conn = null;
   this.closed = false;
-	this.queue = queue;
 };
 
 InputPort.openInputPort = function(name) {
@@ -22,6 +21,10 @@ InputPort.openInputPort = function(name) {
   } 
   console.log('Port ' + proc.name + '.' + name + ' not found');
   return null;
+};
+
+InputPort.prototype.setRuntime = function(runtime) {
+  this._runtime = runtime;
 };
 
 InputPort.prototype.receive = function(){
@@ -62,7 +65,7 @@ InputPort.prototype.receive = function(){
    for (var i = 0; i < conn.up.length; i ++) { 
     if (conn.up[i].status == ProcessStatus.WAITING_TO_SEND) {
     conn.up[i].status = ProcessStatus.READY_TO_EXECUTE; 
-    this.queue.push(conn.up[i]); 
+    this._runtime.pushToQueue(conn.up[i]); 
     }  
    }
       
@@ -96,6 +99,6 @@ InputPort.prototype.close = function(){
   }
   for (var i = 0; i < conn.up.length; i ++) { 
     if (conn.up[i].status == ProcessStatus.WAITING_TO_SEND)
-    this.queue.push(conn.up[i]); 
+    this._runtime.pushToQueue(conn.up[i]); 
    }
 };

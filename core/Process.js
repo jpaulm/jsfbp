@@ -2,13 +2,12 @@
 
 var Enum = require('./utils').Enum;
 
-var Process = module.exports = function(name, func, list) {
-  this.name = name;  
-  this.func = func; 
+var Process = module.exports = function(name, func) {
+  this.name = name;
+  this.func = func;
   this.fiber = null;
   this.inports = [];
   this.outports = [];
-  list[list.length] = this;
   this.status = Process.Status.NOT_INITIALIZED;  
   this.ownedIPs = 0; 
   this.cbpending = false;

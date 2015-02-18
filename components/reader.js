@@ -1,25 +1,24 @@
 'use strict';
 
-var fbp = require('..')
-  , Fiber = require('fibers')
+var Fiber = require('fibers')
   , fs = require('fs')
   , InputPort = require('../core/InputPort')
   , IP = require('../core/IP')
 	, OutputPort = require('../core/OutputPort');
 
 // Reader based on Bruno Jouhier's code
-module.exports = function reader() {
-  var proc = fbp.getCurrentProc();
+module.exports = function reader(runtime) {
+  var proc = runtime.getCurrentProc();
   var inport = InputPort.openInputPort('FILE');
   var ip = inport.receive();
   var fname = ip.contents;
   IP.drop(ip);
-  fbp.setCallbackPending(true);
+  runtime.setCallbackPending(true);
 
-  var data = myReadFile(fname, "utf8", proc);
+  var data = myReadFile(runtime, fname, "utf8", proc);
   console.log('read complete: ' + proc.name);
 
-  fbp.setCallbackPending(false);
+  runtime.setCallbackPending(false);
   var outport = OutputPort.openOutputPort('OUT');
   var array = data.split('\n');
   for (var i = 0; i < array.length; i++) {
@@ -28,11 +27,11 @@ module.exports = function reader() {
   }
 };
 
-function myReadFile(path, options, proc) {
+function myReadFile(runtime, path, options, proc) {
   console.log('read started: ' + proc.name);
   fs.readFile(path, options, function(err, data) {
     console.log('callback for: ' + proc.name);
-    fbp.queueCallback(proc, data);
+    runtime.queueCallback(proc, data);
   });
   console.log('read pending: ' + proc.name);
   return Fiber.yield();
