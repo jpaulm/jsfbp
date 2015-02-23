@@ -28,9 +28,11 @@ module.exports = function randdelay(runtime) {
 
 function sleep(runtime, proc, ms) {
   console.log(proc.name + ' start sleep: ' + Math.round(ms * 100) / 100 + ' msecs');  
-    var fiber = Fiber.current;
-    setTimeout(function() {
-        runtime.queueCallback(proc);
-    }, ms);
-    return Fiber.yield();
+  var fiber = Fiber.current;
+  setTimeout(function() {
+    proc.yielded = false;
+    runtime.queueCallback(proc);
+  }, ms);
+  proc.yielded = true;
+  return Fiber.yield();
 }

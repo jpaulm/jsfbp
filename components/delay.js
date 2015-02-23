@@ -11,7 +11,7 @@ module.exports = function delay(runtime) {
   var intvlport = InputPort.openInputPort('INTVL');
   var outport = OutputPort.openOutputPort('OUT');
   var intvl_ip = intvlport.receive();
-  var intvl = intvl_ip.contents;
+  var intvl = parseInt(intvl_ip.contents);
   IP.drop(intvl_ip);
 
   while (true) {
@@ -27,10 +27,13 @@ module.exports = function delay(runtime) {
 } 
 
 function sleep(runtime, proc, ms) {
-  console.log(proc.name + ' start sleep: ' + Math.round(ms * 100) / 100 + ' msecs');  
-    var fiber = Fiber.current;
-    setTimeout(function() {
-        runtime.queueCallback(proc);
-    }, ms);
-    return Fiber.yield();
+  console.log(proc.name + ' start sleep: ' + Math.round(ms * 100) / 100 + ' msecs');
+  var fiber = Fiber.current;
+  setTimeout(function() {
+    console.log("queued callback again");
+    proc.yielded = false;
+    runtime.queueCallback(proc);
+  }, ms);
+  proc.yielded = true;
+  return Fiber.yield();
 }
