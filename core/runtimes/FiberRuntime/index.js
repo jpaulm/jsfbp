@@ -81,13 +81,14 @@ FiberRuntime.prototype.runAsyncCallback = function(cb) {
   
   var self = this;
   
-  cb(function () {
+  cb(function (result) {
     proc.yielded = false;
     proc.cbpending = false;
+    proc.result = result;
     self.queueCallback(proc);
   });
   
-  Fiber.yield();  
+  return Fiber.yield();
 };
 
 FiberRuntime.prototype.run = function (processes, options, callback) {
