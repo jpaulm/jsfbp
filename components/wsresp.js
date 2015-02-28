@@ -1,5 +1,7 @@
 'use strict';
 
+var IP = require('../core/IP');
+
 module.exports = function wsresp() {
   var ip;
   var inport = this.openInputPort('IN');

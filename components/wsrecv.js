@@ -1,6 +1,7 @@
 'use strict';
 
-var WebSocketServer = require('ws').Server;
+var IP = require('../core/IP')
+  , WebSocketServer = require('ws').Server;
 
 module.exports = function wsrecv(runtime) {
   var inport = this.openInputPort('PORTNO');
@@ -9,16 +10,14 @@ module.exports = function wsrecv(runtime) {
   var wss = new WebSocketServer({ port: portno });
   var ws = null;
   while (true) {
-    runtime.setCallbackPending(true);
-
-    var result = wsReceive(runtime, wss, ws, this);
+    var result = runtime.runAsyncCallback(genWsReceiveFun(runtime, wss, ws, this));
     console.log('wsReceive complete: ' + this.name);
     //console.log(result);
     if (result[1].endsWith('@kill')) {
       break;
     }
-    runtime.setCallbackPending(false);
-    var outport = OutputPort.openOutputPort('OUT');
+
+    var outport = this.openOutputPort('OUT');
     outport.send(this.createIPBracket(IP.OPEN));
     outport.send(this.createIP(result[0]));
     outport.send(this.createIP(result[1]));
@@ -26,16 +25,17 @@ module.exports = function wsrecv(runtime) {
   }
 }
 
-function wsReceive(runtime, wss, ws, proc) {
-  wss.on('connection', function connection(ws) {
-    ws.on('message', function incoming(message) {
-      console.log('running callback for: ' + proc.name);
-      runtime.queueCallback(proc, [ws, message]);
+function genWsReceiveFun(runtime, wss, ws, proc) {
+  return function (done) {
+    wss.on('connection', function connection(ws) {
+      ws.on('message', function incoming(message) {
+        console.log('running callback for: ' + proc.name);
+        done([ws, message]);
+      });
+      ws.send('connected!');
     });
-    ws.send('connected!');
-  });
-  console.log('wsReceive pending: ' + proc.name);
-  return Fiber.yield();
+    console.log('wsReceive pending: ' + proc.name);
+  };
 }
 
 String.prototype.endsWith = function (s) {
