@@ -1,25 +1,19 @@
 'use strict';
 
-var Fiber = require('fibers')
-  , InputPort = require('../core/InputPort')
-  , IP = require('../core/IP')
-  , OutputPort = require('../core/OutputPort');
-
 module.exports = function randdelay(runtime) {
-  var proc = runtime.getCurrentProc();
-  var inport = InputPort.openInputPort('IN');
-  var intvlport = InputPort.openInputPort('INTVL');
-  var outport = OutputPort.openOutputPort('OUT');
+  var inport = this.openInputPort('IN');
+  var intvlport = this.openInputPort('INTVL');
+  var outport = this.openOutputPort('OUT');
   var intvl_ip = intvlport.receive();
   var intvl = intvl_ip.contents;
-  IP.drop(intvl_ip);
+  this.dropIP(intvl_ip);
 
   while (true) {
     var ip = inport.receive();
     if (ip === null) {
       break;
     }
-    runtime.runAsyncCallback(genSleepFun(proc, Math.random() * intvl));
+    runtime.runAsyncCallback(genSleepFun(this, Math.random() * intvl));
     outport.send(ip);
   }
 };

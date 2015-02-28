@@ -11,18 +11,6 @@ var InputPort = module.exports = function(){
   this.closed = false;
 };
 
-InputPort.openInputPort = function(name) {
-  var proc = Fiber.current.fbpProc;
-  var namex = proc.name + '.' + name;  
-  //console.log(proc.inports);
-  for (var i = 0; i < proc.inports.length; i++) {    
-    if (proc.inports[i][0] == namex)
-    return proc.inports[i][1];  // return inputport
-  } 
-  console.log('Port ' + proc.name + '.' + name + ' not found');
-  return null;
-};
-
 InputPort.prototype.setRuntime = function(runtime) {
   this._runtime = runtime;
 };
@@ -35,7 +23,7 @@ InputPort.prototype.receive = function(){
    if (tracing)
     console.log(proc.name + ' recv IIP from port ' + this.name + ': ' + conn.contents);
    //var ip = new exports.IP(conn + '');
-   var ip = IP.create(conn.contents);
+   var ip = proc.createIP(conn.contents);
    conn.closed = true;
    ip.user = proc;
    //console.log(conn);

@@ -1,33 +1,28 @@
 'use strict';
 
-var Fiber = require('fibers')
-  , fs = require('fs')
-  , InputPort = require('../core/InputPort')
-  , IP = require('../core/IP')
-	, OutputPort = require('../core/OutputPort');
+var fs = require('fs');
 
 // Reader based on Bruno Jouhier's code
 module.exports = function reader(runtime) {
-  var proc = runtime.getCurrentProc();
-  var inport = InputPort.openInputPort('FILE');
+  var inport = this.openInputPort('FILE');
   var ip = inport.receive();
   var fname = ip.contents;
-  IP.drop(ip);
+  this.dropIP(ip);
   
-  var result = runtime.runAsyncCallback(myReadFile(fname, "utf8", proc));
+  var result = runtime.runAsyncCallback(myReadFile(fname, "utf8", this));
   
-  console.log('read complete: ' + proc.name);
+  console.log('read complete: ' + this.name);
 
   if (result[0] == undefined) {
      console.log(result[1]);
      return;  
   }
 
-  var outport = OutputPort.openOutputPort('OUT');
+  var outport = this.openOutputPort('OUT');
   var array = result[0].split('\n');
   //console.log(array);
   for (var i = 0; i < array.length; i++) {
-    var ip = IP.create(array[i]);
+    var ip = this.createIP(array[i]);
     outport.send(ip);
   }
 };

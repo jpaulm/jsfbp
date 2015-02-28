@@ -1,33 +1,29 @@
 'use strict';
 
-var Fiber = require('fibers')
-  , fs = require('fs')
-  , InputPort = require('../core/InputPort')
-  , IP = require('../core/IP');
+var fs = require('fs');
 
 module.exports = function writer(runtime) {
-   var proc = runtime.getCurrentProc();
-   var inport = InputPort.openInputPort('FILE');
-   var dataport = InputPort.openInputPort('IN');
-   var ip = inport.receive();
-   var fname = ip.contents;
-   IP.drop(ip);
-   var string = '';
-   while (true) {
-      ip = dataport.receive();
-      if (ip === null) {
-        break;
-      }
-      string += ip.contents + '\n';
-      IP.drop(ip);
+  var inport = this.openInputPort('FILE');
+  var dataport = this.openInputPort('IN');
+  var ip = inport.receive();
+  var fname = ip.contents;
+  this.dropIP(ip);
+  var string = '';
+  while (true) {
+   ip = dataport.receive();
+   if (ip === null) {
+     break;
    }
+   string += ip.contents + '\n';
+   this.dropIP(ip);
+  }
 
-   var result = runtime.runAsyncCallback(myWriteFile(fname, string, "utf8", proc));
-   console.log('write complete: ' + proc.name);
-   if (result != null) {
-     console.log(result);
-     return;
-   }
+  var result = runtime.runAsyncCallback(myWriteFile(fname, string, "utf8", this));
+  console.log('write complete: ' + this.name);
+  if (result != null) {
+    console.log(result);
+    return;
+  }
 };
 
 function myWriteFile(path, data, options, proc) {

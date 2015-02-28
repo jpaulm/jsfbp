@@ -1,10 +1,8 @@
-var InputPort = require('../../core/InputPort')
-  , IP = require('../../core/IP')
-  , OutputPort = require('../../core/OutputPort');
+'use strict';
 
 module.exports = function wssimproc() {
-  var inport = InputPort.openInputPort('IN');
-  var outport = OutputPort.openOutputPort('OUT');
+  var inport = this.openInputPort('IN');
+  var outport = this.openOutputPort('OUT');
   while (true) {
     var ip = inport.receive();
     if (ip == null) {
@@ -14,10 +12,10 @@ module.exports = function wssimproc() {
     ip = inport.receive();
     outport.send(ip);      // connection
     ip = inport.receive();
-    outport.send(IP.create('Frankie Tomatto'));
-    outport.send(IP.create('Joe Fresh'));
-    outport.send(IP.create('Aunt Jemima'));
-    IP.drop(ip);
+    outport.send(this.createIP('Frankie Tomatto'));
+    outport.send(this.createIP('Joe Fresh'));
+    outport.send(this.createIP('Aunt Jemima'));
+    this.dropIP(ip);
     ip = inport.receive();
     outport.send(ip);
   }

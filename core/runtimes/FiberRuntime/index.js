@@ -115,7 +115,7 @@ FiberRuntime.prototype._createFiber = function (process) {
   if (this._tracing) {
     console.log('creating new fiber for ' + process.name);
   }
-  process.fiber = new Fiber(process.func.bind(null, this));
+  process.fiber = new Fiber(process.func.bind(process, this));
   process.fiber.fbpProc = process;
   process.status = Process.Status.ACTIVE;
   

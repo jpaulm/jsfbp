@@ -1,11 +1,8 @@
 'use strict';
 
-var InputPortArray = require('../core/InputPortArray')
-  , OutputPort = require('../core/OutputPort');
-
 module.exports = function concat() {
-  var array = InputPortArray.openInputPortArray('IN');
-  var outport = OutputPort.openOutputPort('OUT');
+  var array = this.openInputPortArray('IN');
+  var outport = this.openOutputPort('OUT');
   var ip = null;
 
   for (var i = 0; i < array.length; i++) {

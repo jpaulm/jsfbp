@@ -8,18 +8,6 @@ var OutputPort = module.exports = function(){
   this.closed = false;
 };
 
-OutputPort.openOutputPort = function(name) {
-  var proc = Fiber.current.fbpProc; 
-  var namex = proc.name + '.' + name;
-  for (var i = 0; i < proc.outports.length; i++) {
-    if (proc.outports[i][0] == namex) {
-      return proc.outports[i][1];  // return conn
-    }
-  }
-  console.log('Port ' + proc.name + '.' + name + ' not found');
-  return null;
-};
-
 OutputPort.prototype.setRuntime = function(runtime) {
   this._runtime = runtime;
 };

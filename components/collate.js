@@ -1,17 +1,12 @@
 'use strict';
 
-var InputPort = require('../core/InputPort')
-  , InputPortArray = require('../core/InputPortArray')
-  , IP = require('../core/IP')
-  , OutputPort = require('../core/OutputPort');
-
 module.exports = function collate() {
-  var ctlfields = InputPort.openInputPort('CTLFIELDS');
-  var inportArray = InputPortArray.openInputPortArray('IN');
-  var outport = OutputPort.openOutputPort('OUT');
+  var ctlfields = this.openInputPort('CTLFIELDS');
+  var inportArray = this.openInputPortArray('IN');
+  var outport = this.openOutputPort('OUT');
 
   var ctlfieldsP = ctlfields.receive();
-  IP.drop(ctlfieldsP);
+  this.dropIP(ctlfieldsP);
 
   var fields = ctlfieldsP.contents.split(',').map(function(str) { return parseInt(str); });
   var totalFieldLength = fields.reduce(function(acc, n) { return acc + n; }, 0);

@@ -1,29 +1,28 @@
-var InputPort = require('../core/InputPort')
-  , IP = require('../core/IP');
+'use strict';
 
 module.exports = function wsresp() {
   var ip;
-  var inport = InputPort.openInputPort('IN');
+  var inport = this.openInputPort('IN');
   while (true) {
     ip = inport.receive();   // shd be open bracket
     if (ip === null) {
       break;
     }
     //console.log(ip);
-    IP.drop(ip);
+    this.dropIP(ip);
     ip = inport.receive();   // shd be connection
     //console.log(ip);
     var ws = ip.contents;
-    IP.drop(ip);
+    this.dropIP(ip);
     while (true) {
       ip = inport.receive();
       //console.log(ip);
       if (ip.type == IP.CLOSE) {
-        IP.drop(ip);
+        this.dropIP(ip);
         break;
       }
       var msg = ip.contents;
-      IP.drop(ip);
+      this.dropIP(ip);
       ws.send(msg);
     }
   }

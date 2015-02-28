@@ -1,13 +1,9 @@
-var fbp = require('..') 
-  , Fiber = require('fibers')
-  , IP = require('../core/IP')
-  , InputPort = require('../core/InputPort')
-  , OutputPort = require('../core/OutputPort')
-  , WebSocketServer = require('ws').Server;
+'use strict';
+
+var WebSocketServer = require('ws').Server;
 
 module.exports = function wsrecv(runtime) {
-  var proc = runtime.getCurrentProc();
-  var inport = InputPort.openInputPort('PORTNO');
+  var inport = this.openInputPort('PORTNO');
   var ip = inport.receive();
   var portno = ip.contents;
   var wss = new WebSocketServer({ port: portno });
@@ -15,18 +11,18 @@ module.exports = function wsrecv(runtime) {
   while (true) {
     runtime.setCallbackPending(true);
 
-    var result = wsReceive(runtime, wss, ws, proc);
-    console.log('wsReceive complete: ' + proc.name);
+    var result = wsReceive(runtime, wss, ws, this);
+    console.log('wsReceive complete: ' + this.name);
     //console.log(result);
     if (result[1].endsWith('@kill')) {
       break;
     }
     runtime.setCallbackPending(false);
     var outport = OutputPort.openOutputPort('OUT');
-    outport.send(IP.createBracket(IP.OPEN));
-    outport.send(IP.create(result[0]));
-    outport.send(IP.create(result[1]));
-    outport.send(IP.createBracket(IP.CLOSE));
+    outport.send(this.createIPBracket(IP.OPEN));
+    outport.send(this.createIP(result[0]));
+    outport.send(this.createIP(result[1]));
+    outport.send(this.createIPBracket(IP.CLOSE));
   }
 }
 
