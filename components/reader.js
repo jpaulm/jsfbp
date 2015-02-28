@@ -13,12 +13,11 @@ module.exports = function reader(runtime) {
   var ip = inport.receive();
   var fname = ip.contents;
   IP.drop(ip);
-  runtime.setCallbackPending(true);
-
-  var result = myReadFile(runtime, fname, "utf8", proc);
+  
+  var result = runtime.runAsyncCallback(myReadFile(fname, "utf8", proc));
+  
   console.log('read complete: ' + proc.name);
 
-  runtime.setCallbackPending(false);
   if (result[0] == undefined) {
      console.log(result[1]);
      return;  
@@ -33,12 +32,12 @@ module.exports = function reader(runtime) {
   }
 };
 
-function myReadFile(runtime, path, options, proc) {
-  console.log('read started: ' + proc.name);
-  fs.readFile(path, options, function(err, data) {
-    console.log('running callback for: ' + proc.name);
-    runtime.queueCallback(proc, [data, err]);
-  });
-  console.log('read pending: ' + proc.name);
-  return Fiber.yield();
+function myReadFile(path, options, proc) {
+  return function (done) {
+    console.log('read started: ' + proc.name);
+    fs.readFile(path, options, function(err, data) {
+      done([data, err]);
+    });
+    console.log('read pending: ' + proc.name);
+  };
 }
