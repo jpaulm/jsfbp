@@ -32,17 +32,20 @@ describe('randdelay', function() {
   
   it('should randomly delay multiple IPs', function(done) {
     var DELAY = 1000;
-    var DELAY_MAX_DIFF = 150;
-    this.timeout(DELAY + DELAY_MAX_DIFF);
+    var DELAY_MAX_DIFF = 300;
+    var DELAY_TOTAL = DELAY * 5;
+    this.timeout(DELAY_TOTAL + DELAY_MAX_DIFF);
     
     var network = new fbp.Network();
     
     var result = [];
     var startTime;
     
+    var i = 0;
     var mockReceiver = MockReceiver(result, function receive() {
+      i++;
       var diffTime = Date.now() - startTime;
-      expect(Math.abs(diffTime - DELAY)).to.be.within(0, DELAY + DELAY_MAX_DIFF);
+      expect(Math.abs(diffTime - DELAY)).to.be.within(0, DELAY*i + DELAY_MAX_DIFF);
       console.log("DELAY " + diffTime);
     });
     

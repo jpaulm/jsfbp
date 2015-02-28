@@ -74,8 +74,20 @@ FiberRuntime.prototype.queueCallback = function(proc, result) {
   this._queue.push(proc);
 };
 
-FiberRuntime.prototype.setCallbackPending = function(b) {
-  Fiber.current.fbpProc.cbpending = b;
+FiberRuntime.prototype.runAsyncCallback = function(cb) {
+  var proc = this.getCurrentProc();
+  proc.yielded = true;
+  proc.cbpending = true;
+  
+  var self = this;
+  
+  cb(function () {
+    proc.yielded = false;
+    proc.cbpending = false;
+    self.queueCallback(proc);
+  });
+  
+  Fiber.yield();  
 };
 
 FiberRuntime.prototype.run = function (processes, options, callback) {
@@ -178,7 +190,7 @@ FiberRuntime.prototype._actualRun = function (trace) {
 
 FiberRuntime.prototype._tick = function () {
   var x = this._queue.shift();
-  while (x != undefined) {      
+  while (x != undefined) {
     if (x.fiber == null) {
       x = this._createFiber(x);
     }
@@ -186,8 +198,11 @@ FiberRuntime.prototype._tick = function () {
     if (x.status == Process.Status.DORMANT && this._areUpConnsClosed(x)) {
       this._close(x);
     }
-    else if (x.status != Process.Status.CLOSED) {        
-      x.fiber.run(x.result);
+    else if (x.status != Process.Status.CLOSED) {
+      if (!x.cbpending) {
+        x.fiber.run(x.result);
+      }
+      this._logProcessInfo(x);
       x.data = null;
       
       if (!x.yielded && !x.cbpending) {
@@ -206,7 +221,14 @@ FiberRuntime.prototype._tick = function () {
         }
       }
     }
+    
+    if (this._tracing) {
+      console.log("Shift new process, old one = " + x.name);
+    }
     x = this._queue.shift();
+    if (this._tracing && x) {
+      console.log("New one: " + x.name);
+    }
   }
 };
 

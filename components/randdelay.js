@@ -19,20 +19,17 @@ module.exports = function randdelay(runtime) {
     if (ip === null) {
       break;
     }
-    runtime.setCallbackPending(true);
-    sleep(runtime, proc, Math.random() * intvl);
-    runtime.setCallbackPending(false);
+    runtime.runAsyncCallback(genSleepFun(proc, Math.random() * intvl));
     outport.send(ip);
   }
 };
 
-function sleep(runtime, proc, ms) {
-  console.log(proc.name + ' start sleep: ' + Math.round(ms * 100) / 100 + ' msecs');  
-  var fiber = Fiber.current;
-  setTimeout(function() {
-    proc.yielded = false;
-    runtime.queueCallback(proc);
-  }, ms);
-  proc.yielded = true;
-  return Fiber.yield();
+function genSleepFun(proc, ms) {
+  return function (done) {
+    console.log(proc.name + ' start sleep: ' + Math.round(ms * 100) / 100 + ' msecs');
+    
+    setTimeout(function() {
+      done();
+    }, ms);
+  };
 }

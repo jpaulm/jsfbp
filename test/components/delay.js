@@ -22,7 +22,7 @@ describe('delay', function() {
     
     var startTime = Date.now();
     
-    network.run(new fbp.FiberRuntime(), { trace: true }, function () {
+    network.run(new fbp.FiberRuntime(), { trace: false }, function () {
       expect(result).to.deep.equal([42]);
       var diffTime = Date.now() - startTime;
       expect(Math.abs(diffTime - DELAY)).to.be.below(DELAY_MAX_DIFF);
@@ -31,10 +31,10 @@ describe('delay', function() {
   });
   
   it('should exactly delay multiple IPs', function(done) {
-    done();return;
     var DELAY = 1000;
-    var DELAY_MAX_DIFF = 150;
-    this.timeout(DELAY + DELAY_MAX_DIFF);
+    var DELAY_MAX_DIFF = 300;
+    var TOTAL_DELAY = DELAY * 3;
+    this.timeout(TOTAL_DELAY + DELAY_MAX_DIFF);
     
     var network = new fbp.Network();
     
@@ -43,6 +43,8 @@ describe('delay', function() {
     var sender   = network.defProc(MockSender([1,2,3]));
     var delay    = network.defProc('./components/delay.js');
     var receiver = network.defProc(MockReceiver(result));
+    
+    sender.name = "Sender"; delay.name = "DELAY"; receiver.name = "RECVR";
 
     network.initialize(delay, 'INTVL', DELAY);
     network.connect(sender, 'OUT', delay, 'IN', 5);
@@ -53,7 +55,7 @@ describe('delay', function() {
     network.run(new fbp.FiberRuntime(), { trace: false }, function () {
       expect(result).to.deep.equal([1,2,3]);
       var diffTime = Date.now() - startTime;
-      expect(Math.abs(diffTime - DELAY)).to.be.below(DELAY_MAX_DIFF);
+      expect(Math.abs(diffTime - TOTAL_DELAY)).to.be.below(DELAY_MAX_DIFF);
       done();
     });
   });
