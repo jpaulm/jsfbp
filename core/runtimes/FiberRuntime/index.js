@@ -137,7 +137,7 @@ FiberRuntime.prototype._genInitialQueue = function () {
   
   this._list.forEach(function (process) {
     var shallAdd = process.inports.every(function (inport) {
-      return !(inport[1].conn instanceof IIPConnection);
+      return inport[1].conn instanceof IIPConnection;
     });
     
     if (shallAdd) {
@@ -170,6 +170,13 @@ FiberRuntime.prototype._areUpConnsClosed = function (proc) {
 // Fibre running scheduler
 FiberRuntime.prototype._actualRun = function (trace) {
   this._queue = this._genInitialQueue();
+  
+  if (this._tracing) {
+    var procNames = this._queue.map(function (proc) {
+      return proc.name;
+    });
+    console.log(procNames);
+  }
 
   while (true) {
     this._tick();
