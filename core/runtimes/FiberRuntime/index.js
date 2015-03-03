@@ -140,7 +140,7 @@ FiberRuntime.prototype._genInitialQueue = function () {
       return !(inport[1].conn instanceof IIPConnection);
     });
     
-    if (shallAdd || true) {
+    if (shallAdd) {
       self._queue.push(process);
     }
   });
@@ -170,7 +170,7 @@ FiberRuntime.prototype._areUpConnsClosed = function (proc) {
 // Fibre running scheduler
 FiberRuntime.prototype._actualRun = function (trace) {
   this._queue = this._genInitialQueue();
-  
+
   while (true) {
     this._tick();
 
