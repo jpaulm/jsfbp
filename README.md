@@ -67,40 +67,38 @@ Components
  
 API
 ---
-Defining network:
-- start with `var fbp = require('fbp');`
-- `fbp.defProc` - define Process
-- `fbp.connect` - connect output port to input port
-- `fbp.initialize` - specify IIP and the port it is connected to
- 
-- finish with
-- `var trace = true;`  or `... false` - specify whether tracing desired
-- `fbp.run(trace);`
+1. Get access to JSFBP: `var fbp = require('fbp')`
+2. Create a new network: `var network = new fbp.Network();`
+3. Define your network:
+ - Add processes: `network.defProc(&hellip;)`
+ - Connect output ports to input ports: `network.connect(&hellip;)`
+ - Specify IIPs: `network.initialize(&hellip;)`
+4. Create a new runtime: `var fiberRuntime = new fbp.FiberRuntime();`
+5. Run it!
+  ```network.run(fiberRuntime, {trace: true/false}, function success() {
+    console.log("Finished!");
+  });
+```
+ Activating `trace` can be desired in debugging scenarios.
 
 Component headers:
 `'use strict';`
 
-Use some subset of the following (as needed by component code):
-```
-var fbp = require('..')
-  , Fiber = require('fibers')
-  , IP = require('../core/IP')
-  , InputPort = require('../core/InputPort')
-  , InputPortArray = require('../core/InputPortArray')
-  , OutputPort = require('../core/OutputPort') 
-  , OutputPortArray = require('../core/OutputPortArray')
-  , Utils = require('../core/Utils');
-```
+In most cases you do not need to *require()* any JSFBP-related scripts or libraries as a component developer. Everything you need is injected into the component's function as its context `this` (the process object) and as a parameter (the runtime object).
+Some utility functions are stored in `core/utils.js`. Import them if you really need them.
+You should generally refrain from accessing runtime-related code (e.g. Fibers) to ensure the greatest compatibility.
 
-Component services:
-- `var ip = IP.create(contents);` - create an IP containing `contents`
-- `var ip = IP.createBracket(IP.OPEN|IP.CLOSE[, contents])` - create an open or close bracket IP
-- `IP.drop(ip);` - drop IP
+Component services
+
+- `var ip = this.createIP(contents);` - create an IP containing `contents`
+- `var ip = this.createIPBracket(IP.OPEN|IP.CLOSE[, contents])` - create an open or close bracket IP
+  **Be sure** to include IP: `var IP = require('IP')` to gain access to the IP constants.
+- `this.dropIP(ip);` - drop IP
   
-- `var inport = InputPort.openInputPort('IN');` - create InputPort variable  
-- `var array = InputPortArray.openInputPortArray('IN');` - create input array port array
-- `var outport = OutputPort.openOutputPort('OUT');` - create OutputPort variable 
-- `var array = OutputPortArray.openOutputPortArray('OUT');` - create output array port array   
+- `var inport = this.openInputPort('IN');` - create InputPort variable  
+- `var array = this.openInputPortArray('IN');` - create input array port array
+- `var outport = this.openOutputPort('OUT');` - create OutputPort variable 
+- `var array = this.openOutputPortArray('OUT');` - create output array port array   
   
 - `var ip = inport.receive();` - returns null if end of stream 
 - `var ip = array[i].receive();` - receive to element of port array
@@ -108,9 +106,18 @@ Component services:
 - `array[i].send(ip);` - send from element of port array
 - `inport.close();` - close input port (or array port element)
   
--  `fbp.setCallbackPending(true);` - used when doing asynchronous I/O in component
--  `fbp.queueCallback(proc[,data]);` - queue the callback to the JSFBP future events queue
--  `utils.getElementWithSmallestBacklog(array);` - used by `lbal` - not for general use
+-  `runtime.runAsyncCallback()` - used when doing asynchronous I/O in component
+  Example:
+  ```
+runtime.runAsyncCallback(function (done) {
+  // your asynchronous
+  &hellip;
+  // call done (possibly asynchronously) when you're done!
+  done();
+});
+```
+-  `Utils.getElementWithSmallestBacklog(array);` - used by `lbal` - not for general use
+  **Be sure** to include Utils: `var Utils = require('core/utils')`.
 
 Install & Run
 ---
