@@ -1,12 +1,10 @@
-jsfbp
-=====
+# jsfbp
 
 "Classical" FBP implementation written in JavaScript, using Node-Fibers - https://github.com/laverdet/node-fibers .  
 
 JSFBP takes advantage of JavaScript's concept of functions as first-degree objects to allow applications to be built using "green threads".  JSFBP makes use of a "Future Events Queue" which supports the green threads, and provides quite good performance (see below) - the JavaScript events queue is only used for JavaScript asynchronous functions, as before.
 
-General
----
+# General
 
 Test cases so far:
 
@@ -43,8 +41,7 @@ Some of these have tracing set on, depending on what testing was being done when
 
 These tests (except for `fbptestws`) can be run sequentially by running `fbptests.bat`.
  
-Components
----
+# Components
 
 - `concat`  - concatenates all the streams that are sent to its array input port (size determined in network definition) 
 - `copier`  - copies its input stream to its output stream
@@ -65,8 +62,10 @@ Components
 - `wssimproc` - "simulated" processing for web socket server - actually just outputs 3 names
 
  
-API
----
+# API
+
+## For normal users
+
 1. Get access to JSFBP: `var fbp = require('fbp')`
 2. Create a new network: `var network = new fbp.Network();`
 3. Define your network:
@@ -80,6 +79,8 @@ API
   });
 ```
  Activating `trace` can be desired in debugging scenarios.
+
+## For component developers
 
 Component headers:
 `'use strict';`
@@ -119,10 +120,9 @@ runtime.runAsyncCallback(function (done) {
 -  `Utils.getElementWithSmallestBacklog(array);` - used by `lbal` - not for general use
   **Be sure** to include Utils: `var Utils = require('core/utils')`.
 
-Install & Run
----
+# Install & Run
 
-1. Install node.js - see http://nodejs.org/download/  .  Node 12.0 has a problem (at least in Windows) - for now, use node 11.16.
+1. Install node.js - see http://nodejs.org/download/  .  Node 12.0 leads to compatibility problems with Fiber, see [here](https://gist.github.com/ComFreek/c341bacfaae3aca887df) how to use Node 11.16 on a per-project basis. Alternatively, you can also globally install an older Node version.
 
 2. Clone or download this project
 
@@ -130,8 +130,7 @@ Install & Run
 
 4. Run `node examples/fbptestx.js`, where `fbptestx` is any of the tests listed above. If tracing is desired, change the value of the `trace` variable at the bottom of fbptest.js to `true`. 
 
-Testing Web Socket Server
----
+# Testing Web Socket Server
 
 Run `node examples\websocket\fbptestws.js`, which is a simple web socket server.  It responds to any request (except `@kill`) by returning 3 names.
 
