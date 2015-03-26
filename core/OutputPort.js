@@ -2,28 +2,19 @@
 var Fiber = require('fibers')
   , ProcessStatus = require('./Process').Status;
 
-var OutputPort = module.exports = function(queue){
+var OutputPort = module.exports = function(){
   this.name = null;
   this.conn = null;  
   this.closed = false;
-	this.queue = queue;
 };
 
-OutputPort.openOutputPort = function(name) {
-  var proc = Fiber.current.fbpProc; 
-  var namex = proc.name + '.' + name;
-  for (var i = 0; i < proc.outports.length; i++) {
-    if (proc.outports[i][0] == namex) {
-      return proc.outports[i][1];  // return conn
-    }
-  }
-  console.log('Port ' + proc.name + '.' + name + ' not found');
-  return null;
+OutputPort.prototype.setRuntime = function(runtime) {
+  this._runtime = runtime;
 };
 
 OutputPort.prototype.send = function(ip){
-  var proc = Fiber.current.fbpProc; 
-  var conn = this.conn;    
+  var proc = Fiber.current.fbpProc;
+  var conn = this.conn;
     
   if (tracing) {
     console.log(proc.name + ' send to ' + this.name + ': ' + ip.contents);
@@ -41,7 +32,7 @@ OutputPort.prototype.send = function(ip){
         conn.down.status == ProcessStatus.NOT_INITIALIZED ||
         conn.down.status == ProcessStatus.DORMANT) {
       conn.down.status = ProcessStatus.READY_TO_EXECUTE; 
-      this.queue.push(conn.down);
+      this._runtime.pushToQueue(conn.down);
     }
     if (conn.usedslots == conn.array.length) { 
       proc.status = ProcessStatus.WAITING_TO_SEND;

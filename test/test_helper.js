@@ -2,36 +2,25 @@
 
 var chai = require('chai');
 
-var InputPort = require('../core/InputPort')
-  , IP = require('../core/IP')
-  , OutputPort = require('../core/OutputPort');
-
 global.expect = chai.expect;
-
-var InputPort = require('../core/InputPort')
-  , InputPortArray = require('../core/InputPortArray')
-  , OutputPort = require('../core/OutputPort')
-  , OutputPortArray = require('../core/OutputPortArray')
-  , IP = require('../core/IP');
-
-
 
 global.MockSender = function(inputArray) {
   return function() {
-    var outport = OutputPort.openOutputPort('OUT');
+    var outport = this.openOutputPort('OUT');
+    var proc = this;
     inputArray.forEach(function(item) {
-      outport.send(IP.create(item));
+      outport.send(proc.createIP(item));
     });
   }
 }
 
 global.MockReceiver = function(outputArray) {
   return function() {
-    var inport = InputPort.openInputPort('IN');
+    var inport = this.openInputPort('IN');
     var ip;
     while ((ip = inport.receive()) !== null) {
       outputArray.push(ip.contents);
-      IP.drop(ip);
+      this.dropIP(ip);
     }
   }
 }

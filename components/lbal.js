@@ -1,12 +1,10 @@
 'use strict';
 
-var InputPort = require('../core/InputPort')
-  , OutputPortArray = require('../core/OutputPortArray')
-  , Utils = require('../core/Utils');
+var Utils = require('../core/Utils');
 
 module.exports = function lbal() {
-  var inport = InputPort.openInputPort('IN');
-  var array = OutputPortArray.openOutputPortArray('OUT');
+  var inport = this.openInputPort('IN');
+  var array = this.openOutputPortArray('OUT');
 
   while (true) {
     var ip = inport.receive();

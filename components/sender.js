@@ -1,19 +1,14 @@
 'use strict';
 
-var fbp = require('..')
-  , InputPort = require('../core/InputPort')
-  , IP = require('../core/IP')
-  , OutputPort = require('../core/OutputPort');
-
 module.exports = function sender() {
-  var inport = InputPort.openInputPort('COUNT');
-  var outport = OutputPort.openOutputPort('OUT');
+  var inport = this.openInputPort('COUNT');
+  var outport = this.openOutputPort('OUT');
   var ip = inport.receive();
   var count = ip.contents;
-  IP.drop(ip);
+  this.dropIP(ip);
   //console.log(count);
   for (var i = 0; i < count; i++) {
-    var ip = IP.create(i + '');
+    var ip = this.createIP(i + '');
     if (-1 == outport.send(ip)) {
       return;
     }

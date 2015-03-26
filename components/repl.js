@@ -1,13 +1,8 @@
 'use strict';
 
-var fbp = require('..')
-  , InputPort = require('../core/InputPort')
-  , IP = require('../core/IP')
-  , OutputPortArray = require('../core/OutputPortArray');
-
 module.exports = function repl() {
-  var inport = InputPort.openInputPort('IN');
-  var array = OutputPortArray.openOutputPortArray('OUT');
+  var inport = this.openInputPort('IN');
+  var array = this.openOutputPortArray('OUT');
 
   while (true) {
     var ip = inport.receive();
@@ -15,8 +10,8 @@ module.exports = function repl() {
       break;
     }
     for (var i = 0; i < array.length; i++) {
-      array[i].send(IP.create(ip.contents));
+      array[i].send(this.createIP(ip.contents));
     }
-    IP.drop(ip);
+    this.dropIP(ip);
   }
 };

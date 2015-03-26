@@ -1,12 +1,10 @@
-jsfbp
-=====
+# jsfbp
 
 "Classical" FBP implementation written in JavaScript, using Node-Fibers - https://github.com/laverdet/node-fibers .  
 
 JSFBP takes advantage of JavaScript's concept of functions as first-degree objects to allow applications to be built using "green threads".  JSFBP makes use of a "Future Events Queue" which supports the green threads, and provides quite good performance (see below) - the JavaScript events queue is only used for JavaScript asynchronous functions, as before.
 
-General
----
+# General
 
 Test cases so far:
 
@@ -43,8 +41,7 @@ Some of these have tracing set on, depending on what testing was being done when
 
 These tests (except for `fbptestws`) can be run sequentially by running `fbptests.bat`.
  
-Components
----
+# Components
 
 - `concat`  - concatenates all the streams that are sent to its array input port (size determined in network definition) 
 - `copier`  - copies its input stream to its output stream
@@ -65,27 +62,44 @@ Components
 - `wssimproc` - "simulated" processing for web socket server - actually just outputs 3 names
 
  
-API
----
-Defining network:
-- start with `var fbp = require('fbp');`
-- `fbp.defProc` - define Process
-- `fbp.connect` - connect output port to input port
-- `fbp.initialize` - specify IIP and the port it is connected to
- 
-- finish with
-- `var trace = true;`  or `... false` - specify whether tracing desired
-- `fbp.run(trace);`
+# API
+
+## For normal users
+
+1. Get access to JSFBP: `var fbp = require('fbp')`
+2. Create a new network: `var network = new fbp.Network();`
+3. Define your network:
+ - Add processes: `network.defProc(&hellip;)`
+ - Connect output ports to input ports: `network.connect(&hellip;)`
+ - Specify IIPs: `network.initialize(&hellip;)`
+4. Create a new runtime: `var fiberRuntime = new fbp.FiberRuntime();`
+5. Run it!
+  ```network.run(fiberRuntime, {trace: true/false}, function success() {
+    console.log("Finished!");
+  });
+```
+ Activating `trace` can be desired in debugging scenarios.
+
+## For component developers
+
+Component headers:
+`'use strict';`
+
+In most cases you do not need to *require()* any JSFBP-related scripts or libraries as a component developer. Everything you need is injected into the component's function as its context `this` (the process object) and as a parameter (the runtime object).
+Some utility functions are stored in `core/utils.js`. Import them if you really need them.
+You should generally refrain from accessing runtime-related code (e.g. Fibers) to ensure the greatest compatibility.
+
+Component services
+
+- `var ip = this.createIP(contents);` - create an IP containing `contents`
+- `var ip = this.createIPBracket(IP.OPEN|IP.CLOSE[, contents])` - create an open or close bracket IP
+  **Be sure** to include IP: `var IP = require('IP')` to gain access to the IP constants.
+- `this.dropIP(ip);` - drop IP
   
-Component services:
-- `var ip = IP.create(contents);` - create an IP containing `contents`
-- `var ip = IP.createBracket(IP.OPEN|IP.CLOSE[, contents])` - create an open or close bracket IP
-- `IP.drop(ip);` - drop IP
-  
-- `var inport = InputPort.openInputPort('IN');` - create InputPort variable  
-- `var array = InputPortArray.openInputPortArray('IN');` - create input array port array
-- `var outport = OutputPort.openOutputPort('OUT');` - create OutputPort variable 
-- `var array = OutputPortArray.openOutputPortArray('OUT');` - create output array port array   
+- `var inport = this.openInputPort('IN');` - create InputPort variable  
+- `var array = this.openInputPortArray('IN');` - create input array port array
+- `var outport = this.openOutputPort('OUT');` - create OutputPort variable 
+- `var array = this.openOutputPortArray('OUT');` - create output array port array   
   
 - `var ip = inport.receive();` - returns null if end of stream 
 - `var ip = array[i].receive();` - receive to element of port array
@@ -93,14 +107,22 @@ Component services:
 - `array[i].send(ip);` - send from element of port array
 - `inport.close();` - close input port (or array port element)
   
--  `fbp.setCallbackPending(true);` - used when doing asynchronous I/O in component
--  `queueCallback(proc[,data]);` - queue the callback to the JSFBP future events queue
--  `utils.getElementWithSmallestBacklog(array);` - used by `lbal` - not for general use
+-  `runtime.runAsyncCallback()` - used when doing asynchronous I/O in component
+  Example:
+  ```
+runtime.runAsyncCallback(function (done) {
+  // your asynchronous
+  &hellip;
+  // call done (possibly asynchronously) when you're done!
+  done();
+});
+```
+-  `Utils.getElementWithSmallestBacklog(array);` - used by `lbal` - not for general use
+  **Be sure** to include Utils: `var Utils = require('core/utils')`.
 
-Install & Run
----
+# Install & Run
 
-1. Install node.js - see http://nodejs.org/download/  .  Node 12.0 has a problem (at least in Windows) - for now, use node 11.16.
+1. Install node.js - see http://nodejs.org/download/  .  Node 12.0 leads to compatibility problems with Fiber, see [here](https://gist.github.com/ComFreek/c341bacfaae3aca887df) how to use Node 11.16 on a per-project basis. Alternatively, you can also globally install an older Node version.
 
 2. Clone or download this project
 
@@ -108,8 +130,7 @@ Install & Run
 
 4. Run `node examples/fbptestx.js`, where `fbptestx` is any of the tests listed above. If tracing is desired, change the value of the `trace` variable at the bottom of fbptest.js to `true`. 
 
-Testing Web Socket Server
----
+# Testing Web Socket Server
 
 Run `node examples\websocket\fbptestws.js`, which is a simple web socket server.  It responds to any request (except `@kill`) by returning 3 names.
 

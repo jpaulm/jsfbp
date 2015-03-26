@@ -2,16 +2,19 @@ var fbp = require('..')
   , path = require('path');
 
 // --- define network ---
-var sender = fbp.defProc('./components/sender.js');
-var reader = fbp.defProc('./components/reader.js');
-var copier = fbp.defProc('./components/copier.js');
-var recvr  = fbp.defProc('./components/recvr.js');
+var network = new fbp.Network();
 
-fbp.initialize(sender, 'COUNT', '20');
-fbp.connect(sender, 'OUT', copier, 'IN', 5);
-fbp.initialize(reader, 'FILE', path.resolve(__dirname, 'data/text.txt'));
-fbp.connect(reader, 'OUT', copier, 'IN', 5);
-fbp.connect(copier, 'OUT', recvr, 'IN', 5);
+var sender = network.defProc('./components/sender.js');
+var reader = network.defProc('./components/reader.js');
+var copier = network.defProc('./components/copier.js');
+var recvr  = network.defProc('./components/recvr.js');
+
+network.initialize(sender, 'COUNT', '20');
+network.connect(sender, 'OUT', copier, 'IN', 5);
+network.initialize(reader, 'FILE', path.resolve(__dirname, 'data/text.txt'));
+network.connect(reader, 'OUT', copier, 'IN', 5);
+network.connect(copier, 'OUT', recvr, 'IN', 5);
 
 // --- run ---
-fbp.run({ trace: false });
+var fiberRuntime = new fbp.FiberRuntime();
+network.run(fiberRuntime, { trace: true });

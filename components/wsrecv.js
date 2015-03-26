@@ -1,47 +1,41 @@
-var fbp = require('..') 
-  , Fiber = require('fibers')
-  , IP = require('../core/IP')
-  , InputPort = require('../core/InputPort')
-  , OutputPort = require('../core/OutputPort')
+'use strict';
+
+var IP = require('../core/IP')
   , WebSocketServer = require('ws').Server;
 
-module.exports = function wsrecv() {
-  var proc = fbp.getCurrentProc();
-  var inport = InputPort.openInputPort('PORTNO');
+module.exports = function wsrecv(runtime) {
+  var inport = this.openInputPort('PORTNO');
   var ip = inport.receive();
   var portno = ip.contents;
   var wss = new WebSocketServer({ port: portno });
   var ws = null;
   while (true) {
-    fbp.setCallbackPending(true);
-
-    var result = wsReceive(wss, ws, proc);
-    console.log('wsReceive complete: ' + proc.name);
+    var result = runtime.runAsyncCallback(genWsReceiveFun(runtime, wss, ws, this));
+    console.log('wsReceive complete: ' + this.name);
     //console.log(result);
     if (result[1].endsWith('@kill')) {
       break;
     }
-    fbp.setCallbackPending(false);
-    var outport = OutputPort.openOutputPort('OUT');
-    outport.send(IP.createBracket(IP.OPEN));
-    outport.send(IP.create(result[0]));
-    outport.send(IP.create(result[1]));
-    outport.send(IP.createBracket(IP.CLOSE));
+
+    var outport = this.openOutputPort('OUT');
+    outport.send(this.createIPBracket(IP.OPEN));
+    outport.send(this.createIP(result[0]));
+    outport.send(this.createIP(result[1]));
+    outport.send(this.createIPBracket(IP.CLOSE));
   }
 }
 
-function wsReceive(wss, ws, proc) {
-  //var fiber =  Fiber.current;
-  wss.on('connection', function connection(ws) {
-    ws.on('message', function incoming(message) {
-      //fbp.setCurrentProc(proc);
-      console.log('running callback for: ' + proc.name);
-      fbp.queueCallback(proc, [ws, message]);
+function genWsReceiveFun(runtime, wss, ws, proc) {
+  return function (done) {
+    wss.on('connection', function connection(ws) {
+      ws.on('message', function incoming(message) {
+        console.log('running callback for: ' + proc.name);
+        done([ws, message]);
+      });
+      ws.send('connected!');
     });
-    ws.send('connected!');
-  });
-  console.log('wsReceive pending: ' + proc.name);
-  return Fiber.yield();
+    console.log('wsReceive pending: ' + proc.name);
+  };
 }
 
 String.prototype.endsWith = function (s) {

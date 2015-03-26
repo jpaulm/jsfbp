@@ -1,13 +1,16 @@
 var fbp = require('../..');
 
 // --- define network ---
-var respond  = fbp.defProc(require('../../components/wsresp'));
-var simproc  = fbp.defProc(require('./wssimproc'));
-var receiver = fbp.defProc(require('../../components/wsrecv'));
+var network = new fbp.Network();
 
-fbp.initialize(receiver, 'PORTNO', '9003');
-fbp.connect(receiver, 'OUT', simproc, 'IN', 6);
-fbp.connect(simproc, 'OUT', respond, 'IN', 6);
+var respond  = network.defProc(require('../../components/wsresp'));
+var simproc  = network.defProc(require('./wssimproc'));
+var receiver = network.defProc(require('../../components/wsrecv'));
+
+network.initialize(receiver, 'PORTNO', '9003');
+network.connect(receiver, 'OUT', simproc, 'IN', 6);
+network.connect(simproc, 'OUT', respond, 'IN', 6);
 
 // --- run ---
-fbp.run({ trace: true });
+var fiberRuntime = new fbp.FiberRuntime();
+network.run(fiberRuntime, { trace: true });
