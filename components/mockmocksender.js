@@ -5,7 +5,7 @@ var fbp = require('..')
   , IP = require('../core/IP')
   , OutputPort = require('../core/OutputPort');
 
-module.exports = function sender() {
+module.exports = function mockmocksender() {
   var inport = InputPort.openInputPort('PARMS');
   var outport = OutputPort.openOutputPort('OUT');
   var ip = inport.receive();
