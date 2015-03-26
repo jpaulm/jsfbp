@@ -1,39 +1,33 @@
 'use strict';
 
-var InputPort = require('../core/InputPort')
-  , OutputPort = require('../core/OutputPort')
-  , fbp = require('..')
-  , Fiber = require('fibers')
-  , IP = require('../core/IP');
-
-module.exports = function delay() {
-  var proc = fbp.getCurrentProc();
-  var inport = InputPort.openInputPort('IN');
-  var intvlport = InputPort.openInputPort('INTVL');
-  var outport = OutputPort.openOutputPort('OUT');
+module.exports = function delay(runtime) {
+//  var proc = fbp.getCurrentProc();
+  var inport = this.openInputPort('IN');
+  var intvlport = this.openInputPort('INTVL');
+  var outport = this.openOutputPort('OUT');
   var intvl_ip = intvlport.receive();
   var intvl = intvl_ip.contents;
-  IP.drop(intvl_ip);
+  this.dropIP(intvl_ip);
 
   while (true) {
     var ip = inport.receive();
     if (ip === null) {
       break;
     }
-    fbp.setCallbackPending(true);
-    console.log('start wait for ' + Math.round(intvl * 100) / 100 + ' msecs: ' + ip.contents);
-    sleep(proc, intvl);
-    fbp.setCallbackPending(false);
+    //fbp.setCallbackPending(true);
+    //console.log('start wait for ' + Math.round(intvl * 100) / 100 + ' msecs: ' + ip.contents);
+    runtime.runAsyncCallback(genSleepFun(this, intvl));
+    //fbp.setCallbackPending(false);
     outport.send(ip);
   }
 } 
 
-function sleep(proc, ms) {
-    // console.log(proc.name + ' start sleep: ' + Math.round(ms * 100) / 100 + ' msecs');  
-    var fiber = Fiber.current;
+function genSleepFun(proc, ms) {
+  return function (done) {
+    console.log(proc.name + ' start sleep: ' + Math.round(ms * 100) / 100 + ' msecs');
+    
     setTimeout(function() {
-        console.log('end wait for ' + Math.round(ms * 100) / 100 + ' msecs');
-        fbp.queueCallback(proc);
+      done();
     }, ms);
-    return Fiber.yield();
+  };
 }
