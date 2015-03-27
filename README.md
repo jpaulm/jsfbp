@@ -69,12 +69,14 @@ These tests (except for `fbptestws`) can be run sequentially by running `fbptest
 1. Get access to JSFBP: `var fbp = require('fbp')`
 2. Create a new network: `var network = new fbp.Network();`
 3. Define your network:
- - Add processes: `network.defProc(&hellip;)`
- - Connect output ports to input ports: `network.connect(&hellip;)`
- - Specify IIPs: `network.initialize(&hellip;)`
+ - Add processes: `network.defProc(&#x02026;)`
+ - Connect output ports to input ports: `network.connect(&#x02026;)`
+ - Specify IIPs: `network.initialize(&#x02026;)`
 4. Create a new runtime: `var fiberRuntime = new fbp.FiberRuntime();`
 5. Run it!
-  ```network.run(fiberRuntime, {trace: true/false}, function success() {
+ 
+```
+network.run(fiberRuntime, {trace: true/false}, function success() {
     console.log("Finished!");
   });
 ```
@@ -108,11 +110,12 @@ Component services
 - `inport.close();` - close input port (or array port element)
   
 -  `runtime.runAsyncCallback()` - used when doing asynchronous I/O in component
+   
   Example:
-  ```
+```
 runtime.runAsyncCallback(function (done) {
   // your asynchronous
-  &hellip;
+  &#x02026;
   // call done (possibly asynchronously) when you're done!
   done();
 });
