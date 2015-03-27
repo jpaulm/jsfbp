@@ -94,7 +94,7 @@ You should generally refrain from accessing runtime-related code (e.g. Fibers) t
 Component services
 
 - `var ip = this.createIP(contents);` - create an IP containing `contents`
-- `var ip = this.createIPBracket(IP.OPEN|IP.CLOSE[, contents])` - create an open or close bracket IP
+- `var ip = this.createIPBracket(IP.OPEN|IP.CLOSE[, contents])` - create an open or close bracket IP; 
   **Be sure** to include IP: `var IP = require('IP')` to gain access to the IP constants.
 - `this.dropIP(ip);` - drop IP
   
