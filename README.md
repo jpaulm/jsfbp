@@ -8,21 +8,21 @@ JSFBP takes advantage of JavaScript's concept of functions as first-degree objec
 
 Test cases so far:
 
-- `fbptest1` - 3 processes:
+- `fbptest01` - 3 processes:
     - `sender` (generates ascending numeric values)
     - `copier` (copies)
     - `recvr`  (displays incoming values to console)
 
 ![JSFBP](https://github.com/jpaulm/jsfbp/blob/master/docs/JSFBP.png "Simple Test Network")
 
-- `fbptest2` - `sender` replaced with `reader`
-- `fbptest3` - `sender` and `reader` both feeding into `copier.IN`
-- `fbptest4` - `sender` feeding `repl` which sends 3 copies of input IP (as specified in network), each copy going to a separate element of array port `OUT`; all 3 copies then feeding into `recvr.IN`
-- `fbptest5` - Two copies of `reader` running concurrently, one feeds direct to `rrmerge` ("round robin" merge) input port element 0; other one into `copier` and then into `rrmerge` input port element 1; from `rrmerge.OUT` to `recvr.IN` 
-- `fbptest6` - The output streams of the `repl` (in `fbptest4`) are fed to the input array port of `rrmerge`, and from its `OUT` to `recvr.IN`
-- `fbptest7` - Creates a deadlock condition - the status of each Process is displayed
-- `fbptest8` - reads text, reverses it twice and outputs it
-- `fbptest9` - `copier` in `fbptest1` is replaced with a version of `copier` which terminates prematurely and closes its input port, bringing the network down (ungracefully!)
+- `fbptest02` - `sender` replaced with `reader`
+- `fbptest03` - `sender` and `reader` both feeding into `copier.IN`
+- `fbptest04` - `sender` feeding `repl` which sends 3 copies of input IP (as specified in network), each copy going to a separate element of array port `OUT`; all 3 copies then feeding into `recvr.IN`
+- `fbptest05` - Two copies of `reader` running concurrently, one feeds direct to `rrmerge` ("round robin" merge) input port element 0; other one into `copier` and then into `rrmerge` input port element 1; from `rrmerge.OUT` to `recvr.IN` 
+- `fbptest06` - The output streams of the `repl` (in `fbptest4`) are fed to the input array port of `rrmerge`, and from its `OUT` to `recvr.IN`
+- `fbptest07` - Creates a deadlock condition - the status of each Process is displayed
+- `fbptest08` - reads text, reverses it twice and outputs it
+- `fbptest09` - `copier` in `fbptest1` is replaced with a version of `copier` which terminates prematurely and closes its input port, bringing the network down (ungracefully!)
 - `fbptest10` -  `copier` in `fbptest1` is replaced with a non-looping version of `copier`
 - `fbptest11` -  Load balancer (`lbal`) feeding 3 instances of a random delay component (`randdelay`)
   
@@ -189,7 +189,7 @@ Reverse2 closed
 Performance
 ---
 
-The first test case (`fbptest1`) with 100,000,000 IPs running through three processes takes 170 seconds.  Since there are two connections, giving a total of 200,000,000 send/receive pairs, this works out to approx. 0.85 microsecs per send/receive pair. 
+The first test case (`fbptest01`) with 100,000,000 IPs running through three processes takes 170 seconds.  Since there are two connections, giving a total of 200,000,000 send/receive pairs, this works out to approx. 0.85 microsecs per send/receive pair. 
 
 My machine has 4 AMD Phenom(tm) II X4 925 processors, and this test appeared to be using 2 of them (not sure why!).
 
