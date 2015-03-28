@@ -46,7 +46,7 @@ These tests (except for `fbptestws`) can be run sequentially by running `fbptest
 - `concat`  - concatenates all the streams that are sent to its array input port (size determined in network definition) 
 - `copier`  - copies its input stream to its output stream
 - `copier_closing` - forces close of input port after 20 IPs
-- `copier_nonlooper` - same as `copier`, except that it is written as a non-looper
+- `copier_nonlooper` - same as `copier`, except that it is written as a non-looper (it has been modified to call the FBP services from lower in the process's stack)
 - `lbal`    - load balancer - sends output to output port array element with smallest number of IPs in transit
 - `randdelay` - sends incoming IPs to output port after random number of millisecs (between 0 and 400)
 - `reader`  - does an asynchronous read on the file specified by its FILE IIP 
