@@ -131,7 +131,7 @@ runtime.runAsyncCallback(function (done) {
 
 3. Run `npm install` in the project directory
 
-4. Run `node examples/fbptestx.js`, where `fbptestx` is any of the tests listed above. If tracing is desired, change the value of the `trace` variable at the bottom of fbptest.js to `true`. 
+4. Run `node examples/fbptestxx.js`, where `fbptestxx` is any of the tests listed above. If tracing is desired, change the value of the `trace` variable at the bottom of `fbptestxx.js` to `true`. 
 
 # Testing Web Socket Server
 
@@ -150,7 +150,7 @@ Enter the string `@kill` in the input field (once or twice), and the network wil
 Tracing
 ---
 
-Here is a sample section of the trace output for `fbptest8.js`:
+Here is a sample section of the trace output for `fbptest08.js`:
 ```
 Recvr recv from Recvr.IN
 Recvr yielded: true, cbpending: false
