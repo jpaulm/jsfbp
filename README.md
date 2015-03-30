@@ -1,6 +1,6 @@
 # jsfbp
 
-"Classical" FBP implementation written in JavaScript, using Node-Fibers - https://github.com/laverdet/node-fibers .  
+"Classical" FBP "green thread" implementation written in JavaScript, using Node-Fibers - https://github.com/laverdet/node-fibers .  
 
 JSFBP takes advantage of JavaScript's concept of functions as first-degree objects to allow applications to be built using "green threads".  JSFBP makes use of a "Future Events Queue" which supports the green threads, and provides quite good performance (see below) - the JavaScript events queue is only used for JavaScript asynchronous functions, as before.
 
@@ -8,22 +8,22 @@ JSFBP takes advantage of JavaScript's concept of functions as first-degree objec
 
 Test cases so far:
 
-- `fbptest1` - 3 processes:
+- `fbptest01` - 3 processes:
     - `sender` (generates ascending numeric values)
     - `copier` (copies)
     - `recvr`  (displays incoming values to console)
 
 ![JSFBP](https://github.com/jpaulm/jsfbp/blob/master/docs/JSFBP.png "Simple Test Network")
 
-- `fbptest2` - `sender` replaced with `reader`
-- `fbptest3` - `sender` and `reader` both feeding into `copier.IN`
-- `fbptest4` - `sender` feeding `repl` which sends 3 copies of input IP (as specified in network), each copy going to a separate element of array port `OUT`; all 3 copies then feeding into `recvr.IN`
-- `fbptest5` - Two copies of `reader` running concurrently, one feeds direct to `rrmerge` ("round robin" merge) input port element 0; other one into `copier` and then into `rrmerge` input port element 1; from `rrmerge.OUT` to `recvr.IN` 
-- `fbptest6` - The output streams of the `repl` (in `fbptest4`) are fed to the input array port of `rrmerge`, and from its `OUT` to `recvr.IN`
-- `fbptest7` - Creates a deadlock condition - the status of each Process is displayed
-- `fbptest8` - reads text, reverses it twice and outputs it
-- `fbptest9` - `copier` in `fbptest1` is replaced with a version of `copier` which terminates prematurely and closes its input port, bringing the network down (ungracefully!)
-- `fbptest10` -  `copier` in `fbptest1` is replaced with a non-looping version of `copier`
+- `fbptest02` - `sender` replaced with `reader`
+- `fbptest03` - `sender` and `reader` both feeding into `copier.IN`
+- `fbptest04` - `sender` feeding `repl` which sends 3 copies of input IP (as specified in network), each copy going to a separate element of array port `OUT`; all 3 copies then feeding into `recvr.IN`
+- `fbptest05` - Two copies of `reader` running concurrently, one feeds direct to `rrmerge` ("round robin" merge) input port element 0; other one into `copier` and then into `rrmerge` input port element 1; from `rrmerge.OUT` to `recvr.IN` 
+- `fbptest06` - The output streams of the `repl` (in `fbptest04`) are fed to the input array port of `rrmerge`, and from its `OUT` to `recvr.IN`
+- `fbptest07` - Creates a deadlock condition - the status of each Process is displayed
+- `fbptest08` - reads text, reverses it twice and outputs it
+- `fbptest09` - `copier` in `fbptest01` is replaced with a version of `copier` which terminates prematurely and closes its input port, bringing the network down (ungracefully!)
+- `fbptest10` -  `copier` in `fbptest01` is replaced with a non-looping version of `copier`
 - `fbptest11` -  Load balancer (`lbal`) feeding 3 instances of a random delay component (`randdelay`)
   
 ![Fbptest11](https://github.com/jpaulm/jsfbp/blob/master/docs/Fbptest11.png "Diagram of fbptest11 above")
@@ -46,7 +46,7 @@ These tests (except for `fbptestws`) can be run sequentially by running `fbptest
 - `concat`  - concatenates all the streams that are sent to its array input port (size determined in network definition) 
 - `copier`  - copies its input stream to its output stream
 - `copier_closing` - forces close of input port after 20 IPs
-- `copier_nonlooper` - same as `copier`, except that it is written as a non-looper
+- `copier_nonlooper` - same as `copier`, except that it is written as a non-looper (it has been modified to call the FBP services from lower in the process's stack)
 - `lbal`    - load balancer - sends output to output port array element with smallest number of IPs in transit
 - `randdelay` - sends incoming IPs to output port after random number of millisecs (between 0 and 400)
 - `reader`  - does an asynchronous read on the file specified by its FILE IIP 
@@ -95,7 +95,7 @@ Component services
 
 - `var ip = this.createIP(contents);` - create an IP containing `contents`
 - `var ip = this.createIPBracket(IP.OPEN|IP.CLOSE[, contents])` - create an open or close bracket IP
-  **Be sure** to include IP: `var IP = require('IP')` to gain access to the IP constants.
+- **Be sure** to include IP: `var IP = require('IP')` to gain access to the IP constants.
 - `this.dropIP(ip);` - drop IP
   
 - `var inport = this.openInputPort('IN');` - create InputPort variable  
@@ -120,8 +120,8 @@ runtime.runAsyncCallback(function (done) {
   done();
 });
 ```
--  `Utils.getElementWithSmallestBacklog(array);` - used by `lbal` - not for general use
-  **Be sure** to include Utils: `var Utils = require('core/utils')`.
+-  `Utils.getElementWithSmallestBacklog(array);` - used by `lbal` - not for general use 
+- **Be sure** to include Utils: `var Utils = require('core/utils')`.
 
 # Install & Run
 
@@ -131,7 +131,14 @@ runtime.runAsyncCallback(function (done) {
 
 3. Run `npm install` in the project directory
 
-4. Run `node examples/fbptestx.js`, where `fbptestx` is any of the tests listed above. If tracing is desired, change the value of the `trace` variable at the bottom of fbptest.js to `true`. 
+4. Run `node examples/fbptestxx.js`, where `fbptestxx` is any of the tests listed above. If tracing is desired, change the value of the `trace` variable at the bottom of `fbptestxx.js` to `true`. 
+
+5. All these tests can be run sequentially by running `examples/fbptests.bat`, or by running `examples/fbptests.sh` under `bash`.
+
+# Testing with Mocha 
+
+The folder called `test` contains a number of Mocha tests - these can be run (once Mocha is installed) by entering the command
+`node.exe node_modules/mocha/bin/mocha --recursive --require test/test_helper.js`
 
 # Testing Web Socket Server
 
@@ -150,7 +157,7 @@ Enter the string `@kill` in the input field (once or twice), and the network wil
 Tracing
 ---
 
-Here is a sample section of the trace output for `fbptest8.js`:
+Here is a sample section of the trace output for `fbptest08.js`:
 ```
 Recvr recv from Recvr.IN
 Recvr yielded: true, cbpending: false
@@ -189,7 +196,7 @@ Reverse2 closed
 Performance
 ---
 
-The first test case (`fbptest1`) with 100,000,000 IPs running through three processes takes 170 seconds.  Since there are two connections, giving a total of 200,000,000 send/receive pairs, this works out to approx. 0.85 microsecs per send/receive pair. 
+The first test case (`fbptest01`) with 100,000,000 IPs running through three processes takes 170 seconds.  Since there are two connections, giving a total of 200,000,000 send/receive pairs, this works out to approx. 0.85 microsecs per send/receive pair. 
 
 My machine has 4 AMD Phenom(tm) II X4 925 processors, and this test appeared to be using 2 of them (not sure why!).
 
