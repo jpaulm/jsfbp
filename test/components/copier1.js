@@ -2,7 +2,7 @@
 
 var fbp = require('../..');
 
-describe('delay', function() {
+describe('copier1', function() {
   it('should copy multiple IPs', function(done) {    
     var network = new fbp.Network();
     

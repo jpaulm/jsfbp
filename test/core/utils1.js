@@ -1,6 +1,6 @@
 var Enum = require('../../core/utils.js').Enum;
 
-describe('Enum', function() {
+describe('utils1', function() {
   it('should create an enum and provide a lookup function', function() {
     var myEnum = Enum(['a', 'b', 'c']);
     expect(myEnum).to.have.ownProperty('a')

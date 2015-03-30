@@ -2,7 +2,7 @@
 
 var fbp = require('../..');
 
-describe('collate', function() {
+describe('collate1', function() {
   it('should collate based on a single field', function(){
     var network = new fbp.Network();
     

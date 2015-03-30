@@ -2,7 +2,7 @@
 
 var fbp = require('../..');
 
-describe('delay', function() {
+describe('delay1', function() {
   it('should exactly delay a single IP', function(done) {
     var DELAY = 1000;
     var DELAY_MAX_DIFF = 150;

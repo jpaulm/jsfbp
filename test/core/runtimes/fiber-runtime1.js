@@ -2,7 +2,7 @@
 
 var fbp = require('../../..');
 
-describe('FiberRuntime', function() {
+describe('FiberRuntime1', function() {
   it('should be able to run a simple sender-->receiver setup', function() {
     var network = new fbp.Network();
 

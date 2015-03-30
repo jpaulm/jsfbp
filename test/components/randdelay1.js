@@ -2,7 +2,7 @@
 
 var fbp = require('../..');
 
-describe('randdelay', function() {
+describe('randdelay1', function() {
   it('should randomly delay a single IP', function(done) {
     var DELAY = 1000;
     var DELAY_MAX_DIFF = 150;
