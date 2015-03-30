@@ -19,11 +19,11 @@ Test cases so far:
 - `fbptest03` - `sender` and `reader` both feeding into `copier.IN`
 - `fbptest04` - `sender` feeding `repl` which sends 3 copies of input IP (as specified in network), each copy going to a separate element of array port `OUT`; all 3 copies then feeding into `recvr.IN`
 - `fbptest05` - Two copies of `reader` running concurrently, one feeds direct to `rrmerge` ("round robin" merge) input port element 0; other one into `copier` and then into `rrmerge` input port element 1; from `rrmerge.OUT` to `recvr.IN` 
-- `fbptest06` - The output streams of the `repl` (in `fbptest4`) are fed to the input array port of `rrmerge`, and from its `OUT` to `recvr.IN`
+- `fbptest06` - The output streams of the `repl` (in `fbptest04`) are fed to the input array port of `rrmerge`, and from its `OUT` to `recvr.IN`
 - `fbptest07` - Creates a deadlock condition - the status of each Process is displayed
 - `fbptest08` - reads text, reverses it twice and outputs it
-- `fbptest09` - `copier` in `fbptest1` is replaced with a version of `copier` which terminates prematurely and closes its input port, bringing the network down (ungracefully!)
-- `fbptest10` -  `copier` in `fbptest1` is replaced with a non-looping version of `copier`
+- `fbptest09` - `copier` in `fbptest01` is replaced with a version of `copier` which terminates prematurely and closes its input port, bringing the network down (ungracefully!)
+- `fbptest10` -  `copier` in `fbptest01` is replaced with a non-looping version of `copier`
 - `fbptest11` -  Load balancer (`lbal`) feeding 3 instances of a random delay component (`randdelay`)
   
 ![Fbptest11](https://github.com/jpaulm/jsfbp/blob/master/docs/Fbptest11.png "Diagram of fbptest11 above")
