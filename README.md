@@ -133,6 +133,13 @@ runtime.runAsyncCallback(function (done) {
 
 4. Run `node examples/fbptestxx.js`, where `fbptestxx` is any of the tests listed above. If tracing is desired, change the value of the `trace` variable at the bottom of `fbptestxx.js` to `true`. 
 
+5. All these tests can be run sequentially by running `examples/fbptests.bat`, or by running `examples/fbptests.sh` under `bash`.
+
+# Testing with Mocha 
+
+The folder called `test` contains a number of Mocha tests - these can be run (once Mocha is installed) by entering the command
+`node.exe node_modules/mocha/bin/mocha --recursive --require test/test_helper.js`
+
 # Testing Web Socket Server
 
 Run `node examples\websocket\fbptestws.js`, which is a simple web socket server.  It responds to any request (except `@kill`) by returning 3 names.
