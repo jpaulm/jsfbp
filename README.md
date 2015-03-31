@@ -135,10 +135,12 @@ runtime.runAsyncCallback(function (done) {
 
 5. All these tests can be run sequentially by running `examples/fbptests.bat`, or by running `examples/fbptests.sh` under `bash`.
 
-# Testing with Mocha 
+# Testing with Mocha
 
-The folder called `test` contains a number of Mocha tests - these can be run (once Mocha is installed) by entering the command
-`node.exe node_modules/mocha/bin/mocha --recursive --require test/test_helper.js`
+The folder called `test` contains a number of Mocha tests.
+
+- Run `npm install` (in case you haven't already done so) and `npm test`
+- Alternatively, you can directly execute `node.exe node_modules/mocha/bin/mocha --recursive --require test/test_helper.js` in case you need to adjust the path to Node's binary or pass further parameters to Mocha.
 
 # Testing Web Socket Server
 
