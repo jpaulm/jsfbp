@@ -231,12 +231,12 @@ FiberRuntime.prototype._tick = function () {
       }
     }
     
-    if (this._tracing) {
-      console.log("Shift new process, old one = " + x.name);
-    }
+    //if (this._tracing) {
+    //  console.log("Shift new process, old one = " + x.name);
+    //}
     x = this._queue.shift();
     if (this._tracing && x) {
-      console.log("New one: " + x.name);
+      console.log("New top of queue: " + x.name + " - status: " + x.getStatusString());
     }
   }
 };
