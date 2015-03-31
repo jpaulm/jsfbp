@@ -100,12 +100,13 @@ FiberRuntime.prototype.run = function (processes, options, callback) {
   var self = this;
 
   Fiber(function() {
-    var startTime = Date.now();
-    console.log('Start time: ' + startTime);
+    var startTime = new Date();
+    var time = startTime.toLocaleString();
+    console.log('Start time: ' + time);
     
     self._actualRun.call(self);
 
-    console.log('Elapsed time in secs: ' + (Date.now() - startTime));
+    console.log('Elapsed time in millisecs: ' + (Date.now() - startTime));
     
     callback(null);
   }).run();
