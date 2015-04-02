@@ -1,9 +1,9 @@
 'use strict';
 
-var Connection = require('./Connection');
+//var Connection = require('./Connection');
 
 var ProcessConnection = module.exports = function(size) {
-  Connection.call(this);
+ // Connection.call(this);
   this.name = null; 
   this.nxtget = 0;
   this.nxtput = 0; 
@@ -15,6 +15,7 @@ var ProcessConnection = module.exports = function(size) {
   for (var i = 0; i < size; i++) {
     this.array[i] = null;
   }
+  this.closed = false;
 };
 
-ProcessConnection.prototype = Object.create(Connection.prototype);
+//ProcessConnection.prototype = Object.create(Connection.prototype);

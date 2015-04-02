@@ -7,8 +7,8 @@ var IP = require('./IP')
 
 var InputPort = module.exports = function(){
   this.name = null;
-  this.conn = null;
-  this.closed = false;
+  this.conn = null;  // either ProcessConnection or IIPConnection
+  //this.closed = false;
 };
 
 InputPort.prototype.setRuntime = function(runtime) {
@@ -52,8 +52,8 @@ InputPort.prototype.receive = function(){
   //if (conn.usedslots == conn.array.length) 
    for (var i = 0; i < conn.up.length; i ++) { 
     if (conn.up[i].status == ProcessStatus.WAITING_TO_SEND) {
-    conn.up[i].status = ProcessStatus.READY_TO_EXECUTE; 
-    this._runtime.pushToQueue(conn.up[i]); 
+      conn.up[i].status = ProcessStatus.READY_TO_EXECUTE; 
+      this._runtime.pushToQueue(conn.up[i]); 
     }  
    }
       

@@ -23,7 +23,8 @@ Process.Status = Enum([
   'WAITING_TO_SEND',
   'READY_TO_EXECUTE',
   'DORMANT',
-  'CLOSED'
+  'CLOSED',
+  'DONE'
 ]);
 
 Process.prototype.getStatusString = function () {

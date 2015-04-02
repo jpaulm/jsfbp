@@ -38,7 +38,7 @@ OutputPort.prototype.send = function(ip){
       proc.status = ProcessStatus.WAITING_TO_SEND;
       proc.yielded = true;
       Fiber.yield(); 
-      proc.status = ProcessStatus.ACTIVE; 
+      //proc.status = ProcessStatus.ACTIVE; 
       proc.yielded = false;    
     }
     else {

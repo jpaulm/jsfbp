@@ -8,7 +8,7 @@ var copier = network.defProc('./components/copier_nonlooper');
 var recvr  = network.defProc('./components/recvr');
 
 network.initialize(sender, 'COUNT', '200');
-network.connect(sender, 'OUT', copier, 'IN', 5);
+network.connect(sender, 'OUT', copier, 'IN', 10);
 network.connect(copier, 'OUT', recvr, 'IN', 5);
 
 // --- run ---
