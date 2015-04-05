@@ -161,38 +161,29 @@ Tracing
 
 Here is a sample section of the trace output for `fbptest08.js`:
 ```
-Recvr recv from Recvr.IN
-Recvr yielded: true, cbpending: false
-Recvr fiber yielded
-Reverse2 fiber resumed
-Reverse2 send OK
-Reverse2 IP dropped with:
- si PBF .yllanretni degnahc eb ot gnivah tuohtiw snoitacilppa tnereffid mrof ot
-Reverse2 recv from Reverse2.IN
-Reverse2 recv OK: .detneiro-tnenopmoc yllarutan suht
-Reverse2 Create IP with: thus naturally component-oriented.
-Reverse2 send to Reverse2.OUT: thus naturally component-oriented.
-Reverse2 yielded: true, cbpending: false
-Reverse2 fiber yielded
-Recvr fiber resumed
-Recvr recv OK: to form different applications without having to be changed inter
+recvr recv OK: externally to the processes. These black box processes can be rec
+onnected endlessly
+data: externally to the processes. These black box processes can be reconnected
+endlessly
+recvr IP dropped with: externally to the processes. These black box processes ca
+n be reconnected endlessly
+recvr recv from recvr.IN
+Yield/return: state of future events queue:
+- reverse2 - status: ACTIVE
+---
+---
+reverse2 send OK
+reverse2 IP dropped with:  si PBF .yllanretni degnahc eb ot gnivah tuohtiw snoit
+acilppa tnereffid mrof ot
+reverse2 recv from reverse2.IN
+reverse2 recv OK: .detneiro-tnenopmoc yllarutan suht
+reverse2 send to reverse2.OUT: thus naturally component-oriented.
+Yield/return: state of future events queue:
+- recvr - status: ACTIVE
+---
+---
+recvr recv OK: to form different applications without having to be changed inter
 nally. FBP is
-data: to form different applications without having to be changed internally. FB
-P is
-Recvr IP dropped with: to form different applications without having to be chang
-ed internally. FBP is
-Recvr recv from Recvr.IN
-Recvr yielded: true, cbpending: false
-Recvr fiber yielded
-Reverse2 fiber resumed
-Reverse2 send OK
-Reverse2 IP dropped with: .detneiro-tnenopmoc yllarutan suht
-Reverse2 recv from Reverse2.IN
-Reverse2 recv EOS from Reverse2.IN
-Reverse2 yielded: false, cbpending: false
-Reverse2 fiber ended
-Reverse2 closing
-Reverse2 closed
 ```
 
 Performance
