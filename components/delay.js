@@ -17,6 +17,8 @@ module.exports = function delay(runtime) {
     //fbp.setCallbackPending(true);
     //console.log('start wait for ' + Math.round(intvl * 100) / 100 + ' msecs: ' + ip.contents);
     runtime.runAsyncCallback(genSleepFun(this, intvl));
+    var name = outport.name.substring(0, outport.name.indexOf("."));
+    console.log(name + ' end sleep ' );
     //fbp.setCallbackPending(false);
     outport.send(ip);
   }

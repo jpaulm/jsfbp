@@ -226,7 +226,7 @@ FiberRuntime.prototype._tick = function() {
 			x.status = Process.Status.ACTIVE;
 
 			if (this._tracing) {
-				console.log("Future events queue: ");
+				console.log("Yield/return: state of future events queue: ");
 				console
 						.log("- " + x.name + " - status: "
 								+ x.getStatusString());
