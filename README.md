@@ -31,6 +31,8 @@ Test cases so far:
 - `fbptest12` -  `reader OUT -> IN copier OUT -> IN writer`
 - `fbptest13` -  Simple network to demonstrate functioning of random delay component (`randdelay`)
 - `fbptest14` -  Network demonstrating parallelism using two instances of `reader` and two fixed delay components (`delay`)
+- 
+- `fbptestvl` -  Volume test (see below): `sender` -> `copier` -> `discard` 
  
 WebSockets 
 - `fbptestws` -  Schematic web socket server (simple Process shown can be replaced by any structure of Processes, provided interfaces are adhered to)
@@ -47,6 +49,7 @@ These tests (except for `fbptestws`) can be run sequentially by running `fbptest
 - `copier`  - copies its input stream to its output stream
 - `copier_closing` - forces close of input port after 20 IPs
 - `copier_nonlooper` - same as `copier`, except that it is written as a non-looper (it has been modified to call the FBP services from lower in the process's stack)
+- `discard` - discard (drop) all incoming IPs
 - `lbal`    - load balancer - sends output to output port array element with smallest number of IPs in transit
 - `randdelay` - sends incoming IPs to output port after random number of millisecs (between 0 and 400)
 - `reader`  - does an asynchronous read on the file specified by its FILE IIP 
@@ -189,7 +192,5 @@ nally. FBP is
 Performance
 ---
 
-The first test case (`fbptest01`) with 100,000,000 IPs running through three processes takes 170 seconds.  Since there are two connections, giving a total of 200,000,000 send/receive pairs, this works out to approx. 0.85 microsecs per send/receive pair. 
-
-My machine has 4 AMD Phenom(tm) II X4 925 processors, and this test appeared to be using 2 of them (not sure why!).
+The volume test case (`fbptestvl`) with 100,000,000 IPs running through three processes took 164 seconds, on my machine which has 4 AMD Phenom(tm) II X4 925 processors,.  Since there are two connections, giving a total of 200,000,000 send/receive pairs, this works out to approx. 0.82 microsecs per send/receive pair. Of course, as it is JavaScript, this test only uses 1 core intensively, although there is some matching activity on the other cores (why...?!)
 
