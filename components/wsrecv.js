@@ -11,18 +11,20 @@ module.exports = function wsrecv(runtime) {
   var ws = null;
   while (true) {
     var result = runtime.runAsyncCallback(genWsReceiveFun(runtime, wss, ws, this));
-    console.log('wsReceive complete: ' + this.name);
+    console.log('wsrecv callback complete: ' + this.name);
     //console.log(result);
-    if (result[1].endsWith('@kill')) {
+    if (result[1].endsWith('@kill')) {      
       break;
     }
 
+    console.log(result);
     var outport = this.openOutputPort('OUT');
     outport.send(this.createIPBracket(IP.OPEN));
     outport.send(this.createIP(result[0]));
     outport.send(this.createIP(result[1]));
     outport.send(this.createIPBracket(IP.CLOSE));
   }
+  this.dropIP(ip);
 }
 
 function genWsReceiveFun(runtime, wss, ws, proc) {
@@ -34,7 +36,7 @@ function genWsReceiveFun(runtime, wss, ws, proc) {
       });
       ws.send('connected!');
     });
-    console.log('wsReceive pending: ' + proc.name);
+    console.log('wsrecv pending: ' + proc.name);
   };
 }
 

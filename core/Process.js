@@ -46,15 +46,20 @@ Process.prototype.createIPBracket = function(bktType, x) {
   ip.type = bktType;     
   this.ownedIPs++;
   ip.owner = this;
+  console.log(ip);
   return ip;
 };
 
 Process.prototype.dropIP = function(ip) {
+var cont = ip.contents;
+if (ip.type != IP.NORMAL) {
+       cont = ["", "OPEN", "CLOSE"][ip.type]  + ", " + cont;
+  }     
   if (tracing) {
-    console.log(this.name + ' IP dropped with: ' + ip.contents);
+    console.log(this.name + ' IP dropped with: ' + cont);
   }
   if (ip.owner != this) {
-    console.log(this.name + ' IP being dropped not owned by this Process: ' + ip.contents); 
+    console.log(this.name + ' IP being dropped not owned by this Process: ' + cont); 
     return;
   }  
   this.ownedIPs--;

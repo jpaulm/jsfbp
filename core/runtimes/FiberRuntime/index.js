@@ -249,7 +249,7 @@ FiberRuntime.prototype._tick = function() {
 					this._close(x);
 					break;
 				} else if (x.status != Process.Status.CLOSED) {
-					if (!x.cbpending) {
+					 if (!x.cbpending) {
 						x.status = Process.Status.ACTIVE;
 
 						// --------------------------

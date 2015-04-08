@@ -8,15 +8,16 @@ module.exports = function wssimproc() {
     if (ip == null) {
       break;
     }
-    outport.send(ip);
-    ip = inport.receive();
-    outport.send(ip);      // connection
-    ip = inport.receive();
+    // not null, so this IP was open bracket
+    outport.send(ip);  //send it on
+    ip = inport.receive();  // connection
+    outport.send(ip);      // send it on
+    ip = inport.receive(); // data IP - drop and emit 3 results
+    this.dropIP(ip);
     outport.send(this.createIP('Frankie Tomatto'));
     outport.send(this.createIP('Joe Fresh'));
-    outport.send(this.createIP('Aunt Jemima'));
-    this.dropIP(ip);
-    ip = inport.receive();
-    outport.send(ip);
+    outport.send(this.createIP('Aunt Jemima'));    
+    ip = inport.receive(); // close bracket
+    outport.send(ip);  // send it on...
   }
 }

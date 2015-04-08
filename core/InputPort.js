@@ -62,8 +62,13 @@ InputPort.prototype.receive = function(){
   conn.nxtget ++;
   if (conn.nxtget > conn.array.length - 1)
    conn.nxtget = 0;   
-  if (tracing)
-   console.log(proc.name + ' recv OK: ' + ip.contents); 
+  var cont = ip.contents; 
+  if (tracing) {       
+    if (ip.type != IP.NORMAL) {
+       cont = ["", "OPEN", "CLOSE"][ip.type]  + ", " + cont;
+    } 
+    console.log(proc.name + ' recv OK: ' + cont); 
+   }
   conn.usedslots--;
   ip.owner = proc; 
   proc.ownedIPs++; 

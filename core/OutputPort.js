@@ -1,6 +1,7 @@
 'use strict';
 var Fiber = require('fibers')
-  , ProcessStatus = require('./Process').Status;
+  , ProcessStatus = require('./Process').Status
+  , IP = require('./IP');
 
 var OutputPort = module.exports = function(){
   this.name = null;
@@ -15,12 +16,15 @@ OutputPort.prototype.setRuntime = function(runtime) {
 OutputPort.prototype.send = function(ip){
   var proc = Fiber.current.fbpProc;
   var conn = this.conn;
-    
+  var cont = ip.contents;   
+  if (ip.type != IP.NORMAL) {
+     cont = ["", "OPEN", "CLOSE"][ip.type] + ", " + cont;
+  } 
   if (tracing) {
-    console.log(proc.name + ' send to ' + this.name + ': ' + ip.contents);
+    console.log(proc.name + ' send to ' + this.name + ': ' + cont);
   }
   if (ip.owner != proc) {
-    console.log(proc.name + ' IP being sent not owned by this Process: ' + ip.contents); 
+    console.log(proc.name + ' IP being sent not owned by this Process: ' + cont); 
     return;
   }  
   if (conn.closed) {
