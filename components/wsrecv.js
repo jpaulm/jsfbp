@@ -24,6 +24,7 @@ module.exports = function wsrecv(runtime) {
     outport.send(this.createIP(result[1]));
     outport.send(this.createIPBracket(IP.CLOSE));
   }
+  wss.close();
   this.dropIP(ip);
 }
 
