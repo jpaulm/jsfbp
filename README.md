@@ -31,7 +31,6 @@ Test cases so far:
 - `fbptest12` -  `reader OUT -> IN copier OUT -> IN writer`
 - `fbptest13` -  Simple network to demonstrate functioning of random delay component (`randdelay`)
 - `fbptest14` -  Network demonstrating parallelism using two instances of `reader` and two fixed delay components (`delay`)
-- 
 - `fbptestvl` -  Volume test (see below): `sender` -> `copier` -> `discard` 
  
 WebSockets 
@@ -147,17 +146,17 @@ The folder called `test` contains a number of Mocha tests.
 
 # Testing Web Socket Server
 
-Run `node examples\websocket\fbptestws.js`, which is a simple web socket server.  It responds to any request (except `@kill`) by returning 3 names.
+Run `node examples\websocket\fbptestws.js`, which is a simple web socket server.  It responds to any request by returning 3 names.
 
 `examples\websocket\chat1.html` is intended as a simple client for testing with `fbptestws.js`. If Firefox doesn't work for you, Chrome should work.
 
-Just enter any string (except `@kill`) into the input field, and click on `Send`, and it will return the strings: 
+Just enter any string into the input field, and click on `Send`, and it will return the strings: 
 
 - Server: Frankie Tomatto
 - Server: Joe Fresh
 - Server: Aunt Jemima
 
-Enter the string `@kill` in the input field (once or twice), and the network will come down (ungracefully).
+Click on the `close` button, and the network will come down.
 
 Tracing
 ---
