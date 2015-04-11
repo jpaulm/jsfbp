@@ -156,7 +156,7 @@ Just enter any string into the input field, and click on `Send`, and it will ret
 - Server: Joe Fresh
 - Server: Aunt Jemima
 
-Click on the `close` button, and the network will come down.
+Click on the `Stop WS` button, and the network will come down.
 
 Tracing
 ---
