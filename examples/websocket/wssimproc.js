@@ -13,10 +13,14 @@ module.exports = function wssimproc() {
     ip = inport.receive();  // connection
     outport.send(ip);      // send it on
     ip = inport.receive(); // data IP - drop and emit 3 results
+    var text = ip.contents;
+    var i = text.indexOf(":");
+    if (i > -1)
+      text = text.substring(0, i + 1) + ' ';
     this.dropIP(ip);
-    outport.send(this.createIP('Frankie Tomatto'));
-    outport.send(this.createIP('Joe Fresh'));
-    outport.send(this.createIP('Aunt Jemima'));    
+    outport.send(this.createIP(text + 'Frankie Tomatto'));
+    outport.send(this.createIP(text + 'Joe Fresh'));
+    outport.send(this.createIP(text + 'Aunt Jemima'));    
     ip = inport.receive(); // close bracket
     outport.send(ip);  // send it on...
   }

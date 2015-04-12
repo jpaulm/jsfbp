@@ -13,7 +13,7 @@ module.exports = function wsrecv(runtime) {
     var result = runtime.runAsyncCallback(genWsReceiveFun(runtime, wss, ws, this));
     console.log('wsrecv callback complete: ' + this.name);
     //console.log(result);
-    if (result[1].endsWith('@kill')) {      
+    if (result[1].endsWith('@kill')) {          
       break;
     }
 
@@ -24,6 +24,7 @@ module.exports = function wsrecv(runtime) {
     outport.send(this.createIP(result[1]));
     outport.send(this.createIPBracket(IP.CLOSE));
   }
+  
   wss.close();
   this.dropIP(ip);
 }
