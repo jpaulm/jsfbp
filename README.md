@@ -2,7 +2,7 @@
 
 "Classical" FBP "green thread" implementation written in JavaScript, using Node-Fibers - https://github.com/laverdet/node-fibers .  
 
-JSFBP takes advantage of JavaScript's concept of functions as first-degree objects to allow applications to be built using "green threads".  JSFBP makes use of a "Future Events Queue" which supports the green threads, and provides quite good performance (see below) - the JavaScript events queue is only used for JavaScript asynchronous functions, as before.
+JSFBP takes advantage of JavaScript's concept of functions as first-degree objects to allow applications to be built using "green threads".  JSFBP makes use of an internal "Future Events Queue" which supports the green threads, and provides quite good performance (see below) - the JavaScript events queue is only used for JavaScript asynchronous functions, as before.
 
 # General
 
@@ -135,17 +135,18 @@ runtime.runAsyncCallback(function (done) {
 
 3. Run `npm install` in the project directory
 
+4. Now run `npm install fibers`.
+
 4. Run `node examples/fbptestxx.js`, where `fbptestxx` is any of the tests listed above. If tracing is desired, change the value of the `trace` variable at the bottom of `fbptestxx.js` to `true`. 
 
-5. If there is a problem finding `node-fibers`, run `npm install fibers` .
-
-6. All these tests can be run sequentially by running `examples/fbptests.bat`, or by running `examples/fbptests.sh` under `bash`.
+5. All these tests can be run sequentially by running `examples/fbptests.bat`, or by running `examples/fbptests.sh` under `bash`.
 
 # Testing with Mocha
 
 The folder called `test` contains a number of Mocha tests.
 
-- Run `npm install` (in case you haven't already done so) and `npm test`
+- Run `npm install` (in case you haven't already done so), `npm install mocha`, `npm install mocha-fibers`, `npm install chai` and `npm test`
+  
 - Alternatively, you can directly execute `node.exe node_modules/mocha/bin/mocha --recursive --require test/test_helper.js` in case you need to adjust the path to Node's binary or pass further parameters to Mocha.
 
 # Testing Web Socket Server
