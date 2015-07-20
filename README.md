@@ -145,7 +145,9 @@ runtime.runAsyncCallback(function (done) {
 
 The folder called `test` contains a number of Mocha tests.
 
-- Run `npm install` (in case you haven't already done so), `npm install mocha`, `npm install mocha-fibers`, `npm install chai` and `npm test`
+- Run `npm install` and `npm install fibers` (in case you haven't already done so), `npm install mocha`, `npm install mocha-fibers`, `npm install chai` 
+
+- Now run `npm test` to execute a series of tests (all the `fbptestxx.js` tests in sequence).
   
 - Alternatively, you can directly execute `node.exe node_modules/mocha/bin/mocha --recursive --require test/test_helper.js` in case you need to adjust the path to Node's binary or pass further parameters to Mocha.
 
