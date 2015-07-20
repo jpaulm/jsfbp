@@ -127,7 +127,7 @@ runtime.runAsyncCallback(function (done) {
 
 # Install & Run
 
-1. Install node.js - see http://nodejs.org/download/  .  Node 12.0 leads to compatibility problems with Fiber, see [here](https://gist.github.com/ComFreek/c341bacfaae3aca887df) how to use Node 11.16 on a per-project basis. Alternatively, you can also globally install an older Node version.
+1. Install node.js - see http://nodejs.org/download/  . 
 
 2. Clone or download this project
 
@@ -135,7 +135,9 @@ runtime.runAsyncCallback(function (done) {
 
 4. Run `node examples/fbptestxx.js`, where `fbptestxx` is any of the tests listed above. If tracing is desired, change the value of the `trace` variable at the bottom of `fbptestxx.js` to `true`. 
 
-5. All these tests can be run sequentially by running `examples/fbptests.bat`, or by running `examples/fbptests.sh` under `bash`.
+5. If there is a problem finding `node-fibers`, run `npm install fibers` .
+
+6. All these tests can be run sequentially by running `examples/fbptests.bat`, or by running `examples/fbptests.sh` under `bash`.
 
 # Testing with Mocha
 
