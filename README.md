@@ -136,9 +136,9 @@ We use `node-fibers` which is known to work with `Node.js 12.7` (as of 24.07.201
 3. Install Visual Studio Express for Desktop 2013 (select that one at the left sidebar at https://www.visualstudio.com/downloads/download-visual-studio-vs)
 4. Clone or download this project
 5. Open a _new_ shell (The shell should not have been opened from before the Visual Studio installation because then the PATH and other environment variables are not yet updated.)
-  5.1) Optionally prepend Python 2.x to your PATH if you haven't already done so
+5.1. Optionally prepend Python 2.x to your PATH if you haven't already done so
           E.g. "SET PATH=C:\path\to\python2-directory\;%PATH%"
-  5.2) Execute "npm install"
+5.2. Execute "npm install"
 6. Run `node examples/fbptestxx.js`, where `fbptestxx` is any of the tests listed above. If tracing is desired, change the value of the `trace` variable at the bottom of `fbptestxx.js` to `true`. 
 7. If `npm install` reports `node-fibers` missing, execute `node install fibers`
 8. All these tests can be run sequentially by running `examples/fbptests.bat`, or by running `examples/fbptests.sh` under `bash`.
