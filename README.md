@@ -129,6 +129,8 @@ runtime.runAsyncCallback(function (done) {
 
 # Install & Run
 
+We use `node-fibers` which is known to work with `Node.js 12.7` (as of 24.07.2015).
+
 1. Install node.js - see http://nodejs.org/download/  . 
 
 2. Clone or download this project
