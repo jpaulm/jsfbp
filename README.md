@@ -132,26 +132,24 @@ runtime.runAsyncCallback(function (done) {
 We use `node-fibers` which is known to work with `Node.js 12.7` (as of 24.07.2015).
 
 1. Install node.js - see http://nodejs.org/download/  . 
-
-2. Clone or download this project
-
-3. Run `npm install` in the project directory
-
-4. Now run `npm install fibers`.
-
-5. Run `node examples/fbptestxx.js`, where `fbptestxx` is any of the tests listed above. If tracing is desired, change the value of the `trace` variable at the bottom of `fbptestxx.js` to `true`. 
-
-6. All these tests can be run sequentially by running `examples/fbptests.bat`, or by running `examples/fbptests.sh` under `bash`.
+2. Install Python 2.x
+3. Install Visual Studio Express for Desktop 2013 (select that one at the left sidebar at https://www.visualstudio.com/downloads/download-visual-studio-vs)
+4. Clone or download this project
+5. Open a _new_ shell (The shell should not have been opened from before the Visual Studio installation because then the PATH and other environment variables are not yet updated.)
+  5.1) Optionally prepend Python 2.x to your PATH if you haven't already done so
+          E.g. "SET PATH=C:\path\to\python2-directory\;%PATH%"
+  5.2) Execute "npm install"
+6. Run `node examples/fbptestxx.js`, where `fbptestxx` is any of the tests listed above. If tracing is desired, change the value of the `trace` variable at the bottom of `fbptestxx.js` to `true`. 
+7. If `npm install` reports `node-fibers` missing, execute `node install fibers`
+8. All these tests can be run sequentially by running `examples/fbptests.bat`, or by running `examples/fbptests.sh` under `bash`.
 
 # Testing with Mocha
 
 The folder called `test` contains a number of Mocha tests.
 
-- Run `npm install` and `npm install fibers` (in case you haven't already done so), `npm install mocha`, `npm install mocha-fibers`, `npm install chai` 
-
-- Now run `npm test` to execute a series of tests (all the `fbptestxx.js` tests in sequence).
-  
-- Alternatively, you can directly execute `node.exe node_modules/mocha/bin/mocha --recursive --require test/test_helper.js` in case you need to adjust the path to Node's binary or pass further parameters to Mocha.
+1. Run `npm install` and `npm install fibers` (in case you haven't already done so), `npm install mocha`, `npm install mocha-fibers`, `npm install chai` 
+2. Now run `npm test` to execute a series of tests (all the `fbptestxx.js` tests in sequence).
+3. Alternatively, you can directly execute `node.exe node_modules/mocha/bin/mocha --recursive --require test/test_helper.js` in case you need to adjust the path to Node's binary or pass further parameters to Mocha.
 
 # Testing Web Socket Server
 
