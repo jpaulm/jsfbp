@@ -137,8 +137,9 @@ We use `node-fibers` which is known to work with `Node.js 12.7` (as of 24.07.201
 4. Clone or download this project
 5. Open a _new_ shell (The shell should not have been opened from before the Visual Studio installation because then the PATH and other environment variables are not yet updated.)
 6. Optionally prepend Python 2.x to your PATH if you haven't already done so
-          E.g. `SET PATH=C:\path\to\python2-directory\;%PATH%`
+          e.g. `SET PATH=C:\path\to\python2-directory\;%PATH%`
 7. Execute `npm install`
+          If you get MSB4019 error messages involving `utf-8-validate` and `bufferutil`, you can just ignore them   
 8. Run `node examples/fbptestxx.js`, where `fbptestxx` is any of the tests listed above. If tracing is desired, change the value of the `trace` variable at the bottom of `fbptestxx.js` to `true`. 
 9. If `npm install` reports `node-fibers` missing, execute `node install fibers`
 10. All these tests can be run sequentially by running `examples/fbptests.bat`, or by running `examples/fbptests.sh` under `bash`.
@@ -147,9 +148,8 @@ We use `node-fibers` which is known to work with `Node.js 12.7` (as of 24.07.201
 
 The folder called `test` contains a number of Mocha tests.
 
-1. Run `npm install` and `npm install fibers` (in case you haven't already done so), `npm install mocha`, `npm install mocha-fibers`, `npm install chai` 
-2. Now run `npm test` to execute a series of tests (all the `fbptestxx.js` tests in sequence).
-3. Alternatively, you can directly execute `node.exe node_modules/mocha/bin/mocha --recursive --require test/test_helper.js` in case you need to adjust the path to Node's binary or pass further parameters to Mocha.
+1. Run `npm test` to execute a series of tests (all the `fbptestxx.js` tests in sequence).
+2. Alternatively, you can directly execute `node.exe node_modules/mocha/bin/mocha --recursive --require test/test_helper.js` in case you need to adjust the path to Node's binary or pass further parameters to Mocha.
 
 # Testing Web Socket Server
 
