@@ -132,6 +132,20 @@ runtime.runAsyncCallback(function (done) {
 We use `node-fibers` which is known to work with `Node.js 12.7` (as of 24.07.2015).
 
 1. Install node.js - see http://nodejs.org/download/  . 
+2. Clone or download this project
+3. Execute `npm install`
+   There was a case, where `npm install` reported that `node-fibers` is missing. Just execute `node install fibers` by hand.
+   
+   If you get an MSB4019 or similar error messages involving `utf-8-validate` and `bufferutil` (some dependencies of another dependencies…), you can just ignore them, given the optional nature of these component's compilation.
+
+4. Run `node examples/fbptestxx.js`, where `fbptestxx` is any of the tests listed above. If tracing is desired, change the value of the `trace` variable at the bottom of `fbptestxx.js` to `true`. 
+5. All these tests can be run sequentially by running `examples/fbptests.bat`, or by running `examples/fbptests.sh` under `bash`.
+
+## Full install
+
+If you do not wish to ignore the optional errors as mentioned in point #3 under *Install*, you will need to install Python 2.x and Visual Studio Express for Desktop 2013.
+
+1. Install node.js - see http://nodejs.org/download/  . 
 2. Install Python 2.x
 3. Install Visual Studio Express for Desktop 2013 (select that one at the left sidebar at https://www.visualstudio.com/downloads/download-visual-studio-vs)
 4. Clone or download this project
@@ -139,7 +153,6 @@ We use `node-fibers` which is known to work with `Node.js 12.7` (as of 24.07.201
 6. Optionally prepend Python 2.x to your PATH if you haven't already done so
         -  e.g. `SET PATH=C:\path\to\python2-directory\;%PATH%`
 7. Execute `npm install`
-        -  If you get MSB4019 error messages involving `utf-8-validate` and `bufferutil`, you can just ignore them   
 8. Run `node examples/fbptestxx.js`, where `fbptestxx` is any of the tests listed above. If tracing is desired, change the value of the `trace` variable at the bottom of `fbptestxx.js` to `true`. 
 9. If `npm install` reports `node-fibers` missing, execute `node install fibers`
 10. All these tests can be run sequentially by running `examples/fbptests.bat`, or by running `examples/fbptests.sh` under `bash`.
