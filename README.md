@@ -143,11 +143,11 @@ We use `node-fibers` which is known to work with `Node.js 12.7` (as of 24.07.201
 
 ## Full install
 
-If you do not wish to ignore the optional errors as mentioned in point #3 under *Install*, you will need to install Python 2.x and Visual Studio Express for Desktop 2013.
+If you do not wish to ignore the errors mentioned in point #3 under *Install*, you will need to install Python 2.x and Visual Studio Express for Desktop 2013.
 
 1. Install node.js - see http://nodejs.org/download/  . 
 2. Install Python 2.x
-3. Install Visual Studio Express for Desktop 2013 (select that one at the left sidebar at https://www.visualstudio.com/downloads/download-visual-studio-vs)
+3. Install Visual Studio Express for Desktop 2013 (click on http://go.microsoft.com/fwlink/?LinkId=532500&clcid=0x409 )
 4. Clone or download this project
 5. Open a _new_ shell (The shell should not have been opened from before the Visual Studio installation because then the PATH and other environment variables are not yet updated.)
 6. Optionally prepend Python 2.x to your PATH if you haven't already done so
