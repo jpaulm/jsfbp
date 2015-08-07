@@ -134,9 +134,9 @@ We use `node-fibers` which is known to work with `Node.js 12.7` (as of 24.07.201
 1. Install node.js - see http://nodejs.org/download/  . 
 2. Clone or download this project
 3. Execute `npm install`
-   There was a case, where `npm install` reported that `node-fibers` is missing. Just execute `node install fibers` by hand.
+   There was a case, where `npm install` reported that `node-fibers` is missing. If this happens, just execute `node install fibers` by hand.
    
-   If you get an MSB4019 or similar error messages involving `utf-8-validate` and `bufferutil` (some dependencies deep down the dependency tree), you can just ignore them, given the optional nature of these component's compilation.
+   If you get an MSB4019 or similar error messages involving `utf-8-validate` and `bufferutil` (some dependencies deep down the dependency tree), you can just ignore them, given the optional nature of these components' compilation.
 
 4. Run `node examples/fbptestxx.js`, where `fbptestxx` is any of the tests listed above. If tracing is desired, change the value of the `trace` variable at the bottom of `fbptestxx.js` to `true`. 
 5. All these tests can be run sequentially by running `examples/fbptests.bat`, or by running `examples/fbptests.sh` under `bash`.
