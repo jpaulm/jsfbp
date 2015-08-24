@@ -16,7 +16,7 @@ module.exports = function wschatresp() {
     //console.log(ip);
     var wss = ip.contents;
     this.dropIP(ip);
-    ip = inport.receive();   // shd be connection
+    ip = inport.receive();   // shd be orig connection
     //console.log(ip);
     var ws = ip.contents;
     this.dropIP(ip);
@@ -29,7 +29,9 @@ module.exports = function wschatresp() {
       }
       var msg = ip.contents;
       this.dropIP(ip);
-      ws.send(msg);
+      wss.clients.forEach(function(client) {
+        client.send(msg);
+      });
     }
   }
 }
