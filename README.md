@@ -166,15 +166,14 @@ The folder called `test` contains a number of Mocha tests.
 
 # Testing Web Socket Server
 
-Run `node examples\websocket\fbptestws.js`, which is a simple web socket server.  It responds to any request by returning 3 names.
+Run `node examples/websocketchat/fbptestws.js`, which is a simple web socket server.  It responds to any request by returning 3 names.
 
-`examples\websocket\chat1.html` is intended as a simple client for testing with `fbptestws.js`. If Firefox doesn't work for you, Chrome should work.
+`examples/websocketchat/chat1.html` is intended as a simple _chat_ client for testing with `fbptestws.js`. If Firefox doesn't work for you, Chrome and Safari will work.
 
-Just enter any string into the input field, and click on `Send`, and it will return the strings: 
+Just enter any string into the input field, and click on `Send`, and it will send to all clients that are connected:
 
-- Server: Frankie Tomatto
-- Server: Joe Fresh
-- Server: Aunt Jemima
+- Server: Client1 wrote:
+- Server: _message text_
 
 Click on the `Stop WS` button, and the network will come down.
 
