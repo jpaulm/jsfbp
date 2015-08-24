@@ -164,16 +164,13 @@ The folder called `test` contains a number of Mocha tests.
 1. Run `npm test` to execute a series of tests (all the `fbptestxx.js` tests in sequence).
 2. Alternatively, you can directly execute `node.exe node_modules/mocha/bin/mocha --recursive --require test/test_helper.js` in case you need to adjust the path to Node's binary or pass further parameters to Mocha.
 
-# Testing Web Socket Server
+# Testing Simple Web Socket Chat Server
 
-Run `node examples/websocketchat/fbptestws.js`, which is a simple web socket server.  It responds to any request by returning 3 names.
+Run `node examples/websocketchat/fbptestwschat.js`, which is a simple web socket chat server.  It responds to any request by broadcasting it to all connected clients.
 
-`examples/websocketchat/chat1.html` is intended as a simple _chat_ client for testing with `fbptestws.js`. If Firefox doesn't work for you, Chrome and Safari will work.
+`examples/websocketchat/index.html` is intended as a simple chat client for testing with `fbptestwschat.js`. If Firefox doesn't work for you, Chrome and Safari will work.
 
-Just enter any string into the input field, and click on `Send`, and it will send to all clients that are connected:
-
-- Server: Client1 wrote:
-- Server: _message text_
+Just enter any string into the input field, and click on `Send`, and it will broadcast it to all clients that are connected.
 
 Click on the `Stop WS` button, and the network will come down.
 
