@@ -13,7 +13,7 @@ module.exports = function wschatrecv(runtime) {
     var result = runtime.runAsyncCallback(genWsReceiveFun(runtime, wss, ws, this));
     console.log('wsrecv callback complete: ' + this.name);
     //console.log(result);
-    if (result[1].endsWith('@kill')) {          
+    if (result[2].endsWith('@kill')) {          
       break;
     }
 
@@ -22,6 +22,7 @@ module.exports = function wschatrecv(runtime) {
     outport.send(this.createIPBracket(IP.OPEN));
     outport.send(this.createIP(result[0]));
     outport.send(this.createIP(result[1]));
+    outport.send(this.createIP(result[2]));
     outport.send(this.createIPBracket(IP.CLOSE));
   }
   
@@ -34,7 +35,7 @@ function genWsReceiveFun(runtime, wss, ws, proc) {
     wss.on('connection', function connection(ws) {
       ws.on('message', function incoming(message) {
         console.log('running callback for: ' + proc.name);
-        done([ws, message]);
+        done([wss, ws, message]);
       });
       ws.send('connected!');
     });

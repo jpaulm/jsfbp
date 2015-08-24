@@ -12,6 +12,10 @@ module.exports = function wschatresp() {
     }
     //console.log(ip);
     this.dropIP(ip);
+    ip = inport.receive();   // shd be wss
+    //console.log(ip);
+    var wss = ip.contents;
+    this.dropIP(ip);
     ip = inport.receive();   // shd be connection
     //console.log(ip);
     var ws = ip.contents;

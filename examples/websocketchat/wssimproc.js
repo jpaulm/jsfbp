@@ -10,6 +10,8 @@ module.exports = function wssimproc() {
     }
     // not null, so this IP was open bracket
     outport.send(ip);  //send it on
+    ip = inport.receive();  // wss object
+    outport.send(ip);      // send it on
     ip = inport.receive();  // connection
     outport.send(ip);      // send it on
     ip = inport.receive(); // data IP - drop and emit 3 results
