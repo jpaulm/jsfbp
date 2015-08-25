@@ -5,9 +5,14 @@ var IP = require('../../core/IP')
 
 module.exports = function wschatrecv(runtime) {
   var inport = this.openInputPort('PORTNO');
+  var outport = this.openOutputPort('OUT');
+  var wssout = this.openOutputPort('WSSOUT');
+
   var ip = inport.receive();
   var portno = ip.contents;
   var wss = new WebSocketServer({ port: portno });
+  wssout.send(this.createIP(wss));
+
   var ws = null;
   while (true) {
     var result = runtime.runAsyncCallback(genWsReceiveFun(runtime, wss, ws, this));
@@ -18,9 +23,8 @@ module.exports = function wschatrecv(runtime) {
     }
 
     console.log(result);
-    var outport = this.openOutputPort('OUT');
+    //var outport = this.openOutputPort('OUT');
     outport.send(this.createIPBracket(IP.OPEN));
-    outport.send(this.createIP(result[0]));
     outport.send(this.createIP(result[1]));
     outport.send(this.createIP(result[2]));
     outport.send(this.createIPBracket(IP.CLOSE));
