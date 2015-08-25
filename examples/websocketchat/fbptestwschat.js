@@ -5,7 +5,7 @@ var network = new fbp.Network();
 
 var receiver = network.defProc(require('../../components/wsrecv'));
 var simproc  = network.defProc(require('./wssimproc'));
-var send = network.defProc(require('./wschatsend'));
+var send = network.defProc(require('./wsbroadcast'));
 
 network.initialize(receiver, 'PORTNO', '9003');
 network.connect(receiver, 'WSSOUT', send, 'WSSIN', 6);

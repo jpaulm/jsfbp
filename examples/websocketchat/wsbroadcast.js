@@ -2,7 +2,7 @@
 
 var IP = require('../../core/IP');
 
-module.exports = function wschatresp() {
+module.exports = function wsbroadcast() {
   var ip;
   var inport = this.openInputPort('IN');
   var wssin = this.openInputPort('WSSIN');
