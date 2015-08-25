@@ -3,7 +3,7 @@ var fbp = require('../..');
 // --- define network ---
 var network = new fbp.Network();
 
-var receiver = network.defProc(require('./wschatrecv'));
+var receiver = network.defProc(require('../../components/wsrecv'));
 var simproc  = network.defProc(require('./wssimproc'));
 var send = network.defProc(require('./wschatsend'));
 
