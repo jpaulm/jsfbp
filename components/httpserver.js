@@ -9,18 +9,18 @@ module.exports = function httpserver(runtime) {
 
   var ip = inport.receive();
   var portno = ip.contents;
-  var server = http.createServer(handleWebRequest);
+  var server = http.createServer(handleServerRequest);
 
   runtime.runAsyncCallback(genListenFun(runtime, server, portno, this));
 
   while (true) {
-    var result = runtime.runAsyncCallback(genWsReceiveFun(runtime, server, portno, this));
+    var result = runtime.runAsyncCallback(genReceiveFun(runtime, server, portno, this));
 
     for (var i=0; i<result.length; ++i) {
       var r = result[i];
       outport.send(this.createIPBracket(IP.OPEN));
-      outport.send(this.createIP(r.req));
-      outport.send(this.createIP(r.res));
+      outport.send(this.createIP(r[0]));
+      outport.send(this.createIP(r[1]));
       outport.send(this.createIPBracket(IP.CLOSE));
     }
   }
@@ -34,9 +34,8 @@ var rx = null;
 
 var wq = [];
 
-function handleWebRequest(req, res) {
-  console.log('got req url: ' + req.url);
-  wq.push({req: req, res: res});
+function handleServerRequest(req, res) {
+  wq.push([req, res]);
 
   if (!!rx) {
     var q = wq;
@@ -56,7 +55,7 @@ function genListenFun(runtime, server, portno, proc) {
   };
 }
 
-function genWsReceiveFun(runtime, server, portno, proc) {
+function genReceiveFun(runtime, server, portno, proc) {
   return function (done) {
     rx = function(q) {
       done(q);
