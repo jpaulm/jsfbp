@@ -2,7 +2,7 @@
 
 var IP = require('../../core/IP');
 
-module.exports = function httpresp() {
+module.exports = function myresp() {
   var ip;
   var inport = this.openInputPort('IN');
 

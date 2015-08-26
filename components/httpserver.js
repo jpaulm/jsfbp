@@ -1,10 +1,9 @@
 'use strict';
 
-var IP = require('../../core/IP')
-  //, WebSocketServer = require('ws').Server
+var IP = require('../core/IP')
   , http = require('http');
 
-module.exports = function httprecv(runtime) {
+module.exports = function httpserver(runtime) {
   var inport = this.openInputPort('PORTNO');
   var outport = this.openOutputPort('OUT');
 
@@ -16,7 +15,6 @@ module.exports = function httprecv(runtime) {
 
   while (true) {
     var result = runtime.runAsyncCallback(genWsReceiveFun(runtime, server, portno, this));
-    //console.log('wsrecv callback complete: ' + this.name);
 
     for (var i=0; i<result.length; ++i) {
       var r = result[i];
