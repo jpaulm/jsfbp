@@ -166,7 +166,7 @@ The folder called `test` contains a number of Mocha tests.
 
 # Testing Simple Web Socket Chat Server
 
-Run `node examples/websocketchat/fbptestwschat.js`, which is a simple web socket chat server.  It responds to any request by broadcasting it to all connected clients.
+Run `node examples/websocketchat/fbptestwschat.js`, which is a simple web socket chat server which responds to any request by broadcasting it to all connected clients. It is similar to the chat sample at: http://socket.io/get-started/chat/ except for serving the client HTML.
 
 `examples/websocketchat/index.html` is intended as a simple chat client for testing with `fbptestwschat.js`. If Firefox doesn't work for you, Chrome and Safari will work.
 

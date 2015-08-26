@@ -2,19 +2,20 @@
 
 var IP = require('../../core/IP');
 
-module.exports = function wschatresp() {
+module.exports = function wsbroadcast() {
   var ip;
   var inport = this.openInputPort('IN');
+  var wssin = this.openInputPort('WSSIN');
+
+  ip = wssin.receive();      // shd be wss
+  var wss = ip.contents;
+
   while (true) {
     ip = inport.receive();   // shd be open bracket
     if (ip === null) {
       break;
     }
     //console.log(ip);
-    this.dropIP(ip);
-    ip = inport.receive();   // shd be wss
-    //console.log(ip);
-    var wss = ip.contents;
     this.dropIP(ip);
     ip = inport.receive();   // shd be orig connection
     //console.log(ip);
