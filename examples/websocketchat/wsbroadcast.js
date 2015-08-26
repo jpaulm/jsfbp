@@ -9,6 +9,7 @@ module.exports = function wsbroadcast() {
 
   ip = wssin.receive();      // shd be wss
   var wss = ip.contents;
+  this.dropIP(ip);
 
   while (true) {
     ip = inport.receive();   // shd be open bracket
