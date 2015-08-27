@@ -6,9 +6,9 @@ module.exports = function collate() {
   var outport = this.openOutputPort('OUT');
 
   var ctlfieldsP = ctlfields.receive();
+  var fields = ctlfieldsP.contents.split(',').map(function(str) { return parseInt(str); });
   this.dropIP(ctlfieldsP);
 
-  var fields = ctlfieldsP.contents.split(',').map(function(str) { return parseInt(str); });
   var totalFieldLength = fields.reduce(function(acc, n) { return acc + n; }, 0);
 
   var portCount = inportArray.length;

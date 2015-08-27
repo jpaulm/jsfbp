@@ -164,6 +164,12 @@ The folder called `test` contains a number of Mocha tests.
 1. Run `npm test` to execute a series of tests (all the `fbptestxx.js` tests in sequence).
 2. Alternatively, you can directly execute `node.exe node_modules/mocha/bin/mocha --recursive --require test/test_helper.js` in case you need to adjust the path to Node's binary or pass further parameters to Mocha.
 
+# Testing Sample HTTP Server
+
+Run `node examples/httpserver/fbphttpserver.js`, which is a simple HTTP server which is similar to the one in the sample at: http://blog.modulus.io/build-your-first-http-server-in-nodejs
+
+NOTE: The HTTP server components are currently all custom components, based on the components used in the simple web socket chat server described below.
+
 # Testing Simple Web Socket Chat Server
 
 Run `node examples/websocketchat/fbptestwschat.js`, which is a simple web socket chat server which responds to any request by broadcasting it to all connected clients. It is similar to the chat sample at: http://socket.io/get-started/chat/ except for serving the client HTML.
