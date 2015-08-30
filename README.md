@@ -143,7 +143,7 @@ We use `node-fibers` which is known to work with `Node.js 12.7` (as of 24.07.201
 
 ## Full install
 
-If you do not wish to ignore the errors mentioned in point #3 under *Install*, you will need to install Python 2.x and Visual Studio Express for Desktop 2013.
+If you do not wish to ignore the errors mentioned in point #3 under *Install*, you will need to install Python 2.x and Visual Studio Express for Desktop 2013. This doesn't seem to guarantee an error-free `npm install`, however.  Still `jsfbp` works fine, even with these errors.
 
 1. Install node.js - see http://nodejs.org/download/  . 
 2. Install Python 2.x
