@@ -31,7 +31,7 @@ Test cases so far:
 - `fbptest12` -  `reader OUT -> IN copier OUT -> IN writer`
 - `fbptest13` -  Simple network to demonstrate functioning of random delay component (`randdelay`)
 - `fbptest14` -  Network demonstrating parallelism using two instances of `reader` and two fixed delay components (`delay`)
-- `fbptestvl` -  Volume test (see below): `sender` -> `copier` -> `discard` 
+- `fbptestvl` -  Volume test (see below): `gendata` -> `copier` -> `discard` 
  
 - `testsubstreamsensitivesplitting.js` - Test substream-sensitive logic in `lbal`, feeding `substreamsensitivemerge.js`
  
@@ -53,6 +53,7 @@ These tests (except for `fbptestws`) can be run sequentially by running `fbptest
 - `copier_closing` - forces close of input port after 20 IPs
 - `copier_nonlooper` - same as `copier`, except that it is written as a non-looper (it has been modified to call the FBP services from lower in the process's stack)
 - `discard` - discard (drop) all incoming IPs
+- `gendata`  - sends as many IPs to its output port as are specified by its COUNT IIP (each just contains the current count)
 - `lbal`    - load balancer - sends output to output port array element with smallest number of IPs in transit
 - `randdelay` - sends incoming IPs to output port after random number of millisecs (between 0 and 400)
 - `reader`  - does an asynchronous read on the file specified by its FILE IIP 
@@ -60,9 +61,8 @@ These tests (except for `fbptestws`) can be run sequentially by running `fbptest
 - `repl`    - replicates the incoming IPs to the streams specified by an array output port (it does not handle tree structures)
 - `reverse` - reverses the string contained in each incoming IP
 - `rrmerge` - "round robin" merge 
-- `sender`  - sends as many IPs to its output port as are specified by its COUNT IIP (each just contains the current count)
-- `writer`  - does an asynchronous write to the file specified by its FILE IIP
 - `substreamsensitivemerge.js` - merges multiple input streams, but keeps IPs in correct sequence within each substream, although sequence of substreams is not guaranteed
+- `writer`  - does an asynchronous write to the file specified by its FILE IIP
 
 - `wsrecv`  - general web socket "receive" component for web socket server - outputs substream 
 - `wsresp`  - general web socket "respond" component sending data from web socket server to client - takes substream as input
