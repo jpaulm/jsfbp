@@ -1,6 +1,6 @@
 'use strict';
 
-module.exports = function sender() {
+module.exports = function gendata() {
   var inport = this.openInputPort('COUNT');
   var outport = this.openOutputPort('OUT');
   var ip = inport.receive();

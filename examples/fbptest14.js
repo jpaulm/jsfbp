@@ -2,9 +2,9 @@ var fbp = require('..');
 
 // --- define network ---
 var network = new fbp.Network();
-var mms0     = network.defProc('./components/mockmocksender', 'mms0');
+var mms0     = network.defProc('./examples/components/mockmocksender', 'mms0');
 var delay0      = network.defProc('./components/delay', 'delay0');
-var mms1     = network.defProc('./components/mockmocksender', 'mms1');
+var mms1     = network.defProc('./examples/components/mockmocksender', 'mms1');
 var delay1      = network.defProc('./components/delay', 'delay1');
 var recvr      = network.defProc('./components/recvr');
 

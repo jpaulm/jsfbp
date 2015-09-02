@@ -14,6 +14,19 @@ module.exports.getElementWithSmallestBacklog = function(array){
   return element;
 };
 
+module.exports.findInputPortElementWithData = function(array){	  
+	  var element = -1;
+	  // if all elements closed, this will return -1
+	  for (var i = 0; i < array.length; i++) {
+	     if (array[i] == null || array[i] == undefined)
+	        continue;
+	     if (array[i].conn.usedslots > 0){	        
+	        element = i;
+	     }   
+	  }
+	  return element;
+	};
+
 module.exports.Enum = function (constants) {
   var _map = {};
   var enumTable = {

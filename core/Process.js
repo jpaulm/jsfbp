@@ -46,7 +46,9 @@ Process.prototype.createIPBracket = function(bktType, x) {
   ip.type = bktType;     
   this.ownedIPs++;
   ip.owner = this;
-  console.log(ip);
+  if (tracing) {
+    console.log(ip);
+  }
   return ip;
 };
 
