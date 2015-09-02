@@ -9,15 +9,15 @@ JSFBP takes advantage of JavaScript's concept of functions as first-degree objec
 Test cases so far:
 
 - `fbptest01` - 3 processes:
-    - `sender` (generates ascending numeric values)
+    - `gendata` (generates ascending numeric values)
     - `copier` (copies)
     - `recvr`  (displays incoming values to console)
 
 ![JSFBP](https://github.com/jpaulm/jsfbp/blob/master/docs/JSFBP.png "Simple Test Network")
 
-- `fbptest02` - `sender` replaced with `reader`
-- `fbptest03` - `sender` and `reader` both feeding into `copier.IN`
-- `fbptest04` - `sender` feeding `repl` which sends 3 copies of input IP (as specified in network), each copy going to a separate element of array port `OUT`; all 3 copies then feeding into `recvr.IN`
+- `fbptest02` - `gendata` replaced with `reader`
+- `fbptest03` - `gendata` and `reader` both feeding into `copier.IN`
+- `fbptest04` - `gendata` feeding `repl` which sends 3 copies of input IP (as specified in network), each copy going to a separate element of array port `OUT`; all 3 copies then feeding into `recvr.IN`
 - `fbptest05` - Two copies of `reader` running concurrently, one feeds direct to `rrmerge` ("round robin" merge) input port element 0; other one into `copier` and then into `rrmerge` input port element 1; from `rrmerge.OUT` to `recvr.IN` 
 - `fbptest06` - The output streams of the `repl` (in `fbptest04`) are fed to the input array port of `rrmerge`, and from its `OUT` to `recvr.IN`
 - `fbptest07` - Creates a deadlock condition - the status of each Process is displayed
@@ -32,6 +32,8 @@ Test cases so far:
 - `fbptest13` -  Simple network to demonstrate functioning of random delay component (`randdelay`)
 - `fbptest14` -  Network demonstrating parallelism using two instances of `reader` and two fixed delay components (`delay`)
 - `fbptestvl` -  Volume test (see below): `sender` -> `copier` -> `discard` 
+ 
+- `testsubstreamsensitivesplitting.js` - Test substream-sensitive logic in `lbal`, feeding `substreamsensitivemerge.js`
  
 WebSockets
 ----
@@ -60,7 +62,8 @@ These tests (except for `fbptestws`) can be run sequentially by running `fbptest
 - `rrmerge` - "round robin" merge 
 - `sender`  - sends as many IPs to its output port as are specified by its COUNT IIP (each just contains the current count)
 - `writer`  - does an asynchronous write to the file specified by its FILE IIP
-  
+- `substreamsensitivemerge.js` - merges multiple input streams, but keeps IPs in correct sequence within each substream, although sequence of substreams is not guaranteed
+
 - `wsrecv`  - general web socket "receive" component for web socket server - outputs substream 
 - `wsresp`  - general web socket "respond" component sending data from web socket server to client - takes substream as input
 - `wssimproc` - "simulated" processing for web socket server - actually just outputs 3 names
@@ -68,7 +71,7 @@ These tests (except for `fbptestws`) can be run sequentially by running `fbptest
  
 # API
 
-## For normal users
+## For application developers
 
 1. Get access to JSFBP: `var fbp = require('fbp')`
 2. Create a new network: `var network = new fbp.Network();`
@@ -126,6 +129,9 @@ runtime.runAsyncCallback(function (done) {
 ```
 -  `Utils.getElementWithSmallestBacklog(array);` - used by `lbal` - not for general use 
 - **Be sure** to include Utils: `var Utils = require('core/utils')`.
+ 
+-  `Utils.findInputPortElementWithData(array);` - used by `substreamsensitivemerge` - not for general use 
+- **Be sure** to include Utils: `var Utils = require('core/utils')`.
 
 # Install & Run
 
@@ -143,7 +149,7 @@ We use `node-fibers` which is known to work with `Node.js 12.7` (as of 24.07.201
 
 ## Full install
 
-If you do not wish to ignore the errors mentioned in point #3 under *Install*, you will need to install Python 2.x and Visual Studio Express for Desktop 2013.
+If you wish to eliminate the errors mentioned in point #3 under *Install*, you will need to install Python 2.x and Visual Studio Express for Desktop 2013. This doesn't seem to guarantee an error-free `npm install`, however.  Still `jsfbp` works fine, even with these errors.
 
 1. Install node.js - see http://nodejs.org/download/  . 
 2. Install Python 2.x
