@@ -165,13 +165,6 @@ FiberRuntime.prototype._logProcessInfo = function(proc) {
 	}
 };
 
-/*
- * FiberRuntime.prototype._areUpConnsClosed = function (proc) { return
- * proc.inports.every(function (inport) { if (inport[1].conn instanceof
- * IIPConnection) { return true; } else if (!(inport[1].conn.closed) ||
- * inport[1].conn.usedslots > 0) { return false; } else { return true; } }); };
- * 
- */
 
 FiberRuntime.prototype._procState = function(proc) {
 	// return 2 if all upstream processes closed down, 1 if no data in

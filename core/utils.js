@@ -1,5 +1,8 @@
 'use strict';
 
+var Fiber = require('fibers'),
+  ProcessStatus = require('./Process').Status;
+
 module.exports.getElementWithSmallestBacklog = function(array){
   var number = Number.MAX_VALUE; 
   var element = 0;
@@ -14,18 +17,50 @@ module.exports.getElementWithSmallestBacklog = function(array){
   return element;
 };
 
-module.exports.findInputPortElementWithData = function(array){	  
-	  var element = -1;
-	  // if all elements closed, this will return -1
-	  for (var i = 0; i < array.length; i++) {
-	     if (array[i] == null || array[i] == undefined)
-	        continue;
-	     if (array[i].conn.usedslots > 0){	        
-	        element = i;
-	     }   
+module.exports.findInputPortElementWithData = function(array) {
+	var proc = Fiber.current.fbpProc;
+
+	if (tracing) {
+	    console.log(proc.name + ' findIPE_with_data ');
 	  }
-	  return element;
-	};
+	
+	while (true) {
+		var element = -1;
+		var allDrained = true;		
+		for (var i = 0; i < array.length; i++) {
+			if (array[i] == null || array[i] == undefined)
+				continue;
+			if (array[i].conn.usedslots > 0) {  // connection has data
+				element = i;
+				return i;			
+			}
+			else if (array[i].conn.closed)  { 	// connection is drained				
+				continue;
+			}
+			else {
+				allDrained = false;                  // no data but not all closed, so suspend
+			}
+		}
+		if (allDrained) {
+			if (tracing) {
+			    console.log(proc.name + ' findIPE_with_data: all drained');
+			  }
+			return -1;
+		}
+		
+		proc.status = ProcessStatus.WAITING_TO_RECEIVE;
+		proc.yielded = true;
+		if (tracing) {
+		    console.log(proc.name + ' findIPE_with_data: susp');
+		  }
+		Fiber.yield();
+		// proc.status = ProcessStatus.ACTIVE;
+		proc.yielded = false;
+		if (tracing) {
+		    console.log(proc.name + ' findIPE_with_data: resume');
+		  }
+	}
+};
 
 module.exports.Enum = function (constants) {
   var _map = {};

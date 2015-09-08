@@ -14,7 +14,7 @@ module.exports = function genss() {
   outport.send(p);
   
   for (var i = 0; i < count; i++) {
-    var ip = this.createIP((count - i) + '');
+    var ip = this.createIP((count - i) + 'abcd');
     if (-1 == outport.send(ip)) {
       return;
     }
