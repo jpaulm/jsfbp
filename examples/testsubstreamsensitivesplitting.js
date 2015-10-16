@@ -18,7 +18,7 @@ var passthru2  = network.defProc('./components/passthru.js', 'passthru2');
 
 var makeMergeSubstreamSensitive = true;
 
-network.initialize(genss, 'COUNT', '400');
+network.initialize(genss, 'COUNT', '100');
 network.connect(genss, 'OUT', lbal, 'IN', 10);
 network.connect(lbal, 'OUT[0]', passthru0, 'IN', 1);
 network.connect(lbal, 'OUT[1]', passthru1, 'IN', 1);
