@@ -44,7 +44,7 @@ module.exports = function checksequencewithinsubstreams() {
 		var i = s.indexOf("abcd");
 		var j = parseInt(s.substring(0, i));
 		if (seq == -1) {
-			console.log("1st of substream " + j + ": " + s);
+			//console.log("1st of substream " + j + ": " + s);
 			seq = j;
 		}
 		else {
@@ -57,7 +57,7 @@ module.exports = function checksequencewithinsubstreams() {
 		count--;
     }
     
-    if (outport != null)
+    if (outport != null) 
     	outport.send(ip);
     else
     	this.dropIP(ip);
