@@ -14,6 +14,7 @@ var lbal = network.defProc('./components/lbal.js');
 var passthru0  = network.defProc('./components/passthru.js', 'passthru0');
 var passthru1  = network.defProc('./components/passthru.js', 'passthru1');
 var passthru2  = network.defProc('./components/passthru.js', 'passthru2');
+var recvr  = network.defProc('./components/recvr.js');
 
 
 var makeMergeSubstreamSensitive = true;
@@ -28,7 +29,7 @@ network.connect(lbal, 'OUT[2]', passthru2, 'IN', 1);
  * 3 passthru's feeding one port -> pretty mixed up data
  */  
 if (!makeMergeSubstreamSensitive) {
-	var recvr  = network.defProc('./components/recvr.js');
+
       network.connect(passthru0, 'OUT', recvr, 'IN', 1);
       network.connect(passthru1, 'OUT', recvr, 'IN', 1);
       network.connect(passthru2, 'OUT', recvr, 'IN', 1);
@@ -44,7 +45,8 @@ else {
 	  network.connect(passthru0, 'OUT', ssmerge, 'IN[0]', 1);
 	  network.connect(passthru1, 'OUT', ssmerge, 'IN[1]', 1);
 	  network.connect(passthru2, 'OUT', ssmerge, 'IN[2]', 1);	
-	  network.connect(ssmerge, 'OUT', csws, 'IN');	  
+	  network.connect(ssmerge, 'OUT', csws, 'IN');	
+	  network.connect(csws, 'OUT', recvr, 'IN');
 	  
 }
 
