@@ -6,6 +6,9 @@ var fbp = require('..');
 // the substreams may be rearranged, but within a substreams the IPs must preserve their 
 // number and sequence 
 
+// Warning: given the small connection sizes, this network should deadlock - see comment in javafbp, but
+// for some reason, this isn't happening - more research needs to take place!
+
 // --- define network ---
 var network = new fbp.Network();
 
