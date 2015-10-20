@@ -15,6 +15,7 @@ module.exports = function substreamsensitivemerge() {
 	while (true) {
 		if (substream_level == 0) {
 			elemno = Utils.findInputPortElementWithData(inportArray);
+			//console.log("Merge elemno:" + elemno);
 			if (elemno == -1) // all elements drained
 				break;
 		}
