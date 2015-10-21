@@ -45,15 +45,17 @@ else {
 /* using substreamsensitivemerge
  *  
  */	
+	  
+	  var recvr  = network.defProc('./components/recvr.js');
 	  var ssmerge  = network.defProc('./components/substreamsensitivemerge.js');
-	  var discard  = network.defProc('./components/discard.js');
-	  //var csws = network.defProc('./examples/components/checksequencewithinsubstreams.js');
+	  //var discard  = network.defProc('./components/discard.js');
+	  var csws = network.defProc('./examples/components/checksequencewithinsubstreams.js');
 	  
 	  network.connect(passthru0, 'OUT', ssmerge, 'IN[0]', 1);
 	  network.connect(passthru1, 'OUT', ssmerge, 'IN[1]', 1);
 	  network.connect(passthru2, 'OUT', ssmerge, 'IN[2]', 1);	
-	  network.connect(ssmerge, 'OUT', discard, 'IN');	
-	  //network.connect(csws, 'OUT', recvr, 'IN');
+	  network.connect(ssmerge, 'OUT', csws, 'IN');	
+	  network.connect(csws, 'OUT', recvr, 'IN');
 	  
 }
 
