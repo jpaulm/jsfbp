@@ -15,7 +15,7 @@ module.exports = function lbal() {
     }
     
     if (substream_level == 0) {
-       sel = Utils.getElementWithSmallestBacklog(array);
+       sel = Utils.getElementWithSmallestBacklog(array, sel);
     }
     if (ip.type == IP.OPEN)
 		substream_level ++;

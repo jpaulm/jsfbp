@@ -16,14 +16,14 @@ var genss = network.defProc('./examples/components/genss.js');
 var lbal = network.defProc('./components/lbal.js');
 var passthru0  = network.defProc('./components/delay.js', 'passthru0');
 var passthru1  = network.defProc('./components/delay.js', 'passthru1');
-var passthru2  = network.defProc('./components/delay.js', 'passthru2');
+var passthru2  = network.defProc('./components/passthru.js', 'passthru2');
 
 
 
 var makeMergeSubstreamSensitive = true;
 
 network.initialize(genss, 'COUNT', '100');
-network.connect(genss, 'OUT', lbal, 'IN', 10);
+network.connect(genss, 'OUT', lbal, 'IN', 4);
 network.initialize(passthru0, 'INTVL', '400');
 network.connect(lbal, 'OUT[0]', passthru0, 'IN', 1);
 network.initialize(passthru1, 'INTVL', '400');
@@ -46,16 +46,19 @@ else {
  *  
  */	
 	  
-	  var recvr  = network.defProc('./components/recvr.js');
-	  var ssmerge  = network.defProc('./components/substreamsensitivemerge.js');
-	  //var discard  = network.defProc('./components/discard.js');
+	  var ssmerge  = network.defProc('./components/substreamsensitivemerge.js');	  
 	  var csws = network.defProc('./examples/components/checksequencewithinsubstreams.js');
+	  var passthruF  = network.defProc('./components/delay.js', 'passthruF');
+	  var recvr  = network.defProc('./components/recvr.js');
+	  //var discard  = network.defProc('./components/discard.js');
 	  
-	  network.connect(passthru0, 'OUT', ssmerge, 'IN[0]', 1);
-	  network.connect(passthru1, 'OUT', ssmerge, 'IN[1]', 1);
-	  network.connect(passthru2, 'OUT', ssmerge, 'IN[2]', 1);	
+	  network.connect(passthru0, 'OUT', ssmerge, 'IN[0]', 8);
+	  network.connect(passthru1, 'OUT', ssmerge, 'IN[1]', 8);
+	  network.connect(passthru2, 'OUT', ssmerge, 'IN[2]', 8);
 	  network.connect(ssmerge, 'OUT', csws, 'IN');	
-	  network.connect(csws, 'OUT', recvr, 'IN');
+	  network.connect(csws, 'OUT', passthruF, 'IN');
+	  network.initialize(passthruF, 'INTVL', '400');
+	  network.connect(passthruF, 'OUT', recvr, 'IN');
 	  
 }
 

@@ -3,18 +3,23 @@
 var Fiber = require('fibers'),
   ProcessStatus = require('./Process').Status;
 
-module.exports.getElementWithSmallestBacklog = function(array){
+module.exports.getElementWithSmallestBacklog = function(array, elem){
   var number = Number.MAX_VALUE; 
-  var element = 0;
-  for (var i = 0; i < array.length; i++) {
-     if (array[i] == null || array[i] == undefined)
+  var element = elem;
+  if (element == -1)
+	 element = 0;
+  var j = element;
+  for (var i = 0; i < array.length; i++) { 
+     if (array[j] == null || array[j] == undefined)
         continue;
-     if (number > array[i].conn.usedslots){
-        number = array[i].conn.usedslots;
-        element = i;
+     if (number > array[j].conn.usedslots){
+        number = array[j].conn.usedslots;
+        element = j;
      }   
+     j = (j + 1) % array.length;
   }
-  return element;
+  //console.log('element: ' + element + '(' + number + ')');
+  return element;  
 };
 
 module.exports.findInputPortElementWithData = function(array) {
@@ -32,6 +37,9 @@ module.exports.findInputPortElementWithData = function(array) {
 				continue;
 			if (array[i].conn.usedslots > 0) {  // connection has data
 				element = i;
+				if (tracing) {
+				    console.log(proc.name + ' findIPE_with_data - found: ' + i);
+				}
 				return i;			
 			}
 			else if (array[i].conn.closed)  { 	// connection is drained				
@@ -48,13 +56,13 @@ module.exports.findInputPortElementWithData = function(array) {
 			return -1;
 		}
 		
-		proc.status = ProcessStatus.WAITING_TO_RECEIVE;
+		proc.status = ProcessStatus.WAITING_TO_FIPE;
 		proc.yielded = true;
 		if (tracing) {
 		    console.log(proc.name + ' findIPE_with_data: susp');
 		  }
 		Fiber.yield();
-		// proc.status = ProcessStatus.ACTIVE;
+		proc.status = ProcessStatus.ACTIVE;
 		proc.yielded = false;
 		if (tracing) {
 		    console.log(proc.name + ' findIPE_with_data: resume');

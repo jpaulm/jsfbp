@@ -20,6 +20,7 @@ Process.Status = Enum([
   'NOT_INITIALIZED',
   'ACTIVE', // (includes waiting on callback ...)
   'WAITING_TO_RECEIVE',
+  'WAITING_TO_FIPE',
   'WAITING_TO_SEND',
   'READY_TO_EXECUTE',
   'DORMANT',
@@ -35,6 +36,9 @@ Process.prototype.createIP = function (data) {
   var ip = new IP(data);
   this.ownedIPs++;
   ip.owner = this;
+  if (tracing) {
+	     console.log("Normal IP created: " + ip.contents);
+	  }
   return ip;
 };
 
@@ -46,9 +50,10 @@ Process.prototype.createIPBracket = function(bktType, x) {
   ip.type = bktType;     
   this.ownedIPs++;
   ip.owner = this;
-  //if (tracing) {
-  //  console.log(ip);
-  //}
+  if (tracing) {	  
+	var cont = ["", "OPEN", "CLOSE"][ip.type] + ", " + ip.contents;		   
+    console.log("Bracket IP created: " + cont);
+  }
   return ip;
 };
 

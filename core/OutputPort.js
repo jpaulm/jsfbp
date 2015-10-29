@@ -34,7 +34,8 @@ OutputPort.prototype.send = function(ip){
   while (true) {    
     if (conn.down.status == ProcessStatus.WAITING_TO_RECEIVE ||
         conn.down.status == ProcessStatus.NOT_INITIALIZED ||
-        conn.down.status == ProcessStatus.DORMANT) {
+        conn.down.status == ProcessStatus.DORMANT||
+        conn.down.status == ProcessStatus.WAITING_TO_FIPE) {
       conn.down.status = ProcessStatus.READY_TO_EXECUTE; 
       this._runtime.pushToQueue(conn.down);
     }
@@ -57,7 +58,7 @@ OutputPort.prototype.send = function(ip){
   conn.usedslots++;
   proc.ownedIPs--;
   if (tracing) {
-    console.log(proc.name + ' send OK');  
+    console.log(proc.name + ' send OK: ' + cont);  
   }
   return 0;
 };
