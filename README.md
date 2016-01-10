@@ -32,6 +32,8 @@ Test cases so far:
 - `fbptest13` -  Simple network to demonstrate functioning of random delay component (`randdelay`)
 - `fbptest14` -  Network demonstrating parallelism using two instances of `reader` and two fixed delay components (`delay`)
 - `fbptestvl` -  Volume test (see below): `gendata` -> `copier` -> `discard` 
+- `update`    -  "Update" run, demonstrating use of `collate.js` 
+
  
 - `testsubstreamsensitivesplitting.js` - Test substream-sensitive logic in `lbal`, feeding `substreamsensitivemerge.js`
  
@@ -48,11 +50,13 @@ These tests (except for `fbptestws`) can be run sequentially by running `fbptest
  
 # Components
 
+- `collate` - collates from 1 to any number of sorted input streams, generating merged stream with bracket IPs inserted (sort fields assumed to be contiguous starting at 1st byte; all streams assumed to be sorted on same fields, in ascending sequence) 
 - `concat`  - concatenates all the streams that are sent to its array input port (size determined in network definition) 
 - `copier`  - copies its input stream to its output stream
 - `copier_closing` - forces close of input port after 20 IPs
 - `copier_nonlooper` - same as `copier`, except that it is written as a non-looper (it has been modified to call the FBP services from lower in the process's stack)
 - `discard` - discard (drop) all incoming IPs
+- `display` - display all incoming IPs, including bracket IPs
 - `gendata`  - sends as many IPs to its output port as are specified by its COUNT IIP (each just contains the current count)
 - `lbal`    - load balancer - sends output to output port array element with smallest number of IPs in transit
 - `randdelay` - sends incoming IPs to output port after random number of millisecs (between 0 and 400)
@@ -99,6 +103,8 @@ Some utility functions are stored in `core/utils.js`. Import them if you really 
 You should generally refrain from accessing runtime-related code (e.g. Fibers) to ensure the greatest compatibility.
 
 Component services
+
+- In what follows, the `this` is only valid if the function is called from the component level; if called from a subroutine, pass in `this` as a parameter.
 
 - `var ip = this.createIP(contents);` - create an IP containing `contents`
 - `var ip = this.createIPBracket(IP.OPEN|IP.CLOSE[, contents])` - create an open or close bracket IP
