@@ -11,7 +11,7 @@ module.exports = function reader(runtime) {
   
   var result = runtime.runAsyncCallback(myReadFile(fname, "utf8", this));
   
-  console.log('read complete: ' + this.name);
+  //console.log('read complete: ' + this.name);
 
   if (result[0] == undefined) {
      console.log(result[1]);
@@ -29,10 +29,10 @@ module.exports = function reader(runtime) {
 
 function myReadFile(path, options, proc) {
   return function (done) {
-    console.log('read started: ' + proc.name);
+    //console.log('read started: ' + proc.name);
     fs.readFile(path, options, function(err, data) {
       done([data, err]);
     });
-    console.log('read pending: ' + proc.name);
+    //console.log('read pending: ' + proc.name);
   };
 }
