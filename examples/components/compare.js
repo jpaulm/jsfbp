@@ -6,8 +6,8 @@
  * 
  * It is a general component, but it seems appropriate to include it in examples/components
  * 
- * Amusingly, I had forgotten that the input streams have to be darined - otherwise the compare
- * process will keep on getting reinvoked indefinitely.  The drain logic has now been added.
+ * Amusingly, I had forgotten that the input streams have to be drained - otherwise the compare
+ * process will keep on getting reinvoked indefinitely.  The drainInputs logic has now been added.
  */
 
 var IP = require('../../core/IP');
