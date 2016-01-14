@@ -1,9 +1,14 @@
 'use strict';
 
+/**
+ * display has an optional output port
+ */
+
 var IP = require('../core/IP');
 
 module.exports = function display() {
   var inport = this.openInputPort('IN');
+  var outport = this.openOutputPort('OUT', 'OPTIONAL');
   while (true) {
     var ip = inport.receive();
     if (ip === null) {
@@ -16,6 +21,6 @@ module.exports = function display() {
     	console.log('CLOSE: ' + data);
     else
         console.log('data: ' + data);
-    this.dropIP(ip);
+    outport.send(ip);
   }
 };

@@ -1,5 +1,13 @@
 'use strict';
 
+/**
+ * This component collates 1 to n input streams based on some number of contiguous key values; it
+ * assumes all incoming streams are sorted on the same keys, in ascending order  
+ * The keys start in the first byte of each incoming IP 
+ * Key lengths are specified in the CTLFIELDS IIP, separated by commas  
+ * 
+ */
+
 var IP = require('../core/IP');
 
 module.exports = function collate() {

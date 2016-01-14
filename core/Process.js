@@ -107,14 +107,15 @@ Process.prototype.openInputPortArray = function(name) {
   return array; 
 };
 
-Process.prototype.openOutputPort = function(name) {
+Process.prototype.openOutputPort = function(name, opt) {
   var namex = this.name + '.' + name;
   for (var i = 0; i < this.outports.length; i++) {
     if (this.outports[i][0] == namex) {
       return this.outports[i][1];  // return conn
     }
   }
-  console.log('Port ' + this.name + '.' + name + ' not found');
+  if (opt != 'OPTIONAL')
+     console.log('Port ' + this.name + '.' + name + ' not found');
   return null;
 };
 
