@@ -33,6 +33,12 @@ Test cases so far:
 - `fbptest14` -  Network demonstrating parallelism using two instances of `reader` and two fixed delay components (`delay`)
 - `fbptestvl` -  Volume test (see below): `gendata` -> `copier` -> `discard` 
 - `update`    -  "Update" run, demonstrating use of `collate.js` 
+- `update_c`  -  Same as `update.js` but routing output to a `compare` process, rather than to `display`
+  
+The following diagram shows `update` and `update_c` in one diagram using the DrawFBP Enclosure function - this is not really a valid DrawFBP diagram, so no port names are shown:
+
+![update_c](https://github.com/jpaulm/jsfbp/blob/master/docs/Update_c.png "Diagram showing update.js and update_c.js")
+
 
  
 - `testsubstreamsensitivesplitting.js` - Test substream-sensitive logic in `lbal`, feeding `substreamsensitivemerge.js`
