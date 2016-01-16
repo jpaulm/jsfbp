@@ -13,7 +13,7 @@ Test cases so far:
     - `copier` (copies)
     - `recvr`  (displays incoming values to console)
 
-![JSFBP](https://github.com/jpaulm/jsfbp/blob/master/docs/JSFBP.png "Simple Test Network")
+![jsfbp](https://cloud.githubusercontent.com/assets/312871/12333111/52f268b8-bac0-11e5-963d-08061734dc68.png  "Simple Test Network")
 
 - `fbptest02` - `gendata` replaced with `reader`
 - `fbptest03` - `gendata` and `reader` both feeding into `copier.IN`
@@ -26,7 +26,7 @@ Test cases so far:
 - `fbptest10` -  `copier` in `fbptest01` is replaced with a non-looping version of `copier`
 - `fbptest11` -  Load balancer (`lbal`) feeding 3 instances of a random delay component (`randdelay`)
   
-![Fbptest11](https://github.com/jpaulm/jsfbp/blob/master/docs/Fbptest11.png "Diagram of fbptest11 above")
+![fbptest11](https://cloud.githubusercontent.com/assets/312871/12333117/5ae111a0-bac0-11e5-8167-0bb4bfb24f25.png  "Diagram of fbptest11 above")
 
 - `fbptest12` -  `reader OUT -> IN copier OUT -> IN writer`
 - `fbptest13` -  Simple network to demonstrate functioning of random delay component (`randdelay`)
@@ -45,8 +45,8 @@ WebSockets
 ----
 
 - `fbptestws` -  Schematic web socket server (simple Process shown can be replaced by any structure of Processes, provided interfaces are adhered to)
- 
-![Fbptestws](https://github.com/jpaulm/jsfbp/blob/master/docs/Fbptestws.png "Diagram of fbptestws above")
+
+![fbptestws](https://cloud.githubusercontent.com/assets/312871/12344772/0433b4a8-bb0f-11e5-8084-082b9a7b9c22.png "Diagram of fbptestws above")
  
 Some of these have tracing set on, depending on what testing was being done when they were promoted!
 
