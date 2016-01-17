@@ -43,7 +43,7 @@ The following diagram shows `update` and `update_c` in one diagram using the Dra
 
 ![update_combined](https://cloud.githubusercontent.com/assets/312871/12332149/efc37f52-baba-11e5-8775-d1516a0cc568.png "Diagram showing update.js and update_c.js")
 
-Here is `update_c` by itself, with component and port names marked in - a JSFBP network could be generated from this:
+Here is `update_c` by itself, with component and port names marked in - it contains all the information needed to generate a running JSFBP network (the file and report icons do not generate any code):
 
 ![update_c](https://cloud.githubusercontent.com/assets/312871/12379403/ffb3d6ea-bd27-11e5-9f56-1a8e4758dc1d.png "Diagram showing update_c.js")
  
