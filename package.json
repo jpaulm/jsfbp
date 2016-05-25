@@ -4,15 +4,20 @@
   "description": "FBP implementation written using node-fibers ",
   "repository": {
     "type": "git",
-    "url": "https://github.com/jpaulm/jsfbp.git"
+    "url": "git+https://github.com/jpaulm/jsfbp.git"
+  },
+  "engines": {
+    "node" : "~4.3.1"
   },
   "keywords": [
     "fbp",
     "flow-based-programming",
-    "node-fibers",
-    "javascript"
+    "node-fibers"
   ],
   "author": "J. Paul Morrison",
+  "contributors": [
+    "Dan Rumney <dancrumb@gmail.com>"
+  ],
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/jpaulm/jsfbp/issues"
@@ -23,15 +28,13 @@
   },
   "main": "index.js",
   "devDependencies": {
-    "chai": "^2.0.0",
+    "chai": "^3.5.0",
     "mocha": "^2.1.0",
     "mocha-fibers": "^1.1.0",
-    "ws": "^0.7.1"
+    "ws": "^1.1.0"
   },
   "directories": {
-    "doc": "docs",
-    "example": "examples",
-    "test": "test"
+    "doc": "docs"
   },
   "scripts": {
     "test": "mocha --ui mocha-fibers --recursive -R spec --require test/test_helper.js"
