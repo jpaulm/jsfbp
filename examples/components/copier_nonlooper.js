@@ -17,7 +17,7 @@ module.exports = function copier_nonlooper() {
 };
 
 function subrtn(inport, outport) {
- var ip = inport.receive();
+  var ip = inport.receive();
   var i = ip.contents;
   outport.send(ip);
 };

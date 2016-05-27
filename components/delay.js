@@ -27,8 +27,8 @@ module.exports = function delay(runtime) {
 function genSleepFun(proc, ms) {
   return function (done) {
     //console.log(proc.name + ' start sleep: ' + ms + ' msecs');
-    
-    setTimeout(function() {
+
+    setTimeout(function () {
       done();
     }, ms);
   };

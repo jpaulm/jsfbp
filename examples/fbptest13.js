@@ -3,9 +3,9 @@ var fbp = require('..');
 // --- define network ---
 var network = new fbp.Network();
 
-var gendata     = network.defProc('./examples/components/gendata');
-var randdelay  = network.defProc('./components/randdelay');
-var recvr      = network.defProc('./components/recvr');
+var gendata = network.defProc('./examples/components/gendata');
+var randdelay = network.defProc('./components/randdelay');
+var recvr = network.defProc('./components/recvr');
 
 network.initialize(gendata, 'COUNT', '20');
 network.initialize(randdelay, 'INTVL', '2000');   // random between 0 and 5000 msecs
@@ -14,4 +14,4 @@ network.connect(randdelay, 'OUT', recvr, 'IN', 5);
 
 // --- run ---
 var fiberRuntime = new fbp.FiberRuntime();
-network.run(fiberRuntime, { trace: false });
+network.run(fiberRuntime, {trace: false});

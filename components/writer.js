@@ -10,12 +10,12 @@ module.exports = function writer(runtime) {
   this.dropIP(ip);
   var string = '';
   while (true) {
-   ip = dataport.receive();
-   if (ip === null) {
-     break;
-   }
-   string += ip.contents + '\n';
-   this.dropIP(ip);
+    ip = dataport.receive();
+    if (ip === null) {
+      break;
+    }
+    string += ip.contents + '\n';
+    this.dropIP(ip);
   }
 
   var result = runtime.runAsyncCallback(myWriteFile(fname, string, "utf8", this));

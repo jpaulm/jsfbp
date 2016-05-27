@@ -12,21 +12,21 @@ module.exports = function genss() {
   //console.log(count);
   var p = this.createIPBracket(IP.OPEN);
   outport.send(p);
-  
+
   for (var i = 0; i < count; i++) {
     var ip = this.createIP((count - i) + 'abcd');
     if (-1 == outport.send(ip)) {
       return;
     }
     if (i < count - 1) {
-		if (i % 5 == 5 - 1) {
-			p = this.createIPBracket(IP.CLOSE);
-			outport.send(p);
+      if (i % 5 == 5 - 1) {
+        p = this.createIPBracket(IP.CLOSE);
+        outport.send(p);
 
-			p = this.createIPBracket(IP.OPEN);
-			outport.send(p);
-		}
-	}
+        p = this.createIPBracket(IP.OPEN);
+        outport.send(p);
+      }
+    }
   }
   p = this.createIPBracket(IP.CLOSE);
   outport.send(p);

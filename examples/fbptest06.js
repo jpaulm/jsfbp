@@ -3,10 +3,10 @@ var fbp = require('..');
 // --- define network ---
 var network = new fbp.Network();
 
-var gendata  = network.defProc('./examples/components/gendata');
-var repl    = network.defProc('./components/repl.js');
+var gendata = network.defProc('./examples/components/gendata');
+var repl = network.defProc('./components/repl.js');
 var rrmerge = network.defProc('./components/rrmerge');
-var recvr   = network.defProc('./components/recvr');
+var recvr = network.defProc('./components/recvr');
 
 network.initialize(gendata, 'COUNT', '20');
 network.connect(gendata, 'OUT', repl, 'IN', 5);
@@ -17,4 +17,4 @@ network.connect(rrmerge, 'OUT', recvr, 'IN', 5);
 
 // --- run ---
 var fiberRuntime = new fbp.FiberRuntime();
-network.run(fiberRuntime, { trace: false });
+network.run(fiberRuntime, {trace: false});

@@ -13,15 +13,15 @@ module.exports = function lbal() {
     if (ip === null) {
       break;
     }
-    
+
     if (substream_level == 0) {
-       sel = Utils.getElementWithSmallestBacklog(array, sel);
+      sel = Utils.getElementWithSmallestBacklog(array, sel);
     }
     if (ip.type == IP.OPEN)
-		substream_level ++;
-	else if (ip.type == IP.CLOSE)
-		substream_level --;
-    
+      substream_level++;
+    else if (ip.type == IP.CLOSE)
+      substream_level--;
+
     array[sel].send(ip);
   }
 };

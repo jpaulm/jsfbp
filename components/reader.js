@@ -8,14 +8,14 @@ module.exports = function reader(runtime) {
   var ip = inport.receive();
   var fname = ip.contents;
   this.dropIP(ip);
-  
+
   var result = runtime.runAsyncCallback(myReadFile(fname, "utf8", this));
-  
+
   //console.log('read complete: ' + this.name);
 
   if (result[0] == undefined) {
-     console.log(result[1]);
-     return;  
+    console.log(result[1]);
+    return;
   }
 
   var outport = this.openOutputPort('OUT');
@@ -30,7 +30,7 @@ module.exports = function reader(runtime) {
 function myReadFile(path, options, proc) {
   return function (done) {
     //console.log('read started: ' + proc.name);
-    fs.readFile(path, options, function(err, data) {
+    fs.readFile(path, options, function (err, data) {
       done([data, err]);
     });
     //console.log('read pending: ' + proc.name);

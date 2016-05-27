@@ -3,35 +3,35 @@
 var Fiber = require('fibers'),
   ProcessStatus = require('./Process').Status;
 
-module.exports.getElementWithSmallestBacklog = function(array, elem){
-  var number = Number.MAX_VALUE; 
+module.exports.getElementWithSmallestBacklog = function (array, elem) {
+  var number = Number.MAX_VALUE;
   var element = elem;
   if (element == -1)
-	 element = 0;
+    element = 0;
   var j = element;
-  for (var i = 0; i < array.length; i++) { 
-     if (array[j] == null || array[j] == undefined)
-        continue;
-     if (number > array[j].conn.usedslots){
-        number = array[j].conn.usedslots;
-        element = j;
-     }   
-     j = (j + 1) % array.length;
+  for (var i = 0; i < array.length; i++) {
+    if (array[j] == null || array[j] == undefined)
+      continue;
+    if (number > array[j].conn.usedslots) {
+      number = array[j].conn.usedslots;
+      element = j;
+    }
+    j = (j + 1) % array.length;
   }
   //console.log('element: ' + element + '(' + number + ')');
-  return element;  
+  return element;
 };
 
-module.exports.findInputPortElementWithData = function(array) {
-	var proc = Fiber.current.fbpProc;
+module.exports.findInputPortElementWithData = function (array) {
+  var proc = Fiber.current.fbpProc;
 
 	if (tracing) {
-	    console.log(proc.name + ' findIPE_with_data ');
-	  }
-	
-	while (true) {
+    console.log(proc.name + ' findIPE_with_data ');
+  }
+
+  while (true) {
 		var element = -1;
-		var allDrained = true;		
+    var allDrained = true;
 		for (var i = 0; i < array.length; i++) {
 			if (array[i] == null || array[i] == undefined)
 				continue;
@@ -39,35 +39,35 @@ module.exports.findInputPortElementWithData = function(array) {
 				element = i;
 				if (tracing) {
 				    console.log(proc.name + ' findIPE_with_data - found: ' + i);
-				}
+      }
 				return i;			
-			}
+      }
 			else if (array[i].conn.closed)  { 	// connection is drained				
 				continue;
-			}
-			else {
-				allDrained = false;                  // no data but not all closed, so suspend
-			}
-		}
+      }
+      else {
+        allDrained = false;                  // no data but not all closed, so suspend
+      }
+    }
 		if (allDrained) {
 			if (tracing) {
-			    console.log(proc.name + ' findIPE_with_data: all drained');
-			  }
-			return -1;
-		}
-		
-		proc.status = ProcessStatus.WAITING_TO_FIPE;
-		proc.yielded = true;
+        console.log(proc.name + ' findIPE_with_data: all drained');
+      }
+      return -1;
+    }
+
+    proc.status = ProcessStatus.WAITING_TO_FIPE;
+    proc.yielded = true;
 		if (tracing) {
-		    console.log(proc.name + ' findIPE_with_data: susp');
-		  }
-		Fiber.yield();
-		proc.status = ProcessStatus.ACTIVE;
-		proc.yielded = false;
+      console.log(proc.name + ' findIPE_with_data: susp');
+    }
+    Fiber.yield();
+    proc.status = ProcessStatus.ACTIVE;
+    proc.yielded = false;
 		if (tracing) {
-		    console.log(proc.name + ' findIPE_with_data: resume');
-		  }
-	}
+      console.log(proc.name + ' findIPE_with_data: resume');
+    }
+  }
 };
 
 module.exports.Enum = function (constants) {

@@ -10,11 +10,11 @@ module.exports = function recvr() {
       break;
     }
     if (ip.type == IP.OPEN)
-    	console.log('open');
-	else if (ip.type == IP.CLOSE)
-		console.log('close');
-	else
-        console.log('data: ' + ip.contents);
+      console.log('open');
+    else if (ip.type == IP.CLOSE)
+      console.log('close');
+    else
+      console.log('data: ' + ip.contents);
     this.dropIP(ip);
   }
 };

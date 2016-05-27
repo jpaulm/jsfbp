@@ -4,9 +4,9 @@
 
 var ProcessConnection = module.exports = function(size) {
  // Connection.call(this);
-  this.name = null; 
+  this.name = null;
   this.nxtget = 0;
-  this.nxtput = 0; 
+  this.nxtput = 0;
   this.down = null;  // downstream process
   this.usedslots = 0;
   this.array = [];

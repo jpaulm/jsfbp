@@ -16,7 +16,7 @@ module.exports = function httpserver(runtime) {
   while (true) {
     var result = runtime.runAsyncCallback(genReceiveFun(runtime, server, portno, this));
 
-    for (var i=0; i<result.length; ++i) {
+    for (var i = 0; i < result.length; ++i) {
       var r = result[i];
       outport.send(this.createIPBracket(IP.OPEN));
       outport.send(this.createIP(r[0]));
@@ -47,7 +47,7 @@ function handleServerRequest(req, res) {
 function genListenFun(runtime, server, portno, proc) {
   return function (done) {
     // In next tick (TODO use process.nextTick() instead):
-    setTimeout(function() {
+    setTimeout(function () {
       done();
     }, 0);
 
@@ -57,7 +57,7 @@ function genListenFun(runtime, server, portno, proc) {
 
 function genReceiveFun(runtime, server, portno, proc) {
   return function (done) {
-    rx = function(q) {
+    rx = function (q) {
       done(q);
     }
   };

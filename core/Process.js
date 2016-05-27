@@ -3,16 +3,16 @@
 var Enum = require('./utils').Enum
   , IP = require('./IP');
 
-var Process = module.exports = function(name, func) {
+var Process = module.exports = function (name, func) {
   this.name = name;
   this.func = func;
   this.fiber = null;
   this.inports = [];
   this.outports = [];
-  this.status = Process.Status.NOT_INITIALIZED;  
-  this.ownedIPs = 0; 
+  this.status = Process.Status.NOT_INITIALIZED;
+  this.ownedIPs = 0;
   this.cbpending = false;
-  this.yielded = false; 
+  this.yielded = false;
   this.result = null; // [data, err]
 };
 
@@ -37,77 +37,77 @@ Process.prototype.createIP = function (data) {
   this.ownedIPs++;
   ip.owner = this;
   if (tracing) {
-	     console.log("Normal IP created: " + ip.contents);
-	  }
+    console.log("Normal IP created: " + ip.contents);
+  }
   return ip;
 };
 
-Process.prototype.createIPBracket = function(bktType, x) {
+Process.prototype.createIPBracket = function (bktType, x) {
   if (x == undefined) {
     x = null;
   }
-  var ip = new IP(x);    
-  ip.type = bktType;     
+  var ip = new IP(x);
+  ip.type = bktType;
   this.ownedIPs++;
   ip.owner = this;
   if (tracing) {	  
-	var cont = ["", "OPEN", "CLOSE"][ip.type] + ", " + ip.contents;		   
+    var cont = ["", "OPEN", "CLOSE"][ip.type] + ", " + ip.contents;
     console.log("Bracket IP created: " + cont);
   }
   return ip;
 };
 
-Process.prototype.dropIP = function(ip) {
-var cont = ip.contents;
-if (ip.type != IP.NORMAL) {
-       cont = ["", "OPEN", "CLOSE"][ip.type]  + ", " + cont;
-  }     
+Process.prototype.dropIP = function (ip) {
+  var cont = ip.contents;
+  if (ip.type != IP.NORMAL) {
+    cont = ["", "OPEN", "CLOSE"][ip.type] + ", " + cont;
+  }
   if (tracing) {
     console.log(this.name + ' IP dropped with: ' + cont);
   }
   if (ip.owner != this) {
-    console.log(this.name + ' IP being dropped not owned by this Process: ' + cont); 
+    console.log(this.name + ' IP being dropped not owned by this Process: ' + cont);
     return;
-  }  
+  }
   this.ownedIPs--;
   ip.owner = null;
 };
 
-Process.prototype.openInputPort = function(name) {
-  var namex = this.name + '.' + name;  
+Process.prototype.openInputPort = function (name) {
+  var namex = this.name + '.' + name;
 
-  for (var i = 0; i < this.inports.length; i++) {    
+  for (var i = 0; i < this.inports.length; i++) {
     if (this.inports[i][0] == namex)
-    return this.inports[i][1];  // return inputport
-  } 
+      return this.inports[i][1];  // return inputport
+  }
   console.log('Port ' + this.name + '.' + name + ' not found');
   return null;
 };
 
-Process.prototype.openInputPortArray = function(name) {
+Process.prototype.openInputPortArray = function (name) {
   var namey = this.name + '.' + name;
-  var hi_index = -1;  
+  var hi_index = -1;
   var array = [];
 
-  var re = new RegExp(namey + '\\[(\\d+)\\]');  
+  var re = new RegExp(namey + '\\[(\\d+)\\]');
 
-  for (var i = 0; i < this.inports.length; i++) {   
-    var namex = re.exec(this.inports[i][0]);   
+  for (var i = 0; i < this.inports.length; i++) {
+    var namex = re.exec(this.inports[i][0]);
 
     if (namex != null && namex.index == 0) {
-        hi_index = Math.max(hi_index, namex[1]);
-        array[namex[1]] = this.inports[i][1];
+      hi_index = Math.max(hi_index, namex[1]);
+      array[namex[1]] = this.inports[i][1];
     }
   }
   if (hi_index == -1) {
     console.log('Port ' + this.name + '.' + name + ' not found');
-    return null; 
+    return null;
   }
-  
-  return array; 
+
+  return array;
 };
 
-Process.prototype.openOutputPort = function(name, opt) {
+Process.prototype.openOutputPort = function (name, opt) {
   var namex = this.name + '.' + name;
   for (var i = 0; i < this.outports.length; i++) {
     if (this.outports[i][0] == namex) {
@@ -115,29 +115,29 @@ Process.prototype.openOutputPort = function(name, opt) {
     }
   }
   if (opt != 'OPTIONAL')
-     console.log('Port ' + this.name + '.' + name + ' not found');
+    console.log('Port ' + this.name + '.' + name + ' not found');
   return null;
 };
 
-Process.prototype.openOutputPortArray = function(name) {
+Process.prototype.openOutputPortArray = function (name) {
   var namey = this.name + '.' + name;
-  var hi_index = -1;  
+  var hi_index = -1;
   var array = [];
 
-  var re = new RegExp(namey + '\\[(\\d+)\\]');  
+  var re = new RegExp(namey + '\\[(\\d+)\\]');
 
   for (var i = 0; i < this.outports.length; i++) {
-    var namex = re.exec(this.outports[i][0]);  
+    var namex = re.exec(this.outports[i][0]);
 
     if (namex != null && namex.index == 0) {
       hi_index = Math.max(hi_index, namex[1]);
       array[namex[1]] = this.outports[i][1];
-    }    
+    }
   }
-  if (hi_index == -1){
+  if (hi_index == -1) {
     console.log('Port ' + this.name + '.' + name + ' not found');
-    return null; 
+    return null;
   }
-  
-  return array; 
+
+  return array;
 };

@@ -21,16 +21,16 @@ module.exports = function reverse() {
 function StringReverse (str) {
   var charArray = [];
   for (var i = 0; i < str.length; i++) {
-    if (i+1 < str.length) {
+    if (i + 1 < str.length) {
       var value = str.charCodeAt(i);
-      var nextValue = str.charCodeAt(i+1);
+      var nextValue = str.charCodeAt(i + 1);
       if ((value >= 0xD800 && value <= 0xDBFF
-          && (nextValue & 0xFC00) == 0xDC00) // Surrogate pair
-          || (nextValue >= 0x0300 && nextValue <= 0x036F)) // Combining marks
+        && (nextValue & 0xFC00) == 0xDC00) // Surrogate pair
+        || (nextValue >= 0x0300 && nextValue <= 0x036F)) // Combining marks
       {
-            charArray.unshift(str.substring(i, i+2));
-            i++; // Skip the other half
-            continue;
+        charArray.unshift(str.substring(i, i + 2));
+        i++; // Skip the other half
+        continue;
       }
     }
 

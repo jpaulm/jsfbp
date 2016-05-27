@@ -31,7 +31,7 @@ module.exports = function wsbroadcast() {
       }
       var msg = ip.contents;
       this.dropIP(ip);
-      wss.clients.forEach(function(client) {
+      wss.clients.forEach(function (client) {
         client.send(msg);
       });
     }
