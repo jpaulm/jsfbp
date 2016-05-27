@@ -26,8 +26,8 @@ FiberRuntime.prototype._close = function (proc) {
   proc.status = Process.Status.CLOSED;
   // console.log('cl' + count);
   this._count--;
-  for (var i = 0; i < proc.outports.length; i++) {
-    var conn = proc.outports[i][1].conn;
+  proc.outports.forEach(function(outPort) {
+    var conn = outPort[1].conn;
     if (conn.down.status == Process.Status.WAITING_TO_RECEIVE
       || conn.down.status == Process.Status.NOT_INITIALIZED) {
       conn.down.status = Process.Status.READY_TO_EXECUTE;
@@ -37,20 +37,21 @@ FiberRuntime.prototype._close = function (proc) {
     if ((conn.upstreamProcsUnclosed) <= 0) {
       conn.closed = true;
     }
-  }
+  }.bind(this));
 
-	for ( var i = 0; i < proc.inports.length; i++) {
-		var conn = proc.inports[i][1].conn;
-      if (conn instanceof IIPConnection) {
-			continue;
-		}
-		for ( var j = 0; j < conn.up.length; j++) {
-			if (conn.up[j].status == Process.Status.CLOSED) {
-				conn.up[j].status = Process.Status.DONE;
-				this._queue.push(conn.up[j]);
-      }
-        }
+  proc.inports.forEach(function(inport) {
+    var conn = inport[1].conn;
+    if (conn instanceof IIPConnection) {
+      return;
     }
+    conn.up.forEach(function(up) {
+      if (up.status == Process.Status.CLOSED) {
+        up.status = Process.Status.DONE;
+        this._queue.push(up);
+      }
+    }.bind(this));
+  }.bind(this));
+
   if (proc.ownedIPs != 0) {
     console.log(proc.name + ' closed without disposing of all IPs');
   }
@@ -186,7 +187,7 @@ FiberRuntime.prototype._procState = function (proc) {
 };
 
 // Fibre running scheduler
-FiberRuntime.prototype._actualRun = function(trace) {
+FiberRuntime.prototype._actualRun = function () {
   this._queue = this._genInitialQueue();
 
   while (true) {
@@ -264,7 +265,7 @@ FiberRuntime.prototype._tick = function () {
 
             if (1 == this._procState(x)) {
               x.status = Process.Status.DORMANT;
-							for ( var i = 0; i < x.inports.length; i++) {
+              for (i = 0; i < x.inports.length; i++) {
                 var inport = x.inports[i];
                 if (inport[1].conn instanceof IIPConnection) {
                   inport[1].conn.closed = false;
