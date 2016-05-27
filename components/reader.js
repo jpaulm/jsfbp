@@ -21,13 +21,14 @@ module.exports = function reader(runtime) {
   var outport = this.openOutputPort('OUT');
   var array = result[0].split('\n');
   //console.log(array);
-  for (var i = 0; i < array.length; i++) {
-    var ip = this.createIP(array[i]);
+  array.forEach(function(item){
+    var ip = this.createIP(item);
     outport.send(ip);
-  }
+  }.bind(this));
+
 };
 
-function myReadFile(path, options, proc) {
+function myReadFile(path, options) {
   return function (done) {
     //console.log('read started: ' + proc.name);
     fs.readFile(path, options, function (err, data) {

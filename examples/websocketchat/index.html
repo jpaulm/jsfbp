@@ -9,23 +9,26 @@
             border: 1px #999999 solid;
             padding: 10px;
         }
+
         p.client {
             border-bottom: 1px aquamarine solid;
         }
+
         p.server {
             border-bottom: 1px crimson solid;
         }
+
         input {
             padding: 5px;
             width: 250px;
         }
+
         button {
             padding: 5px;
         }
     </style>
     <script>
-        if (window.WebSocket)
-  {
+        if (window.WebSocket) {
             //var chatClient = new WebSocket("ws://localhost:8080/websocket/chat");
             var chatClient = new WebSocket("ws://localhost:9003/websocket/chat");
 
@@ -59,12 +62,13 @@
         // Listen for socket closes
         chatClient.onclose = function (event) {
             console.log('Client notified socket has closed', event);
-        	}
+        };
 
         window.onbeforeunload = function () {
-        	    chatClient.onclose = function () {}; // disable onclose handler first
+            chatClient.onclose = function () {
+            }; // disable onclose handler first
             chatClient.close();
-        	}
+        };
 
         function closeme() {
             //chatClient.close(1000);

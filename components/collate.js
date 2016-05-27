@@ -11,19 +11,23 @@
 var IP = require('../core/IP');
 
 module.exports = function collate() {
-  var ctlfields = this.openInputPort('CTLFIELDS');
+  var ctlfieldsPort = this.openInputPort('CTLFIELDS');
   var inportArray = this.openInputPortArray('IN');
   var outport = this.openOutputPort('OUT');
 
-  var ctlfieldsP = ctlfields.receive();
-  var ctlfields = ctlfieldsP.contents.split(',');
-  var ctlfieldlens = ctlfields.map(function(str) { return parseInt(str); });
+  var ctlfieldsIP = ctlfieldsPort.receive();
+  var ctlfields = ctlfieldsIP.contents.split(',');
+  var ctlfieldlens = ctlfields.map(function (str) {
+    return parseInt(str);
+  });
   var prev = null;
   var hold = null;
 
-  this.dropIP(ctlfieldsP);
+  this.dropIP(ctlfieldsIP);
 
-  var totalFieldLength = ctlfieldlens.reduce(function(acc, n) { return acc + n; }, 0);
+  var totalFieldLength = ctlfieldlens.reduce(function (acc, n) {
+    return acc + n;
+  }, 0);
 
   var portCount = inportArray.length;
   var ips = [];
@@ -42,7 +46,7 @@ module.exports = function collate() {
 
   while (portCount) {
     var lowestIndex = 0;
-    var hold = "\uffff";
+    hold = "\uffff";
     ips.forEach(function (ip, portIndex) {
       if (ip !== null) {
         var key = ip.contents.substring(0, totalFieldLength);
@@ -61,20 +65,21 @@ module.exports = function collate() {
     }
   }
 
-  for (var i = 0; i < ctlfields.length; i++) {
+  ctlfields.forEach(function() {
     var p = this.createIPBracket(IP.CLOSE);
     outport.send(p);
-    }
+  }.bind(this));
+
 
   function sendOutput(x, proc) {
     if (prev != null) {
       var level = findLevel();
-	      for (var i = 0; i < level; i++) {
+      for (i = 0; i < level; i++) {
         var p2 = proc.createIPBracket(IP.CLOSE);
         outport.send(p2);
       }
-	      for (var i = 0; i < level; i++) {
-	    	var p2 = proc.createIPBracket(IP.OPEN);
+      for (i = 0; i < level; i++) {
+        p2 = proc.createIPBracket(IP.OPEN);
         outport.send(p2);
       }
     }
@@ -96,4 +101,4 @@ module.exports = function collate() {
     }
     return 0;
   }
-}
+};
