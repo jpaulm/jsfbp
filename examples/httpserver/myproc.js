@@ -19,4 +19,4 @@ module.exports = function myproc() {
     ip = inport.receive(); // close bracket
     outport.send(ip);  // send it on...
   }
-}
+};

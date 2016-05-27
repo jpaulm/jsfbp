@@ -16,7 +16,7 @@ module.exports = function mockmocksender() {
   var value = 0;
   for (var i = 0; i < parmsarray[2]; i++) {
     value += Number(parmsarray[0]);
-    var ip = this.createIP(value + ' ' + parmsarray[1] );
+    ip = this.createIP(value + ' ' + parmsarray[1]);
     if (-1 == outport.send(ip)) {
       return;
     }

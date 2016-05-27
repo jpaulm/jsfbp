@@ -31,7 +31,7 @@ module.exports = function wsrecv(runtime) {
 
   wss.close();
   this.dropIP(ip);
-}
+};
 
 function genWsReceiveFun(runtime, wss, ws, proc) {
   return function (done) {
@@ -48,4 +48,4 @@ function genWsReceiveFun(runtime, wss, ws, proc) {
 
 String.prototype.endsWith = function (s) {
   return this.length >= s.length && this.substr(this.length - s.length) == s;
-}
+};

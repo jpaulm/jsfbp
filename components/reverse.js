@@ -9,7 +9,7 @@ module.exports = function reverse() {
       break;
     }
     var s = ip.contents;
-    outport.send(this.createIP(StringReverse(s)));
+    outport.send(this.createIP(reverseString(s)));
     this.dropIP(ip);
   }
 };
@@ -18,7 +18,7 @@ module.exports = function reverse() {
 // Link to answer on StackOverflow: http://stackoverflow.com/a/17374133
 // Link to user profile page of Scott Gartner: http://stackoverflow.com/users/324657/scott-gartner
 // License: CC BY-SA 3.0 with attribution required: http://creativecommons.org/licenses/by-sa/3.0/
-function StringReverse (str) {
+function reverseString(str) {
   var charArray = [];
   for (var i = 0; i < str.length; i++) {
     if (i + 1 < str.length) {

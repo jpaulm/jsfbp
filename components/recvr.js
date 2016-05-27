@@ -1,6 +1,6 @@
 'use strict';
 
-var IP = require('../core/IP')
+var IP = require('../core/IP');
 
 module.exports = function recvr() {
   var inport = this.openInputPort('IN');

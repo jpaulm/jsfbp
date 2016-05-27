@@ -20,7 +20,6 @@ module.exports = function wsbroadcast() {
     this.dropIP(ip);
     ip = inport.receive();   // shd be orig connection
     //console.log(ip);
-    var ws = ip.contents;
     this.dropIP(ip);
     while (true) {
       ip = inport.receive();
@@ -36,4 +35,4 @@ module.exports = function wsbroadcast() {
       });
     }
   }
-}
+};

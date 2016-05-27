@@ -3,7 +3,7 @@
 var IP = require('./IP')
   , Fiber = require('fibers')
   , IIPConnection = require('./IIPConnection')
-  , ProcessStatus = require('./Process').Status
+  , ProcessStatus = require('./Process').Status;
 
 var InputPort = module.exports = function () {
   this.name = null;
@@ -20,7 +20,7 @@ InputPort.prototype.receive = function () {
   var conn = this.conn;
 
   if (conn instanceof IIPConnection) {
-   if (tracing)
+    if (global.tracing)
       console.log(proc.name + ' recv IIP from port ' + this.name + ': ' + conn.contents);
     //var ip = new exports.IP(conn + '');
     var ip = proc.createIP(conn.contents);
@@ -30,13 +30,13 @@ InputPort.prototype.receive = function () {
     return ip;
   }
 
-  if (tracing)
+  if (global.tracing)
     console.log(proc.name + ' recv from ' + this.name);
 
   while (true) {
     if (conn.usedslots == 0) {
       if (conn.closed) {
-   if (tracing)
+        if (global.tracing)
           console.log(proc.name + ' recv EOS from ' + this.name);
         return null;
       }
@@ -57,13 +57,13 @@ InputPort.prototype.receive = function () {
     }
   }
 
-  var ip = conn.array[conn.nxtget];
+  ip = conn.array[conn.nxtget];
   conn.array[conn.nxtget] = null;
   conn.nxtget++;
   if (conn.nxtget > conn.array.length - 1)
     conn.nxtget = 0;
   var cont = ip.contents;
-  if (tracing) {       
+  if (global.tracing) {
     if (ip.type != IP.NORMAL) {
       cont = ["", "OPEN", "CLOSE"][ip.type] + ", " + cont;
     }
@@ -81,7 +81,6 @@ InputPort.prototype.close = function () {
   conn.closed = true;
   console.log(proc.name + ': ' + conn.usedslots + ' IPs dropped because of close on ' + conn.name);
   while (true) {
-    var ip = conn.array[conn.nxtget];
     conn.array[conn.nxtget] = null;
     conn.nxtget++;
     if (conn.nxtget > conn.array.length - 1)

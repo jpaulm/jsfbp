@@ -1,6 +1,6 @@
 'use strict';
 
-var IP = require('../../core/IP')
+var IP = require('../../core/IP');
 
 // generate substreams of length 5
 module.exports = function genss() {
@@ -14,7 +14,7 @@ module.exports = function genss() {
   outport.send(p);
 
   for (var i = 0; i < count; i++) {
-    var ip = this.createIP((count - i) + 'abcd');
+    ip = this.createIP((count - i) + 'abcd');
     if (-1 == outport.send(ip)) {
       return;
     }

@@ -73,4 +73,4 @@ module.exports = function compare() {
       ip1 = inportArray[1].receive();
     }
   }
-}
+};

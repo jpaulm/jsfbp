@@ -22,14 +22,13 @@ module.exports = function writer(runtime) {
   console.log('write complete: ' + this.name);
   if (result != null) {
     console.log(result);
-    return;
   }
 };
 
 function myWriteFile(path, data, options, proc) {
   return function (done) {
     console.log('write started: ' + proc.name);
-    fs.writeFile(path, data, options, function(err, data) {
+    fs.writeFile(path, data, options, function (err) {
       done(err);
     });
     console.log('write pending: ' + proc.name);

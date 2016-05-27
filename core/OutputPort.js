@@ -20,7 +20,7 @@ OutputPort.prototype.send = function (ip) {
   if (ip.type != IP.NORMAL) {
     cont = ["", "OPEN", "CLOSE"][ip.type] + ", " + cont;
   }
-  if (tracing) {
+  if (global.tracing) {
     console.log(proc.name + ' send to ' + this.name + ': ' + cont);
   }
   if (ip.owner != proc) {
@@ -57,7 +57,7 @@ OutputPort.prototype.send = function (ip) {
   }
   conn.usedslots++;
   proc.ownedIPs--;
-  if (tracing) {
+  if (global.tracing) {
     console.log(proc.name + ' send OK: ' + cont);
   }
   return 0;

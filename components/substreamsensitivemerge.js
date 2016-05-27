@@ -3,7 +3,7 @@
 // substreamsensitivemerge.js
 
 var Utils = require('../core/Utils');
-var IP = require('../core/IP')
+var IP = require('../core/IP');
 
 module.exports = function substreamsensitivemerge() {
 
@@ -38,4 +38,4 @@ module.exports = function substreamsensitivemerge() {
 
     outport.send(ip);
   }
-}
+};

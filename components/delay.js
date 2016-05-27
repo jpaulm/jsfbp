@@ -22,7 +22,7 @@ module.exports = function delay(runtime) {
     //fbp.setCallbackPending(false);
     outport.send(ip);
   }
-} 
+};
 
 function genSleepFun(proc, ms) {
   return function (done) {

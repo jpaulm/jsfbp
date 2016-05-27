@@ -15,7 +15,6 @@ module.exports = function copier_closing() {
       this.dropIP(ip);
       return;
     }
-    var i = ip.contents;
     outport.send(ip);
   }
 };

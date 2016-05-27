@@ -1,7 +1,7 @@
 'use strict';
 
 var Utils = require('../core/Utils');
-var IP = require('../core/IP')
+var IP = require('../core/IP');
 
 module.exports = function lbal() {
   var inport = this.openInputPort('IN');

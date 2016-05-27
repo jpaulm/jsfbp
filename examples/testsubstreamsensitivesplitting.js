@@ -19,7 +19,6 @@ var passthru1 = network.defProc('./components/delay.js', 'passthru1');
 var passthru2 = network.defProc('./components/passthru.js', 'passthru2');
 
 
-
 var makeMergeSubstreamSensitive = true;
 
 network.initialize(genss, 'COUNT', '100');
@@ -31,11 +30,12 @@ network.connect(lbal, 'OUT[1]', passthru1, 'IN', 1);
 network.initialize(passthru2, 'INTVL', '400');
 network.connect(lbal, 'OUT[2]', passthru2, 'IN', 1);
 
+var recvr = network.defProc('./components/recvr.js');
+
 /*
  * 3 passthru's feeding one port -> pretty mixed up data
  */
 if (!makeMergeSubstreamSensitive) {
-	var recvr  = network.defProc('./components/recvr.js');
   network.connect(passthru0, 'OUT', recvr, 'IN', 1);
   network.connect(passthru1, 'OUT', recvr, 'IN', 1);
   network.connect(passthru2, 'OUT', recvr, 'IN', 1);
@@ -49,9 +49,7 @@ else {
   var ssmerge = network.defProc('./components/substreamsensitivemerge.js');
   var csws = network.defProc('./examples/components/checksequencewithinsubstreams.js');
   var passthruF = network.defProc('./components/delay.js', 'passthruF');
-	  var recvr  = network.defProc('./components/recvr.js');
-  //var discard  = network.defProc('./components/discard.js');
-
+  
   network.connect(passthru0, 'OUT', ssmerge, 'IN[0]', 8);
   network.connect(passthru1, 'OUT', ssmerge, 'IN[1]', 8);
   network.connect(passthru2, 'OUT', ssmerge, 'IN[2]', 8);
@@ -61,7 +59,6 @@ else {
   network.connect(passthruF, 'OUT', recvr, 'IN');
 
 }
-
 
 
 // --- run ---

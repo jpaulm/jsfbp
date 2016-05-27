@@ -1,7 +1,5 @@
 'use strict';
 
-var IP = require('../../core/IP');
-
 module.exports = function myresp() {
   var ip;
   var inport = this.openInputPort('IN');
@@ -22,4 +20,4 @@ module.exports = function myresp() {
     ip = inport.receive();   // shd be close bracket
     this.dropIP(ip);
   }
-}
+};

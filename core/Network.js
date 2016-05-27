@@ -14,11 +14,13 @@ Network.prototype.run = function (runtime, options, callback) {
   function setPortRuntime(port) {
     port[1].setRuntime(runtime);
   }
+
   this._processes.forEach(function (process) {
     process.inports.forEach(setPortRuntime);
     process.outports.forEach(setPortRuntime);
   });
-  runtime.run(this._processes, options, callback || function(){});
+  runtime.run(this._processes, options, callback || function () {
+    });
 };
 
 Network.prototype.defProc = function (func, name) {
@@ -55,7 +57,7 @@ Network.prototype.connect = function (upproc, upport, downproc, downport, capaci
 
   var inportf = null;
   var inport = null;
-  for (var i = 0; i < downproc.inports.length; i++) {
+  for (i = 0; i < downproc.inports.length; i++) {
     inport = downproc.inports[i][1];
     if (inport.name == downproc.name + "." + downport) {
       inportf = inport;
