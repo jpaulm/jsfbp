@@ -29,6 +29,8 @@
   "main": "index.js",
   "devDependencies": {
     "chai": "^3.5.0",
+    "eslint": "^2.10.2",
+    "eslint-config-defaults": "^9.0.0",
     "mocha": "^2.1.0",
     "mocha-fibers": "^1.1.0",
     "ws": "^1.1.0"
@@ -37,6 +39,7 @@
     "doc": "docs"
   },
   "scripts": {
-    "test": "mocha --ui mocha-fibers --recursive -R spec --require test/test_helper.js"
+    "test": "mocha --ui mocha-fibers --recursive -R spec --require test/test_helper.js",
+    "lint": "eslint components core examples test index.js"
   }
 }
