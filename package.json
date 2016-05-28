@@ -1,13 +1,13 @@
 {
   "name": "jsfbp",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "FBP implementation written using node-fibers ",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/jpaulm/jsfbp.git"
   },
   "engines": {
-    "node" : ">= 0.12.7"
+    "node": ">= 0.12.7"
   },
   "keywords": [
     "fbp",
