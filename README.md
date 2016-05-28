@@ -90,7 +90,9 @@ These tests (except for `fbptestws`) can be run sequentially by running `fbptest
 1. Get access to JSFBP: `var fbp = require('fbp')`
 2. Create a new network: `var network = new fbp.Network();`
 3. Define your network:
- - Add processes: `network.defProc(...)`  Note: when several processes use the same component, `defProc` takes the process name as a second argument. 
+ - Add processes: `network.defProc(...)`  Note: when several processes use the same component, `defProc` takes the process name as a second argument.
+  The second argument can be an explicit name or a name of the form `root_XXX`, where `XXX` is replaced with a zero-padded
+  number that increments each time the template is used.
  - Connect output ports to input ports: `network.connect(...)`
  - Specify IIPs: `network.initialize(...)`
 4. Create a new runtime: `var fiberRuntime = new fbp.FiberRuntime();`
