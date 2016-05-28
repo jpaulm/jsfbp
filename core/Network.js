@@ -19,15 +19,32 @@ Network.prototype.run = function (runtime, options, callback) {
     process.inports.forEach(setPortRuntime);
     process.outports.forEach(setPortRuntime);
   });
-  runtime.run(this._processes, options, callback || function () {
-    });
+  runtime.run(this._processes, options, callback || function(){});
 };
 
-Network.prototype.defProc = function (func, name) {
+var processNames = {};
+function generateProcessName(nameTemplate) {
+  var reMatch = nameTemplate.match(/(.+)_(X+)/);
+  if(reMatch) {
+    var nameRoot = reMatch[1];
+    var numberPattern = reMatch[2];
+    var processNumber = processNames[nameTemplate] || 0;
+
+    processNames[nameTemplate] = processNumber + 1;
+
+    return nameRoot + new Array(numberPattern.length - (processNumber + '').length + 1).join(0) + processNumber;
+
+  } else {
+    return nameTemplate;
+  }
+}
+
+Network.prototype.defProc = function(func, name) {
   if (typeof func === "string") {
     func = require(path.resolve(path.join(__dirname, '..', func)));
   }
-  var proc = new Process(name || func.name, func);
+  var processName = generateProcessName(name || func.name || 'PROC_XXX');
+  var proc = new Process(processName, func);
   this._processes.push(proc);
   return proc;
 };
@@ -86,3 +103,4 @@ Network.prototype.connect = function (upproc, upport, downproc, downport, capaci
   cnxt.upstreamProcsUnclosed++;
   //console.log(cnxt);
 };
+
