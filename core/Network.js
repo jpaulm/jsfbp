@@ -90,6 +90,23 @@ Network.prototype.run = function (runtime, options, callback) {
     });
 };
 
+var processNames = {};
+function generateProcessName(nameTemplate) {
+  var reMatch = nameTemplate.match(/(.+)_(X+)/);
+  if(reMatch) {
+    var nameRoot = reMatch[1];
+    var numberPattern = reMatch[2];
+    var processNumber = processNames[nameTemplate] || 0;
+
+    processNames[nameTemplate] = processNumber + 1;
+
+    return nameRoot + new Array(numberPattern.length - (processNumber + '').length + 1).join(0) + processNumber;
+
+  } else {
+    return nameTemplate;
+  }
+}
+
 Network.prototype.defProc = function (func, name) {
   if (typeof func === "string") {
     func = loadComponent(func);
@@ -97,7 +114,8 @@ Network.prototype.defProc = function (func, name) {
   if (!func) {
     throw new Error("No function passed to defProc");
   }
-  var proc = new Process(name || func.name, func);
+  var processName = generateProcessName(name || func.name || 'PROC_XXX');
+  var proc = new Process(processName, func);
   trace('Created Process with name: ' + proc.name);
 
   this._processes.push(proc);
