@@ -8,7 +8,6 @@ module.exports = function copier() {
     if (ip === null) {
       break;
     }
-    //var c = ip.contents;
     outport.send(ip);
   }
 };

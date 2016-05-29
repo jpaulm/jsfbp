@@ -10,7 +10,7 @@ module.exports = function wsrecv(runtime) {
 
   var ip = inport.receive();
   var portno = ip.contents;
-  var wss = new WebSocketServer({ port: portno });
+  var wss = new WebSocketServer({port: portno});
   wssout.send(this.createIP(wss));
 
   var ws = null;
@@ -18,7 +18,7 @@ module.exports = function wsrecv(runtime) {
     var result = runtime.runAsyncCallback(genWsReceiveFun(runtime, wss, ws, this));
     console.log('wsrecv callback complete: ' + this.name);
     //console.log(result);
-    if (result[1].endsWith('@kill')) {          
+    if (result[1].endsWith('@kill')) {
       break;
     }
 
@@ -28,10 +28,10 @@ module.exports = function wsrecv(runtime) {
     outport.send(this.createIP(result[1]));
     outport.send(this.createIPBracket(IP.CLOSE));
   }
-  
+
   wss.close();
   this.dropIP(ip);
-}
+};
 
 function genWsReceiveFun(runtime, wss, ws, proc) {
   return function (done) {
@@ -48,4 +48,4 @@ function genWsReceiveFun(runtime, wss, ws, proc) {
 
 String.prototype.endsWith = function (s) {
   return this.length >= s.length && this.substr(this.length - s.length) == s;
-}
+};

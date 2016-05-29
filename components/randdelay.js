@@ -21,8 +21,8 @@ module.exports = function randdelay(runtime) {
 function genSleepFun(proc, ms) {
   return function (done) {
     //console.log(proc.name + ' start sleep: ' + Math.round(ms * 100) / 100 + ' msecs');
-    
-    setTimeout(function() {
+
+    setTimeout(function () {
       done();
     }, ms);
   };

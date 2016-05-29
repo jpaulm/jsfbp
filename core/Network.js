@@ -5,23 +5,25 @@ var IIPConnection = require('./IIPConnection')
   , Process = require('./Process')
   , ProcessConnection = require('./ProcessConnection');
 
-var Network = module.exports = function() {
+var Network = module.exports = function () {
   this._processes = [];
 };
 
-Network.prototype.run = function(runtime, options, callback) {
+Network.prototype.run = function (runtime, options, callback) {
   options = options || {};
-  function setPortRuntime (port) {
+  function setPortRuntime(port) {
     port[1].setRuntime(runtime);
   }
+
   this._processes.forEach(function (process) {
     process.inports.forEach(setPortRuntime);
     process.outports.forEach(setPortRuntime);
   });
-  runtime.run(this._processes, options, callback || function(){});
+  runtime.run(this._processes, options, callback || function () {
+    });
 };
 
-Network.prototype.defProc = function(func, name) {
+Network.prototype.defProc = function (func, name) {
   if (typeof func === "string") {
     func = require(path.resolve(path.join(__dirname, '..', func)));
   }
@@ -30,14 +32,14 @@ Network.prototype.defProc = function(func, name) {
   return proc;
 };
 
-Network.prototype.initialize = function(proc, port, string) {
+Network.prototype.initialize = function (proc, port, string) {
   var inport = new InputPort();
   inport.name = proc.name + "." + port;
   inport.conn = new IIPConnection(string);
   proc.inports[proc.inports.length] = [proc.name + '.' + port, inport];
 };
 
-Network.prototype.connect = function(upproc, upport, downproc, downport, capacity) {
+Network.prototype.connect = function (upproc, upport, downproc, downport, capacity) {
   if (capacity == undefined) {
     capacity = 10;
   }
@@ -55,7 +57,7 @@ Network.prototype.connect = function(upproc, upport, downproc, downport, capacit
 
   var inportf = null;
   var inport = null;
-  for (var i = 0; i < downproc.inports.length; i++) {
+  for (i = 0; i < downproc.inports.length; i++) {
     inport = downproc.inports[i][1];
     if (inport.name == downproc.name + "." + downport) {
       inportf = inport;

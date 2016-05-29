@@ -22,13 +22,13 @@ module.exports = function delay(runtime) {
     //fbp.setCallbackPending(false);
     outport.send(ip);
   }
-} 
+};
 
 function genSleepFun(proc, ms) {
   return function (done) {
     //console.log(proc.name + ' start sleep: ' + ms + ' msecs');
-    
-    setTimeout(function() {
+
+    setTimeout(function () {
       done();
     }, ms);
   };

@@ -8,7 +8,7 @@ module.exports = function gendata() {
   this.dropIP(ip);
   //console.log(count);
   for (var i = 0; i < count; i++) {
-    var ip = this.createIP(i + 'abcd');
+    ip = this.createIP(i + 'abcd');
     if (-1 == outport.send(ip)) {
       return;
     }

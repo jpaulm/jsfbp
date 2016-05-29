@@ -11,12 +11,12 @@ module.exports = function httpserver(runtime) {
   var portno = ip.contents;
   var server = http.createServer(handleServerRequest);
 
-  runtime.runAsyncCallback(genListenFun(runtime, server, portno, this));
+  runtime.runAsyncCallback(genListenFun(runtime, server, portno));
 
   while (true) {
     var result = runtime.runAsyncCallback(genReceiveFun(runtime, server, portno, this));
 
-    for (var i=0; i<result.length; ++i) {
+    for (var i = 0; i < result.length; ++i) {
       var r = result[i];
       outport.send(this.createIPBracket(IP.OPEN));
       outport.send(this.createIP(r[0]));
@@ -24,10 +24,7 @@ module.exports = function httpserver(runtime) {
       outport.send(this.createIPBracket(IP.CLOSE));
     }
   }
-
-  wss.close();
-  this.dropIP(ip);
-}
+};
 
 // TODO move globals into function:
 var rx = null;
@@ -37,27 +34,29 @@ var wq = [];
 function handleServerRequest(req, res) {
   wq.push([req, res]);
 
-  if (!!rx) {
+  if (rx !== null) {
     var q = wq;
     wq = [];
     rx(q);
   }
 }
 
-function genListenFun(runtime, server, portno, proc) {
+function genListenFun(runtime, server, portno) {
   return function (done) {
     // In next tick (TODO use process.nextTick() instead):
-    setTimeout(function() {
+    setTimeout(function () {
       done();
     }, 0);
 
-    server.listen(portno, function() { console.log('server listen cb'); });
+    server.listen(portno, function () {
+      console.log('server listen cb');
+    });
   };
 }
 
-function genReceiveFun(runtime, server, portno, proc) {
+function genReceiveFun() {
   return function (done) {
-    rx = function(q) {
+    rx = function (q) {
       done(q);
     }
   };

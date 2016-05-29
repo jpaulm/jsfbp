@@ -16,11 +16,11 @@ module.exports = function display() {
     }
     var data = ip.contents;
     if (ip.type == IP.OPEN)
-    	console.log('OPEN: ' + data);
+      console.log('OPEN: ' + data);
     else if (ip.type == IP.CLOSE)
-    	console.log('CLOSE: ' + data);
+      console.log('CLOSE: ' + data);
     else
-        console.log('data: ' + data);
+      console.log('data: ' + data);
     outport.send(ip);
   }
 };

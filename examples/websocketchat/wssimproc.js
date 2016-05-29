@@ -26,4 +26,4 @@ module.exports = function wssimproc() {
     ip = inport.receive(); // close bracket
     outport.send(ip);  // send it on...
   }
-}
+};

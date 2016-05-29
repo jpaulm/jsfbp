@@ -1,0 +1,20 @@
+{
+  "parserOptions": {
+    "ecmaVersion": 5,
+    "sourceType": "module",
+    "ecmaFeatures": {
+      "impliedStrict": true
+    },
+    "root" :true
+  },
+  "env": {
+    "node": true
+  },
+  "extends": [
+    "defaults"
+  ],
+  "rules": {
+    "no-console": 0,
+    "no-constant-condition": 0
+  }
+}

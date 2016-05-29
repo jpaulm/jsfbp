@@ -1,7 +1,7 @@
 'use strict';
 
 var Utils = require('../core/Utils');
-var IP = require('../core/IP')
+var IP = require('../core/IP');
 
 module.exports = function lbal() {
   var inport = this.openInputPort('IN');
@@ -13,15 +13,15 @@ module.exports = function lbal() {
     if (ip === null) {
       break;
     }
-    
+
     if (substream_level == 0) {
-       sel = Utils.getElementWithSmallestBacklog(array, sel);
+      sel = Utils.getElementWithSmallestBacklog(array, sel);
     }
     if (ip.type == IP.OPEN)
-		substream_level ++;
-	else if (ip.type == IP.CLOSE)
-		substream_level --;
-    
+      substream_level++;
+    else if (ip.type == IP.CLOSE)
+      substream_level--;
+
     array[sel].send(ip);
   }
 };
