@@ -7,6 +7,7 @@ var IIPConnection = require('./IIPConnection')
 
 var Network = module.exports = function () {
   this._processes = [];
+  this._processNames = {};
 };
 
 Network.prototype.run = function (runtime, options, callback) {
@@ -23,15 +24,14 @@ Network.prototype.run = function (runtime, options, callback) {
     });
 };
 
-var processNames = {};
 function generateProcessName(nameTemplate) {
-  var reMatch = nameTemplate.match(/(.+)_(X+)/);
+  var reMatch = nameTemplate.match(/(.+_)(X+)/);
   if(reMatch) {
     var nameRoot = reMatch[1];
     var numberPattern = reMatch[2];
-    var processNumber = processNames[nameTemplate] || 0;
+    var processNumber = this._processNames[nameTemplate] || 0;
 
-    processNames[nameTemplate] = processNumber + 1;
+    this._processNames[nameTemplate] = processNumber + 1;
 
     return nameRoot + new Array(numberPattern.length - (processNumber + '').length + 1).join(0) + processNumber;
 
@@ -44,7 +44,7 @@ Network.prototype.defProc = function(func, name) {
   if (typeof func === "string") {
     func = require(path.resolve(path.join(__dirname, '..', func)));
   }
-  var processName = generateProcessName(name || func.name || 'PROC_XXX');
+  var processName = generateProcessName.call(this, name || func.name || 'PROC_XXX');
   var proc = new Process(processName, func);
   this._processes.push(proc);
   return proc;
