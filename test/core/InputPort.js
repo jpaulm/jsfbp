@@ -43,7 +43,7 @@ describe('InputPort', function() {
 
     global.tracing= true;
 
-    TestFiber(function(mockProcess) {
+    TestFiber(function() {
       var ip = inPort.receive();
 
       expect(ip).to.be.null;
