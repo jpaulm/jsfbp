@@ -1,4 +1,7 @@
 # jsfbp
+[![NPM](https://nodei.co/npm/jsfbp.png?downloads=true&downloadRank=true&stars=true)](https://nodei.co/npm/jsfbp/)
+
+[![Build Status](https://travis-ci.org/jpaulm/jsfbp.svg?branch=master)](https://travis-ci.org/jpaulm/jsfbp)
 
 "Classical" FBP "green thread" implementation written in JavaScript, using Node-Fibers - https://github.com/laverdet/node-fibers .  
 
