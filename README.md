@@ -160,10 +160,12 @@ We use `node-fibers` which is known to work with `Node.js 12.7` (as of 24.07.201
    
    If you get an MSB4019 or similar error messages involving `utf-8-validate` and `bufferutil` (some dependencies deep down the dependency tree), you can just ignore them, given the optional nature of these components' compilation.
 
-3b. JSFBP is now on `npm`, so you can simply do `npm install jsfbp`.
+3b. JSFBP is now on `npm`, so you can simply do `npm install jsfbp`.  
 
 4. Run `node examples/fbptestxx.js`, where `fbptestxx` is any of the tests listed above. If tracing is desired, change the value of the `trace` variable at the bottom of `fbptestxx.js` to `true`. 
 5. All these tests can be run sequentially by running `examples/fbptests.bat`, or by running `examples/fbptests.sh` under `bash`.
+
+*Important* - BitDefender Antivirus 2016 anti-ransomware feature seems to interfere with `git`- we suggest you leave it turned off while working with `git`.
 
 ## Full install
 
@@ -180,6 +182,8 @@ If you wish to eliminate the errors mentioned in point #3 under *Install*, you w
 8. Run `node examples/fbptestxx.js`, where `fbptestxx` is any of the tests listed above. If tracing is desired, change the value of the `trace` variable at the bottom of `fbptestxx.js` to `true`. 
 9. If `npm install` reports `node-fibers` missing, execute `npm install fibers`
 10. All these tests can be run sequentially by running `examples/fbptests.bat`, or by running `examples/fbptests.sh` under `bash`.
+
+*Important* - BitDefender Antivirus 2016 anti-ransomware feature seems to interfere with `git`- we suggest you leave it turned off while working with `git`.
 
 # Testing with Mocha
 
