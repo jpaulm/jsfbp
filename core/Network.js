@@ -20,8 +20,7 @@ Network.prototype.run = function (runtime, options, callback) {
     process.inports.forEach(setPortRuntime);
     process.outports.forEach(setPortRuntime);
   });
-  runtime.run(this._processes, options, callback || function () {
-    });
+  runtime.run(this._processes, options, callback || function(){});
 };
 
 function generateProcessName(nameTemplate) {
@@ -44,7 +43,7 @@ Network.prototype.defProc = function(func, name) {
   if (typeof func === "string") {
     func = require(path.resolve(path.join(__dirname, '..', func)));
   }
-  var processName = generateProcessName.call(this, name || func.name || 'PROC_XXX');
+  var processName = generateProcessName(name || func.name || 'PROC_XXX');
   var proc = new Process(processName, func);
   this._processes.push(proc);
   return proc;
