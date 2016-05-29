@@ -24,7 +24,8 @@
   },
   "homepage": "https://github.com/jpaulm/jsfbp",
   "dependencies": {
-    "fibers": "^1.0.5"
+    "fibers": "^1.0.5",
+    "parsefbp": "github:jpaulm/parsefbp"
   },
   "main": "index.js",
   "devDependencies": {

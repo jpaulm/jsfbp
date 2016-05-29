@@ -3,13 +3,38 @@ var IIPConnection = require('./IIPConnection')
   , OutputPort = require('./OutputPort')
   , path = require('path')
   , Process = require('./Process')
-  , ProcessConnection = require('./ProcessConnection');
+  , ProcessConnection = require('./ProcessConnection')
+  , fbpParser = require('parsefbp');
 
 var Network = module.exports = function () {
   this._processes = [];
 };
 
-Network.prototype.run = function (runtime, options, callback) {
+Network.createFromGraph = function(graphString) {
+  var graphDefinition = fbpParser.parse(graphString, {caseSensitive: true});
+
+  var network = new fbp.Network();
+  var processes = {};
+
+  graphDefinition.processes.forEach(function(processDefinition, processName) {
+    processes[processName] = network.defProc(require(processDefinition.component), processName);
+  });
+
+  graphDefinition.connections.forEach(function(connection){
+    var target = connection.tgt;
+    if(connection.data) {
+      network.initialize(processes[target.process], target.port, connection.data);
+    } else {
+      var source = connection.src;
+      network.connect(processes[source.process], source.port, processes[target.process], target.port);
+    }
+
+  });
+
+  return network;
+};
+
+Network.prototype.run = function(runtime, options, callback) {
   options = options || {};
   function setPortRuntime(port) {
     port[1].setRuntime(runtime);
@@ -19,8 +44,7 @@ Network.prototype.run = function (runtime, options, callback) {
     process.inports.forEach(setPortRuntime);
     process.outports.forEach(setPortRuntime);
   });
-  runtime.run(this._processes, options, callback || function () {
-    });
+  runtime.run(this._processes, options, callback || function(){});
 };
 
 Network.prototype.defProc = function (func, name) {
@@ -86,3 +110,4 @@ Network.prototype.connect = function (upproc, upport, downproc, downport, capaci
   cnxt.upstreamProcsUnclosed++;
   //console.log(cnxt);
 };
+
