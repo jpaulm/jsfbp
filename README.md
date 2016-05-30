@@ -90,6 +90,10 @@ These tests (except for `fbptestws`) can be run sequentially by running `fbptest
 
 ## For application developers
 
+Networks can be generated programmatically or by loading in an FBP file.
+
+### Programmatically
+
 1. Get access to JSFBP: `var fbp = require('fbp')`
 2. Create a new network: `var network = new fbp.Network();`
 3. Define your network:
@@ -104,20 +108,38 @@ network.run(fiberRuntime, {trace: true/false}, function success() {
     console.log("Finished!");
   });
 ```
+
+### Via an FBP file
+
+1. Generate an `.fbp` file that complies with the specification under [parsefbp](https://github.com/jpaulm/parsefbp).
+2. Get access to JSFBP: `var fbp = require('fbp')`
+3. Load the contents of the `.fbp` file into a String: `fs.readFile(__dirname + '/network.fbp' ...);`
+4. Create a new network: `var network = new fbp.Network.createFromGraph(fileContents);`
+5. Create a new runtime: `var fiberRuntime = new fbp.FiberRuntime();`
+6. Run it!
+```
+network.run(fiberRuntime, {trace: true/false}, function success() {
+    console.log("Finished!");
+  });
+```
+
+
  Activating `trace` can be desired in debugging scenarios.
+
+ ### Useful methods
  
 - `Network#defProc(component[, name])` Creates a process from a component, defined by the first parameter.
   
-  The first parameter can be a function or a string. When a string is used, the component is loaded according to three 
+  - The first parameter can be a function or a string. When a string is used, the component is loaded according to three
   possiblities:
-  - If the component string starts `'./'` then the component is assumed to be one of he JSFBP components and is loaded. 
+    - If the component string starts `'./'` then the component is assumed to be one of he JSFBP components and is loaded.
   For example: `'./components/copier.js'`
-  - If the component string contains a `/`, then it assumed to be of the form `'package/component'`. Thus `package` is loaded
+    - If the component string contains a `/`, then it assumed to be of the form `'package/component'`. Thus `package` is loaded
   and then `component` is retrieved from it. If `package` is `'jsfbp'`, then it is loaded from the JSFBP `components` directory.
-  - Otherwise, the string is assumed to be a node module that _is_ an FBP component and it is simply
+    - Otherwise, the string is assumed to be a node module that _is_ an FBP component and it is simply
   loaded via `require`.
   
-- The second paramter is an optional name for the Process. If not provided, it will be inferred from the `component`.
+  - The second paramter is an optional name for the Process. If not provided, it will be inferred from the `component`.
 
 ## For component developers
 
