@@ -10,10 +10,33 @@ var Network = module.exports = function () {
   this._processes = [];
 };
 
+/*
+ * This function provides support for loading
+ * - components that come _with_ this module -> './components/copier.js'
+ * - components that are inside a package -> 'package/component'
+ * - components that are simply a node module -> 'component'
+ */
+function loadComponent(componentName) {
+  var moduleLocation = componentName;
+  var componentField;
+  if(componentName.startsWith('./')) {
+    moduleLocation = path.resolve(path.join(__dirname, '..', componentName));
+  } else if(componentName.indexOf('/') >= 0) {
+    moduleLocation = componentName.slice(0,componentName.indexOf('/'));
+    componentField = componentName.slice(componentName.indexOf('/')+1);
+  }
+  var component = require(moduleLocation);
+  if(componentField) {
+    return component[componentField]
+  } else {
+    return component;
+  }
+}
+
 Network.createFromGraph = function(graphString) {
   var graphDefinition = fbpParser.parse(graphString, {caseSensitive: true});
 
-  var network = new fbp.Network();
+  var network = new fbpParser.Network();
   var processes = {};
 
   graphDefinition.processes.forEach(function(processDefinition, processName) {
@@ -30,7 +53,6 @@ Network.createFromGraph = function(graphString) {
     }
 
   });
-
   return network;
 };
 
@@ -49,7 +71,7 @@ Network.prototype.run = function(runtime, options, callback) {
 
 Network.prototype.defProc = function (func, name) {
   if (typeof func === "string") {
-    func = require(path.resolve(path.join(__dirname, '..', func)));
+    func = loadComponent(func);
   }
   var proc = new Process(name || func.name, func);
   this._processes.push(proc);

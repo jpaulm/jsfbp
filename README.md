@@ -105,6 +105,19 @@ network.run(fiberRuntime, {trace: true/false}, function success() {
   });
 ```
  Activating `trace` can be desired in debugging scenarios.
+ 
+- `Network#defProc(component[, name])` Creates a process from a component, defined by the first parameter.
+  
+  The first parameter can be a function or a string. When a string is used, the component is loaded according to three 
+  possiblities:
+  - If the component string starts `'./'` then the component is assumed to be one of he JSFBP components and is loaded. 
+  For example: `'./components/copier.js'`
+  - If the component string contains a `/`, then it assumed to be of the form `'package/component'`. Thus `package` is loaded
+  and then `component` is retrieved from it. If `package` is `'jsfbp'`, then it is loaded from the JSFBP `components` directory.
+  - Otherwise, the string is assumed to be a node module that _is_ an FBP component and it is simply
+  loaded via `require`.
+  
+- The second paramter is an optional name for the Process. If not provided, it will be inferred from the `component`.
 
 ## For component developers
 
