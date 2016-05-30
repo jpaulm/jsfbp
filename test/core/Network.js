@@ -1,9 +1,16 @@
 var Network = require('../../core/Network');
 
 describe('Network', function () {
-  it('can load FBP components from this module\'s core', function() {
+  it('can load FBP components from this module\'s core via path', function() {
     var network = new Network();
     var process = network.defProc('./components/copier.js');
+
+    expect(process.func).to.be.a('function');
+  });
+
+  it('can load FBP components from this module\'s core via package/component', function() {
+    var network = new Network();
+    var process = network.defProc('jsfbp/copier');
 
     expect(process.func).to.be.a('function');
   });

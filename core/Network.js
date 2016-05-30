@@ -24,6 +24,10 @@ function loadComponent(componentName) {
   } else if(componentName.indexOf('/') >= 0) {
     moduleLocation = componentName.slice(0,componentName.indexOf('/'));
     componentField = componentName.slice(componentName.indexOf('/')+1);
+    if(moduleLocation === 'jsfbp') {
+      moduleLocation = path.resolve(path.join(__dirname, '../components/', componentField +'.js'));
+      componentField = undefined;
+    }
   }
   var component = require(moduleLocation);
   if(componentField) {
