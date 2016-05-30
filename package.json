@@ -25,7 +25,7 @@
   "homepage": "https://github.com/jpaulm/jsfbp",
   "dependencies": {
     "fibers": "^1.0.5",
-    "parsefbp": "github:jpaulm/parsefbp"
+    "parsefbp": "github:dancrumb/parsefbp#275a2d880e42fe7f61bac6506c830080dd557706"
   },
   "main": "index.js",
   "devDependencies": {
@@ -41,7 +41,7 @@
     "doc": "docs"
   },
   "scripts": {
-    "test": "mocha --ui mocha-fibers --recursive -R spec --require test/test_helper.js",
+    "test": "mocha --ui mocha-fibers --recursive -R spec --require test/test_helper.js test/components test/core",
     "lint": "eslint components core examples test index.js"
   }
 }

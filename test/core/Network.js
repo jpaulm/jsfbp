@@ -1,4 +1,6 @@
 var Network = require('../../core/Network');
+var fbp = require('../..');
+var fs = require('fs');
 
 describe('Network', function () {
   it('can load FBP components from this module\'s core via path', function() {
@@ -28,4 +30,24 @@ describe('Network', function () {
 
     expect(process.func).to.be.an('function');
   });
+
+  it('can be created from an FBP file', function(done) {
+    fs.readFile(__dirname + '/network.fbp', function(err, graph) {
+      if(err) {
+        return done(err);
+      }
+      
+      var network = Network.createFromGraph(graph.toString());
+
+      var fiberRuntime = new fbp.FiberRuntime();
+      network.run(fiberRuntime, {trace: false});
+      
+      var receiverProcess = network.getProcessByName("receiver");
+      var result = receiverProcess.func.getResult();
+
+      expect(result).to.deep.equal(['1,m1', '1,d11', '1,d12', '2,m2', '2,d21', '3,m3', '3,d31', '3,d32', '3,d33', '4,d41']);
+
+      done();
+    });
+  })
 });

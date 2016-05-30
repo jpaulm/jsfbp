@@ -7,8 +7,8 @@ describe('FiberRuntime', function () {
     var network = new fbp.Network();
 
     var result = [];
-    var sender = network.defProc(new MockSender([1, 2, 3, 4, 5]));
-    var recvr = network.defProc(new MockReceiver(result));
+    var sender = network.defProc(new MockSender.generator([1, 2, 3, 4, 5]));
+    var recvr = network.defProc(new MockReceiver.generator(result));
 
     network.connect(sender, 'OUT', recvr, 'IN', 5);
 

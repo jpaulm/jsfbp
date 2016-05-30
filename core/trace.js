@@ -5,8 +5,14 @@
 var Fiber = require('fibers');
 
 module.exports = function(message) {
-  var proc = Fiber.current.fbpProc;
   if(global.trace) {
-    console.log(proc.name + ' ' + message);
+    if (Fiber.current) {
+      var proc = Fiber.current.fbpProc;
+      console.log(proc.name + ' ' + message);
+
+    } else {
+      console.log("NOPROC: " + message);
+    }
   }
+
 };
