@@ -63,6 +63,8 @@ These tests (except for `fbptestws`) can be run sequentially by running `fbptest
  
 # Components
 
+- `breader` - reads from a binary file specified by FILE IIP and sends one IP per byte in the file. Starts sending IPs as soon as first byte is read.
+- `bwriter` - takes a stream of IPs containing bytes and writes them to a file from its FILE IIP. Starts writing as soon as the first IP comes in.
 - `collate` - collates from 1 to any number of sorted input streams, generating merged stream with bracket IPs inserted (sort fields assumed to be contiguous starting at 1st byte; all streams assumed to be sorted on same fields, in ascending sequence) 
 - `concat`  - concatenates all the streams that are sent to its array input port (size determined in network definition) 
 - `copier`  - copies its input stream to its output stream
