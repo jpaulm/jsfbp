@@ -12,9 +12,9 @@ describe('delay', function () {
 
     var result = [];
 
-    var sender = network.defProc(MockSender([42]));
+    var sender = network.defProc(MockSender.generator([42]));
     var delay = network.defProc('./components/delay.js');
-    var receiver = network.defProc(MockReceiver(result));
+    var receiver = network.defProc(MockReceiver.generator(result));
 
     sender.name = "Sender";
     delay.name = "DELAY";
@@ -44,9 +44,9 @@ describe('delay', function () {
 
     var result = [];
 
-    var sender = network.defProc(MockSender([1, 2, 3]));
+    var sender = network.defProc(MockSender.generator([1, 2, 3]));
     var delay = network.defProc('./components/delay.js');
-    var receiver = network.defProc(MockReceiver(result));
+    var receiver = network.defProc(MockReceiver.generator(result));
 
     sender.name = "Sender";
     delay.name = "DELAY";
