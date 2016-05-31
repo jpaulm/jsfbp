@@ -31,6 +31,8 @@ Process.Status = Enum([
   'DONE'
 ]);
 
+Process.prototype.IPTypes = IP.Types;
+
 /*
  * Given a set of ports an a base name XXX, returns all the ports in the set that
  * have the name XXX[<index>]
@@ -76,7 +78,7 @@ Process.prototype.createIPBracket = function (bktType, x) {
 
 Process.prototype.dropIP = function (ip) {
   var cont = ip.contents;
-  if (ip.type != IP.NORMAL) {
+  if (ip.type != this.IPTypes.NORMAL) {
     cont = ["", "OPEN", "CLOSE"][ip.type] + ", " + cont;
   }
   trace('IP dropped with: ' + cont);

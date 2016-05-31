@@ -8,8 +8,6 @@
  *
  */
 
-var IP = require('../core/IP');
-
 module.exports = function collate() {
   var ctlfieldsPort = this.openInputPort('CTLFIELDS');
   var inportArray = this.openInputPortArray('IN');
@@ -40,7 +38,7 @@ module.exports = function collate() {
   });
 
   for (var i = 0; i < ctlfields.length; i++) {
-    var p = this.createIPBracket(IP.OPEN);
+    var p = this.createIPBracket(this.IPTypes.OPEN);
     outport.send(p);
   }
 
@@ -66,7 +64,7 @@ module.exports = function collate() {
   }
 
   ctlfields.forEach(function() {
-    var p = this.createIPBracket(IP.CLOSE);
+    var p = this.createIPBracket(this.IPTypes.CLOSE);
     outport.send(p);
   }.bind(this));
 
@@ -75,11 +73,11 @@ module.exports = function collate() {
     if (prev != null) {
       var level = findLevel();
       for (i = 0; i < level; i++) {
-        var p2 = proc.createIPBracket(IP.CLOSE);
+        var p2 = proc.createIPBracket(proc.IPTypes.CLOSE);
         outport.send(p2);
       }
       for (i = 0; i < level; i++) {
-        p2 = proc.createIPBracket(IP.OPEN);
+        p2 = proc.createIPBracket(proc.IPTypes.OPEN);
         outport.send(p2);
       }
     }

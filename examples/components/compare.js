@@ -10,8 +10,6 @@
  * process will keep on getting reinvoked indefinitely.  The drainInputs logic has now been added.
  */
 
-var IP = require('../../core/IP');
-
 module.exports = function compare() {
 
   var inportArray = this.openInputPortArray('IN');
@@ -42,7 +40,7 @@ module.exports = function compare() {
       drainInputs(this);
       return;
     }
-    if (ip0.type == IP.NORMAL &&
+    if (ip0.type == this.IPTypes.NORMAL &&
       ip0.contents.trim().localeCompare(ip1.contents.trim()) != 0) {
       console.log(ip0.type + ',' + ip0.contents);
       console.log(ip1.type + ',' + ip1.contents);
