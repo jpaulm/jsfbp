@@ -7,7 +7,7 @@
  */
 
 var fs = require('fs');
-var IP = require('jsfbp/core/IP');
+var IP = require('../core/IP');
 var trace = require('../core/trace');
 
 var READ_SIZE = 4;
