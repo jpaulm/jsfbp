@@ -1,7 +1,5 @@
 'use strict';
 
-var IP = require('../core/IP');
-
 module.exports = function recvr() {
   var inport = this.openInputPort('IN');
   while (true) {
@@ -9,9 +7,9 @@ module.exports = function recvr() {
     if (ip === null) {
       break;
     }
-    if (ip.type == IP.OPEN)
+    if (ip.type == this.IPTypes.OPEN)
       console.log('open');
-    else if (ip.type == IP.CLOSE)
+    else if (ip.type == this.IPTypes.CLOSE)
       console.log('close');
     else
       console.log('data: ' + ip.contents);

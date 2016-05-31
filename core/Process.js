@@ -31,6 +31,8 @@ Process.Status = Enum([
   'DONE'
 ]);
 
+Process.prototype.IPTypes = IP.Types;
+
 Process.prototype.getStatusString = function () {
   return Process.Status.__lookup(this.status);
 };
@@ -58,7 +60,7 @@ Process.prototype.createIPBracket = function (bktType, x) {
 
 Process.prototype.dropIP = function (ip) {
   var cont = ip.contents;
-  if (ip.type != IP.NORMAL) {
+  if (ip.type != this.IPTypes.NORMAL) {
     cont = ["", "OPEN", "CLOSE"][ip.type] + ", " + cont;
   }
   trace('IP dropped with: ' + cont);

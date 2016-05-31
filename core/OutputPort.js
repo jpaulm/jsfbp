@@ -1,7 +1,6 @@
 'use strict';
 var Fiber = require('fibers')
   , ProcessStatus = require('./Process').Status
-  , IP = require('./IP')
   , trace = require('./trace');
 
 var OutputPort = module.exports = function () {
@@ -18,7 +17,7 @@ OutputPort.prototype.send = function (ip) {
   var proc = Fiber.current.fbpProc;
   var conn = this.conn;
   var cont = ip.contents;
-  if (ip.type != IP.NORMAL) {
+  if (ip.type != proc.IPTypes.NORMAL) {
     cont = ["", "OPEN", "CLOSE"][ip.type] + ", " + cont;
   }
   trace('send to ' + this.name + ': ' + cont);

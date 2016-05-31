@@ -1,7 +1,6 @@
 'use strict';
 
-var IP = require('../core/IP')
-  , WebSocketServer = require('ws').Server;
+var WebSocketServer = require('ws').Server;
 
 module.exports = function wsrecv(runtime) {
   var inport = this.openInputPort('PORTNO');
@@ -23,10 +22,10 @@ module.exports = function wsrecv(runtime) {
     }
 
     console.log(result);
-    outport.send(this.createIPBracket(IP.OPEN));
+    outport.send(this.createIPBracket(this.IPTypes.OPEN));
     outport.send(this.createIP(result[0]));
     outport.send(this.createIP(result[1]));
-    outport.send(this.createIPBracket(IP.CLOSE));
+    outport.send(this.createIPBracket(this.IPTypes.CLOSE));
   }
 
   wss.close();
