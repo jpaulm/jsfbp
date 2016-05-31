@@ -17,7 +17,7 @@ IP.Types = new Enum([
 ["NORMAL", "OPEN", "CLOSE"].forEach(function(type) {
   Object.defineProperty(IP, type, {
     get: function() {
-      console.error("Accessing IP types from IP object directly is deprecated. Please use IP.Types. " + type);
+      console.error("Accessing IP types from IP object directly is deprecated. Please use IP.Types." + type);
       return IP.Types[type]
     }
   });
