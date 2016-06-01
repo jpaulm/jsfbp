@@ -9,7 +9,7 @@ module.exports = function gendata() {
   //console.log(count);
   for (var i = 0; i < count; i++) {
     ip = this.createIP(i + 'abcd');
-    console.log(outport);
+    //console.log(outport);
     if (-1 == outport.send(ip)) {
       return;
     }
