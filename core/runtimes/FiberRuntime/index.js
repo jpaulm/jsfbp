@@ -131,8 +131,7 @@ FiberRuntime.prototype._hasDeadLock = function () {
 FiberRuntime.prototype._genInitialQueue = function () {
   var self = this;
   var queue = [];
-  //console.log(self._list);  //xxx
-  //console.log(Object.keys(self._list).length);
+
   // A process is selfstarting if its incoming ports are only connected to IIPs
   self._list.forEach(function(process) {
 
