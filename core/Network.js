@@ -157,3 +157,4 @@ Network.prototype.connect = function (upproc, upport, downproc, downport, capaci
   cnxt.upstreamProcsUnclosed++;
   //console.log(cnxt);
 };
+

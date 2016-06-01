@@ -12,9 +12,9 @@ describe('randdelay', function () {
 
     var result = [];
 
-    var sender = network.defProc(MockSender([42]));
+    var sender = network.defProc(MockSender.generator([42]));
     var delay = network.defProc('./components/randdelay.js');
-    var receiver = network.defProc(MockReceiver(result));
+    var receiver = network.defProc(MockReceiver.generator(result));
 
     network.initialize(delay, 'INTVL', DELAY);
     network.connect(sender, 'OUT', delay, 'IN');
@@ -42,14 +42,14 @@ describe('randdelay', function () {
     var startTime;
 
     var i = 0;
-    var mockReceiver = MockReceiver(result, function receive() {
+    var mockReceiver = MockReceiver.generator(result, function receive() {
       i++;
       var diffTime = Date.now() - startTime;
       expect(Math.abs(diffTime - DELAY)).to.be.within(0, DELAY * i + DELAY_MAX_DIFF);
       console.log("DELAY " + diffTime);
     });
 
-    var sender = network.defProc(MockSender([1, 2, 3, 4, 5]));
+    var sender = network.defProc(MockSender.generator([1, 2, 3, 4, 5]));
     var delay = network.defProc('./components/randdelay.js');
     var receiver = network.defProc(mockReceiver);
 
