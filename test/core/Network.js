@@ -64,8 +64,10 @@ describe('Network', function () {
     var receiver = network.defProc(MockReceiver.generator(result), "RECVR");
     var delay = network.defProc('jsfbp/delay', "DELAY");
 
+    //network.initialize(receiver, 'IN', 1); // If you initialize here, an error is thrown
     network.connect(delay, 'OUT', receiver, 'IN');
-    network.initialize(receiver, 'IN', 1);
+    network.initialize(receiver, 'IN', 1); //If you initialize here, RECVR never gets the IIP
+
     network.initialize(delay,'INTVL', 50);
     network.initialize(delay,'IN', 2);
 
