@@ -59,7 +59,7 @@ Network.createFromGraph = function(graphString) {
 
   graphDefinition.connections.forEach(function(connection){
     var target = connection.tgt;
-    if(connection.data) {
+    if('data' in connection) {
       network.initialize(processes[target.process], getPort(target), connection.data);
     } else {
       var source = connection.src;
