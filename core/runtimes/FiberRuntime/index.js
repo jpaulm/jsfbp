@@ -140,9 +140,10 @@ FiberRuntime.prototype._genInitialQueue = function () {
   var self = this;
   var queue = [];
 
+  // A process is selfstarting if its incoming ports are only connected to IIPs
   self._list.forEach(function(process) {
     var selfstarting = process.inports.reduce(function(currentlySelfstarting, inport) {
-      return currentlySelfstarting && (!inport[1].conn instanceof IIPConnection);
+      return currentlySelfstarting && (inport[1].conn instanceof IIPConnection);
     }, true);
 
     if(selfstarting) {
@@ -208,7 +209,7 @@ FiberRuntime.prototype._actualRun = function () {
 
     if (this._hasDeadLock()) {
       console.log('Deadlock detected');
-      for (var i = 0; i < Object.keys(this._list).length; i++) {
+      for (var i = 0; i < this._list.length; i++) {
         console.log('- Process status: '
           + this._list[i].getStatusString() + ' - '
           + this._list[i].name);
@@ -221,7 +222,7 @@ FiberRuntime.prototype._actualRun = function () {
 
 FiberRuntime.prototype._tick = function () {
 
-  var x = this._queue.shift();
+    var x = this._queue.shift();
 
   while (x != undefined) {
 
