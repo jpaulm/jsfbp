@@ -36,12 +36,12 @@ describe('Network', function () {
       if(err) {
         return done(err);
       }
-      
+
       var network = Network.createFromGraph(graph.toString());
 
       var fiberRuntime = new fbp.FiberRuntime();
       network.run(fiberRuntime, {trace: false});
-      
+
       var receiverProcess = network.getProcessByName("receiver");
       var result = receiverProcess.func.getResult();
 
@@ -49,5 +49,9 @@ describe('Network', function () {
 
       done();
     });
-  })
+  });
+
+  it('correctly identifies empty IIPs', function() {
+    expect(function() {Network.createFromGraph("'' -> IN RECVR(jsfbp/recvr)");}).not.to.throw(Error);
+  });
 });
