@@ -3,13 +3,80 @@ var IIPConnection = require('./IIPConnection')
   , OutputPort = require('./OutputPort')
   , path = require('path')
   , Process = require('./Process')
-  , ProcessConnection = require('./ProcessConnection');
+  , ProcessConnection = require('./ProcessConnection')
+  , parseFBP = require('parsefbp')
+  , trace = require('./trace');
 
 var Network = module.exports = function () {
   this._processes = [];
 };
 
-Network.prototype.run = function (runtime, options, callback) {
+/*
+ * This function provides support for loading
+ * - components that come _with_ this module -> './components/copier.js'
+ * - components that are inside a package -> 'package/component'
+ * - components that are simply a node module -> 'component'
+ */
+function loadComponent(componentName) {
+  var moduleLocation = componentName;
+  var componentField;
+  if(componentName.match('^[.]{1,2}/')) {
+    moduleLocation = path.resolve(path.join(__dirname, '..', componentName));
+  } else if(componentName.indexOf('/') >= 0) {
+    moduleLocation = componentName.slice(0,componentName.indexOf('/'));
+    componentField = componentName.slice(componentName.indexOf('/')+1);
+    if(moduleLocation === 'jsfbp') {
+      moduleLocation = path.resolve(path.join(__dirname, '../components/', componentField +'.js'));
+      componentField = undefined;
+    }
+  }
+  var component = require(moduleLocation);
+  if(componentField) {
+    return component[componentField]
+  } else {
+    return component;
+  }
+}
+
+function getPort(connectionEnd) {
+  var port = connectionEnd.port;
+  if('index' in connectionEnd) {
+    port += '['+connectionEnd.index+']';
+  }
+  return port;
+}
+
+Network.createFromGraph = function(graphString) {
+  var graphDefinition = parseFBP(graphString, {caseSensitive: true});
+
+  var network = new Network();
+  var processes = {};
+
+  Object.keys(graphDefinition.processes).forEach(function(processName) {
+    var processDefinition = graphDefinition.processes[processName];
+    processes[processName] = network.defProc(processDefinition.component, processName);
+  });
+
+  graphDefinition.connections.forEach(function(connection){
+    var target = connection.tgt;
+    if('data' in connection) {
+      network.initialize(processes[target.process], getPort(target), connection.data);
+    } else {
+      var source = connection.src;
+      network.connect(processes[source.process], getPort(source), processes[target.process], getPort(target));
+    }
+
+  });
+  return network;
+};
+
+Network.prototype.getProcessByName = function (processName) {
+  return this._processes.find(function(currentProcess) {
+    return currentProcess.name === processName;
+  });
+};
+
+Network.prototype.run = function(runtime, options, callback) {
   options = options || {};
   function setPortRuntime(port) {
     port[1].setRuntime(runtime);
@@ -19,15 +86,19 @@ Network.prototype.run = function (runtime, options, callback) {
     process.inports.forEach(setPortRuntime);
     process.outports.forEach(setPortRuntime);
   });
-  runtime.run(this._processes, options, callback || function () {
-    });
+  runtime.run(this._processes, options, callback || function(){});
 };
 
 Network.prototype.defProc = function (func, name) {
   if (typeof func === "string") {
-    func = require(path.resolve(path.join(__dirname, '..', func)));
+    func = loadComponent(func);
+  }
+  if(!func) {
+    throw new Error("No function passed to defProc");
   }
   var proc = new Process(name || func.name, func);
+  trace('Created Process with name: ' + proc.name);
+
   this._processes.push(proc);
   return proc;
 };

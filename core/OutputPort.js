@@ -6,7 +6,7 @@ var Fiber = require('fibers')
 var OutputPort = module.exports = function () {
   this.name = null;
   this.conn = null;
-  this.closed = false;
+  this.closed = false;  
 };
 
 OutputPort.prototype.setRuntime = function (runtime) {
@@ -37,7 +37,7 @@ OutputPort.prototype.send = function (ip) {
       conn.down.status == ProcessStatus.DORMANT ||
       conn.down.status == ProcessStatus.WAITING_TO_FIPE) {
       conn.down.status = ProcessStatus.READY_TO_EXECUTE;
-      this._runtime.pushToQueue(conn.down);
+      this._runtime.pushToQueue(conn.down);  // xxxxxx
     }
     if (conn.usedslots == conn.array.length) {
       proc.status = ProcessStatus.WAITING_TO_SEND;

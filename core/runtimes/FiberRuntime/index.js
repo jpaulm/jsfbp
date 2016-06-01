@@ -7,7 +7,7 @@ Fiber.prototype.fbpProc = null;
 var FiberRuntime = module.exports = function () {
   this._queue = [];
   this._count = null;
-  this._tracing = false;
+  this._tracing = false;  
 };
 
 FiberRuntime.prototype.isTracing = function () {
@@ -92,9 +92,9 @@ FiberRuntime.prototype.runAsyncCallback = function (cb) {
 };
 
 FiberRuntime.prototype.run = function (processes, options, callback) {
-  this._list = processes;
+  this._list = processes;  
   this._count = this._list.length;
-
+  
   this._tracing = global.tracing = Boolean(options.trace);
 
   var self = this;
@@ -119,7 +119,7 @@ FiberRuntime.prototype._createFiber = function (process) {
   process.fiber = new Fiber(process.func.bind(process, this));
   process.fiber.fbpProc = process;
   process.status = Process.Status.ACTIVE;
-
+  
   return process;
 };
 
@@ -139,20 +139,28 @@ FiberRuntime.prototype._hasDeadLock = function () {
 FiberRuntime.prototype._genInitialQueue = function () {
   var self = this;
   var queue = [];
-
-  for (var i = 0; i < self._list.length; i++) {
+  var keys = Object.keys(self._list);
+  var m = keys.length;
+  //console.log(m);  //xxxx
+  //console.log(self._list);  
+  for (var i = 0; i < m; i++) {
     var selfstarting = true;
-    for (var j = 0; j < self._list[i].inports.length; j++) {
-      var k = self._list[i].inports[j];
+    var prop = keys[i];
+    //console.log(self._list[prop]);  //?
+    for (var j = 0; j < Object.keys(self._list[prop].inports).length; j++) {
+      var k = self._list[prop].inports[j];
+      //console.log(k);  //xxx
       if (!(k[1].conn instanceof IIPConnection)) {
         selfstarting = false;
       }
     }
 
     if (selfstarting) {
-      queue.push(self._list[i]);
+    	//console.log(self._list[prop]);
+        queue.push(self._list[prop]);
     }
   }
+  
   return queue;
 };
 
@@ -189,7 +197,17 @@ FiberRuntime.prototype._procState = function (proc) {
 // Fibre running scheduler
 FiberRuntime.prototype._actualRun = function () {
   this._queue = this._genInitialQueue();
-
+  function setPortRuntime(port) {
+	    console.log('setportruntime');
+	    console.log(runtime);
+	    port[1].setRuntime(runtime);
+	  }
+  console.log('setportruntimes');
+  console.log(this._list);
+  this._list.forEach(function (process) {	  
+        process.inports.forEach(setPortRuntime).bind(this);
+	    process.outports.forEach(setPortRuntime).bind(this);
+	  }.bind(this));
   while (true) {
     this._tick();
 
@@ -199,7 +217,7 @@ FiberRuntime.prototype._actualRun = function () {
 
     if (this._hasDeadLock()) {
       console.log('Deadlock detected');
-      for (var i = 0; i < this._list.length; i++) {
+      for (var i = 0; i < Object.keys(this._list).length; i++) {
         console.log('- Process status: '
           + this._list[i].getStatusString() + ' - '
           + this._list[i].name);
@@ -211,8 +229,8 @@ FiberRuntime.prototype._actualRun = function () {
 };
 
 FiberRuntime.prototype._tick = function () {
-
-  var x = this._queue.shift();
+  
+  var x = this._queue.shift();  
 
   while (x != undefined) {
 
