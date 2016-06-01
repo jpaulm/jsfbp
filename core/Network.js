@@ -20,18 +20,18 @@ var Network = module.exports = function () {
 function loadComponent(componentName) {
   var moduleLocation = componentName;
   var componentField;
-  if(componentName.match('^[.]{1,2}/')) {
+  if (componentName.match('^[.]{1,2}/')) {
     moduleLocation = path.resolve(path.join(__dirname, '..', componentName));
-  } else if(componentName.indexOf('/') >= 0) {
-    moduleLocation = componentName.slice(0,componentName.indexOf('/'));
-    componentField = componentName.slice(componentName.indexOf('/')+1);
-    if(moduleLocation === 'jsfbp') {
-      moduleLocation = path.resolve(path.join(__dirname, '../components/', componentField +'.js'));
+  } else if (componentName.indexOf('/') >= 0) {
+    moduleLocation = componentName.slice(0, componentName.indexOf('/'));
+    componentField = componentName.slice(componentName.indexOf('/') + 1);
+    if (moduleLocation === 'jsfbp') {
+      moduleLocation = path.resolve(path.join(__dirname, '../components/', componentField + '.js'));
       componentField = undefined;
     }
   }
   var component = require(moduleLocation);
-  if(componentField) {
+  if (componentField) {
     return component[componentField]
   } else {
     return component;
@@ -40,26 +40,26 @@ function loadComponent(componentName) {
 
 function getPort(connectionEnd) {
   var port = connectionEnd.port;
-  if('index' in connectionEnd) {
-    port += '['+connectionEnd.index+']';
+  if ('index' in connectionEnd) {
+    port += '[' + connectionEnd.index + ']';
   }
   return port;
 }
 
-Network.createFromGraph = function(graphString) {
+Network.createFromGraph = function (graphString) {
   var graphDefinition = parseFBP(graphString, {caseSensitive: true});
 
   var network = new Network();
   var processes = {};
 
-  Object.keys(graphDefinition.processes).forEach(function(processName) {
+  Object.keys(graphDefinition.processes).forEach(function (processName) {
     var processDefinition = graphDefinition.processes[processName];
     processes[processName] = network.defProc(processDefinition.component, processName);
   });
 
-  graphDefinition.connections.forEach(function(connection){
+  graphDefinition.connections.forEach(function (connection) {
     var target = connection.tgt;
-    if('data' in connection) {
+    if ('data' in connection) {
       network.initialize(processes[target.process], getPort(target), connection.data);
     } else {
       var source = connection.src;
@@ -71,12 +71,12 @@ Network.createFromGraph = function(graphString) {
 };
 
 Network.prototype.getProcessByName = function (processName) {
-  return this._processes.find(function(currentProcess) {
+  return this._processes.find(function (currentProcess) {
     return currentProcess.name === processName;
   });
 };
 
-Network.prototype.run = function(runtime, options, callback) {
+Network.prototype.run = function (runtime, options, callback) {
   options = options || {};
   function setPortRuntime(port) {
     port[1].setRuntime(runtime);
@@ -86,14 +86,15 @@ Network.prototype.run = function(runtime, options, callback) {
     process.inports.forEach(setPortRuntime);
     process.outports.forEach(setPortRuntime);
   });
-  runtime.run(this._processes, options, callback || function(){});
+  runtime.run(this._processes, options, callback || function () {
+    });
 };
 
 Network.prototype.defProc = function (func, name) {
   if (typeof func === "string") {
     func = loadComponent(func);
   }
-  if(!func) {
+  if (!func) {
     throw new Error("No function passed to defProc");
   }
   var proc = new Process(name || func.name, func);
@@ -159,24 +160,24 @@ Network.prototype.connect = function (upproc, upport, downproc, downport, capaci
 };
 
 Network.prototype.sinitialize = function (sinport, string) {
-	  var i = sinport.lastIndexOf('.');
-	  var procname = sinport.substring(0, i);
-	  var port = sinport.substring(i + 1);
-	  var proc = this._processes[procname];
-	  
-	  this.initialize(proc, port, string);
-		};
-		
+  var i = sinport.lastIndexOf('.');
+  var procname = sinport.substring(0, i);
+  var port = sinport.substring(i + 1);
+  var proc = this._processes[procname];
+
+  this.initialize(proc, port, string);
+};
+
 Network.prototype.sconnect = function (soutport, sinport, capacity) {
-	 
-	  var i = soutport.lastIndexOf('.');
-	  var procname = soutport.substring(0, i);
-	  var upport = soutport.substring(i + 1);
-	  var upproc = this._processes[procname];
-	  i = sinport.lastIndexOf('.');
-	  procname = sinport.substring(0, i);
-	  var downport = sinport.substring(i + 1);
-	  var downproc = this._processes[procname];	  
-	  
-	  this.connect(upproc, upport, downproc, downport, capacity);	  
-	};
+
+  var i = soutport.lastIndexOf('.');
+  var procname = soutport.substring(0, i);
+  var upport = soutport.substring(i + 1);
+  var upproc = this._processes[procname];
+  i = sinport.lastIndexOf('.');
+  procname = sinport.substring(0, i);
+  var downport = sinport.substring(i + 1);
+  var downproc = this._processes[procname];
+
+  this.connect(upproc, upport, downproc, downport, capacity);
+};

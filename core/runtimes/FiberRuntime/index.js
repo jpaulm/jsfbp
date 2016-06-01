@@ -7,7 +7,7 @@ Fiber.prototype.fbpProc = null;
 var FiberRuntime = module.exports = function () {
   this._queue = [];
   this._count = null;
-  this._tracing = false;  
+  this._tracing = false;
 };
 
 FiberRuntime.prototype.isTracing = function () {
@@ -92,9 +92,9 @@ FiberRuntime.prototype.runAsyncCallback = function (cb) {
 };
 
 FiberRuntime.prototype.run = function (processes, options, callback) {
-  this._list = processes;  
+  this._list = processes;
   this._count = this._list.length;
-  
+
   this._tracing = global.tracing = Boolean(options.trace);
 
   var self = this;
@@ -119,7 +119,7 @@ FiberRuntime.prototype._createFiber = function (process) {
   process.fiber = new Fiber(process.func.bind(process, this));
   process.fiber.fbpProc = process;
   process.status = Process.Status.ACTIVE;
-  
+
   return process;
 };
 
@@ -139,28 +139,17 @@ FiberRuntime.prototype._hasDeadLock = function () {
 FiberRuntime.prototype._genInitialQueue = function () {
   var self = this;
   var queue = [];
-  var keys = Object.keys(self._list);
-  var m = keys.length;
-  //console.log(m);  //xxxx
-  //console.log(self._list);  
-  for (var i = 0; i < m; i++) {
-    var selfstarting = true;
-    var prop = keys[i];
-    //console.log(self._list[prop]);  //?
-    for (var j = 0; j < Object.keys(self._list[prop].inports).length; j++) {
-      var k = self._list[prop].inports[j];
-      //console.log(k);  //xxx
-      if (!(k[1].conn instanceof IIPConnection)) {
-        selfstarting = false;
-      }
-    }
 
-    if (selfstarting) {
-    	//console.log(self._list[prop]);
-        queue.push(self._list[prop]);
+  self._list.forEach(function(process) {
+    var selfstarting = process.inports.reduce(function(currentlySelfstarting, inport) {
+      return currentlySelfstarting && (!inport[1].conn instanceof IIPConnection);
+    }, true);
+
+    if(selfstarting) {
+      queue.push(process);
     }
-  }
-  
+  });
+
   return queue;
 };
 
@@ -197,17 +186,19 @@ FiberRuntime.prototype._procState = function (proc) {
 // Fibre running scheduler
 FiberRuntime.prototype._actualRun = function () {
   this._queue = this._genInitialQueue();
-  function setPortRuntime(port) {
-	    console.log('setportruntime');
-	    console.log(this);
-	    port[1].setRuntime(this);
-	  }
+  var setPortRuntime = function (port) {
+    console.log('setportruntime');
+    console.log(this);
+    port[1].setRuntime(this);
+  }.bind(this);
+
   console.log('setportruntimes');
   console.log(this._list);
-  this._list.forEach(function (process) {	  
-        process.inports.forEach(setPortRuntime);
-	    process.outports.forEach(setPortRuntime);
-	  }.bind(this));
+  this._list.forEach(function (process) {
+    process.inports.forEach(setPortRuntime);
+    process.outports.forEach(setPortRuntime);
+  });
+
   while (true) {
     this._tick();
 
@@ -229,8 +220,8 @@ FiberRuntime.prototype._actualRun = function () {
 };
 
 FiberRuntime.prototype._tick = function () {
-  
-  var x = this._queue.shift();  
+
+  var x = this._queue.shift();
 
   while (x != undefined) {
 
