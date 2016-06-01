@@ -99,7 +99,7 @@ describe('Network', function () {
     network.initialize(delay1,'IN', 2);
 
     network.run(new fbp.FiberRuntime(), {trace: true}, function () {
-      expect(result).to.deep.equal([2, 1]);
+      expect(result).to.deep.equal([1, 2]);
       done();
     });
   });
