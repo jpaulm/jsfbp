@@ -51,7 +51,7 @@ describe('Network', function () {
     });
   });
 
-  it('correctly identified empty IIPs', function() {
+  it('correctly identifies empty IIPs', function() {
     expect(function() {Network.createFromGraph("'' -> IN RECVR(jsfbp/recvr)");}).not.to.throw(Error);
   });
 });
