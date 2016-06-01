@@ -97,11 +97,16 @@ Network.prototype.defProc = function (func, name) {
   if (!func) {
     throw new Error("No function passed to defProc");
   }
-  var proc = new Process(name || func.name, func);
-  trace('Created Process with name: ' + proc.name);
+  var s = name;
+  if (s == null)
+	  s = func.name;
+  var proc = new Process(s, func);
+  
+  trace('Created Process with name: ' + s);
 
-  this._processes.push(proc);
-  return proc;
+  //this._processes.push(proc);
+  this._processes[s] = proc;
+  return proc;  
 };
 
 Network.prototype.initialize = function (proc, port, string) {
