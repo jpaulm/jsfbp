@@ -56,4 +56,22 @@ describe('Network', function () {
       Network.createFromGraph("'' -> IN RECVR(jsfbp/recvr)");
     }).not.to.throw(Error);
   });
+
+  it('supports IIPs and OutPorts feeding into the same InPort', function(done) {
+    var network = new Network();
+    var result = [];
+
+    var receiver = network.defProc(MockReceiver.generator(result), "RECVR");
+    var delay = network.defProc('jsfbp/delay', "DELAY");
+
+    network.connect(delay, 'OUT', receiver, 'IN');
+    network.initialize(receiver, 'IN', 1);
+    network.initialize(delay,'INTVL', 50);
+    network.initialize(delay,'IN', 2);
+
+    network.run(new fbp.FiberRuntime(), {trace: true}, function () {
+      expect(result).to.deep.equal([1, 2]);
+      done();
+    });
+  })
 });
