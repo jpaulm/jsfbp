@@ -199,14 +199,14 @@ FiberRuntime.prototype._actualRun = function () {
   this._queue = this._genInitialQueue();
   function setPortRuntime(port) {
 	    console.log('setportruntime');
-	    console.log(runtime);
-	    port[1].setRuntime(runtime);
+	    console.log(this);
+	    port[1].setRuntime(this);
 	  }
   console.log('setportruntimes');
   console.log(this._list);
   this._list.forEach(function (process) {	  
-        process.inports.forEach(setPortRuntime).bind(this);
-	    process.outports.forEach(setPortRuntime).bind(this);
+        process.inports.forEach(setPortRuntime);
+	    process.outports.forEach(setPortRuntime);
 	  }.bind(this));
   while (true) {
     this._tick();

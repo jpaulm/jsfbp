@@ -158,3 +158,25 @@ Network.prototype.connect = function (upproc, upport, downproc, downport, capaci
   //console.log(cnxt);
 };
 
+Network.prototype.sinitialize = function (sinport, string) {
+	  var i = sinport.lastIndexOf('.');
+	  var procname = sinport.substring(0, i);
+	  var port = sinport.substring(i + 1);
+	  var proc = this._processes[procname];
+	  
+	  this.initialize(proc, port, string);
+		};
+		
+Network.prototype.sconnect = function (soutport, sinport, capacity) {
+	 
+	  var i = soutport.lastIndexOf('.');
+	  var procname = soutport.substring(0, i);
+	  var upport = soutport.substring(i + 1);
+	  var upproc = this._processes[procname];
+	  i = sinport.lastIndexOf('.');
+	  procname = sinport.substring(0, i);
+	  var downport = sinport.substring(i + 1);
+	  var downproc = this._processes[procname];	  
+	  
+	  this.connect(upproc, upport, downproc, downport, capacity);	  
+	};
