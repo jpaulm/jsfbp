@@ -188,13 +188,9 @@ FiberRuntime.prototype._procState = function (proc) {
 FiberRuntime.prototype._actualRun = function () {
   this._queue = this._genInitialQueue();
   var setPortRuntime = function (port) {
-    console.log('setportruntime');
-    console.log(this);
     port[1].setRuntime(this);
   }.bind(this);
-
-  console.log('setportruntimes');
-  console.log(this._list);
+  
   this._list.forEach(function (process) {
     process.inports.forEach(setPortRuntime);
     process.outports.forEach(setPortRuntime);

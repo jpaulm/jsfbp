@@ -9,7 +9,6 @@ var MockSenderGenerator = function (inputArray) {
       var inputJSON = inport.receive();
       inputArray = JSON.parse(inputJSON.contents);
       this.dropIP(inputJSON);
-      console.log("Got "+ inputArray);
     }
     var outport = this.openOutputPort('OUT');
     var proc = this;
