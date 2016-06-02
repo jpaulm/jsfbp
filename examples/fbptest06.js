@@ -3,10 +3,10 @@ var fbp = require('..');
 // --- define network ---
 var network = new fbp.Network();
 
-var gendata = network.defProc('./examples/components/gendata');
-var repl = network.defProc('./components/repl.js');
-var rrmerge = network.defProc('./components/rrmerge');
-var recvr = network.defProc('./components/recvr');
+var gendata = network.defProc('./examples/components/gendata', 'Gen');
+var repl = network.defProc('./components/repl.js', 'Repl');
+var rrmerge = network.defProc('./components/rrmerge', 'RRMerge');
+var recvr = network.defProc('./components/recvr', 'Recvr');
 
 network.initialize(gendata, 'COUNT', '20');
 network.connect(gendata, 'OUT', repl, 'IN', 5);

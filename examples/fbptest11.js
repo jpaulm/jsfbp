@@ -3,12 +3,12 @@ var fbp = require('..');
 // --- define network ---
 var network = new fbp.Network();
 
-var gendata = network.defProc('./examples/components/gendata');
-var lbal = network.defProc('./components/lbal');
-var randdelay0 = network.defProc('./components/randdelay', 'randdelay0');
-var randdelay1 = network.defProc('./components/randdelay', 'randdelay1');
-var randdelay2 = network.defProc('./components/randdelay', 'randdelay2');
-var recvr = network.defProc('./components/recvr');
+var gendata = network.defProc('./examples/components/gendata', 'Gen');
+var lbal = network.defProc('./components/lbal', 'LBal');
+var randdelay0 = network.defProc('./components/randdelay', 'RD0');
+var randdelay1 = network.defProc('./components/randdelay', 'RD1');
+var randdelay2 = network.defProc('./components/randdelay', 'RD2');
+var recvr = network.defProc('./components/recvr', 'Recvr');
 
 network.initialize(gendata, 'COUNT', '20');
 network.initialize(randdelay0, 'INTVL', '5000');   // random between 0 and 5000 msecs

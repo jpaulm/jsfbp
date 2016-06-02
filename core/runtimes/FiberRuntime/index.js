@@ -139,20 +139,41 @@ FiberRuntime.prototype._hasDeadLock = function () {
 FiberRuntime.prototype._genInitialQueue = function () {
   var self = this;
   var queue = [];
-
+  //console.log(self._list);  //xxx
+  //console.log(Object.keys(self._list).length);
   // A process is selfstarting if its incoming ports are only connected to IIPs
+ /* ---------------------------------
   self._list.forEach(function(process) {
+	console.log(process);  //xxx
     var selfstarting = process.inports.reduce(function(currentlySelfstarting, inport) {
       return currentlySelfstarting && (inport[1].conn instanceof IIPConnection);
     }, true);
-
+    
     if(selfstarting) {
-      queue.push(process);
+        queue.push(process);
+      }
+      */
+   // -----------------------------
+    var selfstarting = true;
+    for (var key in self._list) {
+    	  if (!(self._list.hasOwnProperty(key)))
+    	      continue; 
+    	  //console.log(self._list[key]);
+    	  selfstarting = true;
+    	  self._list[key].inports.forEach(function(port) {
+    		    if (!(port[1].conn instanceof IIPConnection ))
+    		       selfstarting = false;
+    		  } , this);   	 
+    	 
+          if(selfstarting) {
+             queue.push(self._list[key]);
+          }
     }
-  });
+//--------------------------
+  
 
   return queue;
-};
+} 
 
 FiberRuntime.prototype._logProcessInfo = function (proc) {
   if (this._tracing) {
@@ -191,10 +212,17 @@ FiberRuntime.prototype._actualRun = function () {
     port[1].setRuntime(this);
   }.bind(this);
   
-  this._list.forEach(function (process) {
-    process.inports.forEach(setPortRuntime);
-    process.outports.forEach(setPortRuntime);
-  });
+  //this._list.forEach(function (process) {
+  //  process.inports.forEach(setPortRuntime);
+  //  process.outports.forEach(setPortRuntime);
+ // });
+  
+  for (var key in this._list) {
+	  if (!(this._list.hasOwnProperty(key)))
+	      continue; 
+	  this._list[key].inports.forEach(setPortRuntime);   	 
+	  this._list[key].outports.forEach(setPortRuntime); 
+  }
 
   while (true) {
     this._tick();

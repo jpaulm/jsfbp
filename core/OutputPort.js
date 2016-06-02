@@ -37,7 +37,7 @@ OutputPort.prototype.send = function (ip) {
       conn.down.status == ProcessStatus.DORMANT ||
       conn.down.status == ProcessStatus.WAITING_TO_FIPE) {
       conn.down.status = ProcessStatus.READY_TO_EXECUTE;
-      this._runtime.pushToQueue(conn.down);  // xxxxxx
+      this._runtime.pushToQueue(conn.down);  
     }
     if (conn.usedslots == conn.array.length) {
       proc.status = ProcessStatus.WAITING_TO_SEND;

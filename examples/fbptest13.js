@@ -3,9 +3,9 @@ var fbp = require('..');
 // --- define network ---
 var network = new fbp.Network();
 
-var gendata = network.defProc('./examples/components/gendata');
-var randdelay = network.defProc('./components/randdelay');
-var recvr = network.defProc('./components/recvr');
+var gendata = network.defProc('./examples/components/gendata', 'Gen');
+var randdelay = network.defProc('./components/randdelay', 'RD');
+var recvr = network.defProc('./components/recvr', 'Recvr');
 
 network.initialize(gendata, 'COUNT', '20');
 network.initialize(randdelay, 'INTVL', '2000');   // random between 0 and 5000 msecs

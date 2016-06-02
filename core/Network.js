@@ -5,10 +5,11 @@ var IIPConnection = require('./IIPConnection')
   , Process = require('./Process')
   , ProcessConnection = require('./ProcessConnection')
   , parseFBP = require('parsefbp')
-  , trace = require('./trace');
+  , trace = require('./trace')
+  , _ = require('lodash');
 
 var Network = module.exports = function () {
-  this._processes = [];
+  this._processes = {};
 };
 
 /*
@@ -71,9 +72,7 @@ Network.createFromGraph = function (graphString) {
 };
 
 Network.prototype.getProcessByName = function (processName) {
-  return this._processes.find(function (currentProcess) {
-    return currentProcess.name === processName;
-  });
+  return this._processes[processName];
 };
 
 Network.prototype.run = function (runtime, options, callback) {
@@ -82,11 +81,11 @@ Network.prototype.run = function (runtime, options, callback) {
     port[1].setRuntime(runtime);
   }
 
-  this._processes.forEach(function (process) {
+  _.forEach(this._processes, function (process) {
     process.inports.forEach(setPortRuntime);
     process.outports.forEach(setPortRuntime);
   });
-  runtime.run(this._processes, options, callback || function () {
+  runtime.run(_.values(this._processes), options, callback || function () {
     });
 };
 
@@ -95,12 +94,24 @@ Network.prototype.defProc = function (func, name) {
     func = loadComponent(func);
   }
   if (!func) {
-    throw new Error("No function passed to defProc");
+    throw new Error("No function passed to defProc: " + name);
   }
-  var proc = new Process(name || func.name, func);
-  trace('Created Process with name: ' + proc.name);
+  if (!name) {
+    name = func.name;
+    if(!name) {
+      throw new Error("No name passed to defProc:" + func);
+    }
+  }
 
-  this._processes.push(proc);
+  if (this._processes[name]) {
+    throw new Error("Duplicate name specified in defProc:" + func);
+  }
+
+  var proc = new Process(name, func);
+
+  trace('Created Process with name: ' + name);
+
+  this._processes[name] = proc;
   return proc;
 };
 

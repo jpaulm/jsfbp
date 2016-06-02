@@ -12,8 +12,8 @@ var fbp = require('..');
 // --- define network ---
 var network = new fbp.Network();
 
-var genss = network.defProc('./examples/components/genss.js');
-var lbal = network.defProc('./components/lbal.js');
+var genss = network.defProc('./examples/components/genss.js', 'Gen');
+var lbal = network.defProc('./components/lbal.js', 'LBal');
 var passthru0 = network.defProc('./components/delay.js', 'passthru0');
 var passthru1 = network.defProc('./components/delay.js', 'passthru1');
 var passthru2 = network.defProc('./components/passthru.js', 'passthru2');
