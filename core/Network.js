@@ -8,8 +8,11 @@ var IIPConnection = require('./IIPConnection')
   , trace = require('./trace')
   , _ = require('lodash');
 
-var Network = module.exports = function () {
+var Network = module.exports = function (options) {
   this._processes = {};
+    if(options) {
+        this.componentRoot = options.componentRoot;
+    }
 };
 
 /*
@@ -17,8 +20,9 @@ var Network = module.exports = function () {
  * - components that come _with_ this module -> './components/copier.js'
  * - components that are inside a package -> 'package/component'
  * - components that are simply a node module -> 'component'
+ * - components that are local to the application trying to load them
  */
-function loadComponent(componentName) {
+function loadComponent(componentName, localRoot) {
   var moduleLocation = componentName;
   var componentField;
   if (componentName.match('^[.]{1,2}/')) {
@@ -27,11 +31,16 @@ function loadComponent(componentName) {
     moduleLocation = componentName.slice(0, componentName.indexOf('/'));
     componentField = componentName.slice(componentName.indexOf('/') + 1);
     if (moduleLocation === 'jsfbp') {
-      moduleLocation = path.resolve(path.join(__dirname, '../components/', componentField + '.js'));
+      moduleLocation = path.resolve(path.join(__dirname, '..', 'components', componentField + '.js'));
       componentField = undefined;
+    } else if (moduleLocation === '') {
+        moduleLocation = path.join(localRoot, componentField);
+        componentField = undefined;
     }
   }
+    trace("Trying to load: " +require.resolve(moduleLocation));
   var component = require(moduleLocation);
+
   if (componentField) {
     return component[componentField]
   } else {
@@ -47,10 +56,10 @@ function getPort(connectionEnd) {
   return port;
 }
 
-Network.createFromGraph = function (graphString) {
+Network.createFromGraph = function (graphString, localRoot) {
   var graphDefinition = parseFBP(graphString, {caseSensitive: true});
 
-  var network = new Network();
+  var network = new Network({componentRoot: localRoot});
   var processes = {};
 
   Object.keys(graphDefinition.processes).forEach(function (processName) {
@@ -91,7 +100,7 @@ Network.prototype.run = function (runtime, options, callback) {
 
 Network.prototype.defProc = function (func, name) {
   if (typeof func === "string") {
-    func = loadComponent(func);
+    func = loadComponent(func, this.componentRoot || '');
   }
   if (!func) {
     throw new Error("No function passed to defProc: " + name);
