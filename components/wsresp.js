@@ -1,7 +1,5 @@
 'use strict';
 
-var IP = require('../core/IP');
-
 module.exports = function wsresp() {
   var ip;
   var inport = this.openInputPort('IN');
@@ -19,7 +17,7 @@ module.exports = function wsresp() {
     while (true) {
       ip = inport.receive();
       //console.log(ip);
-      if (ip.type == IP.CLOSE) {
+      if (ip.type == this.IPTypes.CLOSE) {
         this.dropIP(ip);
         break;
       }

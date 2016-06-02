@@ -3,7 +3,6 @@
 // substreamsensitivemerge.js
 
 var Utils = require('../core/Utils');
-var IP = require('../core/IP');
 
 module.exports = function substreamsensitivemerge() {
 
@@ -31,9 +30,9 @@ module.exports = function substreamsensitivemerge() {
       }
     }
 
-    if (ip.type == IP.OPEN)
+    if (ip.type == this.IPTypes.OPEN)
       substream_level++;
-    else if (ip.type == IP.CLOSE)
+    else if (ip.type == this.IPTypes.CLOSE)
       substream_level--;
 
     outport.send(ip);

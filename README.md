@@ -157,7 +157,7 @@ Component services
 - In what follows, the `this` is only valid if the function is called from the component level; if called from a subroutine, pass in `this` as a parameter.
 
 - `var ip = this.createIP(contents);` - create an IP containing `contents`
-- `var ip = this.createIPBracket(IP.OPEN|IP.CLOSE[, contents])` - create an open or close bracket IP
+- `var ip = this.createIPBracket(this.IPTypes.OPEN|this.IPTypes.CLOSE[, contents])` - create an open or close bracket IP
 - **Be sure** to include IP: `var IP = require('IP')` to gain access to the IP constants.
 - `this.dropIP(ip);` - drop IP
   

@@ -1,4 +1,3 @@
-var IP  = require('../../core/IP');
 
 var MockReceiverGenerator = function (outputArray) {
   if(!outputArray) {
@@ -8,7 +7,7 @@ var MockReceiverGenerator = function (outputArray) {
     var inport = this.openInputPort('IN');
     var ip;
     while ((ip = inport.receive()) !== null) {
-      if (ip.type === IP.NORMAL) {
+      if (ip.type === this.IPTypes.NORMAL) {
         outputArray.push(ip.contents);
       }
       this.dropIP(ip);

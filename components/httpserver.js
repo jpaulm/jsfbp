@@ -1,7 +1,6 @@
 'use strict';
 
-var IP = require('../core/IP')
-  , http = require('http');
+var http = require('http');
 
 module.exports = function httpserver(runtime) {
   var inport = this.openInputPort('PORTNO');
@@ -18,10 +17,10 @@ module.exports = function httpserver(runtime) {
 
     for (var i = 0; i < result.length; ++i) {
       var r = result[i];
-      outport.send(this.createIPBracket(IP.OPEN));
+      outport.send(this.createIPBracket(this.IPTypes.OPEN));
       outport.send(this.createIP(r[0]));
       outport.send(this.createIP(r[1]));
-      outport.send(this.createIPBracket(IP.CLOSE));
+      outport.send(this.createIPBracket(this.IPTypes.CLOSE));
     }
   }
 };

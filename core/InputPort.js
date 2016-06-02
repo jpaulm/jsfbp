@@ -1,7 +1,6 @@
 'use strict';
 
-var IP = require('./IP')
-  , Fiber = require('fibers')
+var Fiber = require('fibers')
   , IIPConnection = require('./IIPConnection')
   , ProcessStatus = require('./Process').Status
   , trace = require('./trace');
@@ -68,7 +67,7 @@ InputPort.prototype.receive = function () {
     conn.nxtget = 0;
   var cont = ip.contents;
   if (global.tracing) {
-    if (ip.type != IP.NORMAL) {
+    if (ip.type != proc.IPTypes.NORMAL) {
       cont = ["", "OPEN", "CLOSE"][ip.type] + ", " + cont;
     }
     console.log(proc.name + ' recv OK: ' + cont);
