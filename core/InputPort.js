@@ -34,7 +34,7 @@ InputPort.prototype.receive = function () {
     return ip;
   }
 
-  trace('recv from ' + this.name);
+  trace('Requesting IP from ' + this.name);
 
   while (true) {
     if (conn.usedslots == 0) {
@@ -65,7 +65,7 @@ InputPort.prototype.receive = function () {
   if (conn.nxtget > conn.array.length - 1)
     conn.nxtget = 0;
   var cont = ip.contents;
-  trace('recv OK: ' + ["", "OPEN", "CLOSE"][ip.type] + ", " + cont);
+  trace('Received: ' + ["", "OPEN", "CLOSE"][ip.type] + (cont !== null) ? ", " + cont : "");
 
   conn.usedslots--;
   ip.owner = proc;
