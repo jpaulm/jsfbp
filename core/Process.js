@@ -10,8 +10,8 @@ var Process = module.exports = function (name, func) {
   this.name = name;
   this.func = func;
   this.fiber = null;
-  this.inports = [];
-  this.outports = [];
+  this.inports = {};
+  this.outports = {};
   this.status = Process.Status.NOT_INITIALIZED;
   this.ownedIPs = 0;
   this.cbpending = false;
@@ -71,33 +71,32 @@ Process.prototype.dropIP = function (ip) {
   ip.owner = null;
 };
 
-Process.prototype.openInputPort = function (name) {
-  var namex = this.name + '.' + name;
+function getPortArray(ports, name) {
+  var re = new RegExp(name + '\\[\\d+\\]');
 
-  for (var i = 0; i < this.inports.length; i++) {
-    if (this.inports[i][0] == namex)
-      return this.inports[i][1];  // return inputport
+  var array = Object.keys(ports).filter(function(portName) {
+    return re.test(portName);
+  }).sort().map(function(portName) {
+    return ports[portName];
+  });
+
+  return array;
+}
+
+Process.prototype.openInputPort = function (name) {
+  var port = this.inports[name];
+  if(port) {
+    return port;
+  } else {
+    console.log('Port ' + this.name + '.' + name + ' not found');
+    return null;
   }
-  console.log('Port ' + this.name + '.' + name + ' not found');
-  return null;
 };
 
 Process.prototype.openInputPortArray = function (name) {
-  var namey = this.name + '.' + name;
-  var hi_index = -1;
-  var array = [];
+  var array = getPortArray(this.inports, name);
 
-  var re = new RegExp(namey + '\\[(\\d+)\\]');
-
-  for (var i = 0; i < this.inports.length; i++) {
-    var namex = re.exec(this.inports[i][0]);
-
-    if (namex != null && namex.index == 0) {
-      hi_index = Math.max(hi_index, namex[1]);
-      array[namex[1]] = this.inports[i][1];
-    }
-  }
-  if (hi_index == -1) {
+  if (array.length === 0) {
     console.log('Port ' + this.name + '.' + name + ' not found');
     return null;
   }
@@ -106,33 +105,21 @@ Process.prototype.openInputPortArray = function (name) {
 };
 
 Process.prototype.openOutputPort = function (name, opt) {
-  var namex = this.name + '.' + name;
-  for (var i = 0; i < this.outports.length; i++) {
-    if (this.outports[i][0] == namex) {
-      return this.outports[i][1];  // return conn
+  var port = this.outports[name];
+  if(port) {
+    return port;
+  } else {
+    if (opt != 'OPTIONAL') {
+      console.log('Port ' + this.name + '.' + name + ' not found');
     }
+    return null;
   }
-  if (opt != 'OPTIONAL')
-    console.log('Port ' + this.name + '.' + name + ' not found');
-  return null;
 };
 
 Process.prototype.openOutputPortArray = function (name) {
-  var namey = this.name + '.' + name;
-  var hi_index = -1;
-  var array = [];
+  var array = getPortArray(this.outports, name);
 
-  var re = new RegExp(namey + '\\[(\\d+)\\]');
-
-  for (var i = 0; i < this.outports.length; i++) {
-    var namex = re.exec(this.outports[i][0]);
-
-    if (namex != null && namex.index == 0) {
-      hi_index = Math.max(hi_index, namex[1]);
-      array[namex[1]] = this.outports[i][1];
-    }
-  }
-  if (hi_index == -1) {
+  if (array.length === 0) {
     console.log('Port ' + this.name + '.' + name + ' not found');
     return null;
   }

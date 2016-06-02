@@ -77,16 +77,12 @@ Network.prototype.getProcessByName = function (processName) {
 
 Network.prototype.run = function (runtime, options, callback) {
   options = options || {};
-  function setPortRuntime(port) {
-    port[1].setRuntime(runtime);
-  }
 
   _.forEach(this._processes, function (process) {
-    process.inports.forEach(setPortRuntime);
-    process.outports.forEach(setPortRuntime);
+    _.invokeMap(process.inports, 'setRuntime', runtime);
+    _.invokeMap(process.outports, 'setRuntime', runtime);
   });
-  runtime.run(_.values(this._processes), options, callback || function () {
-    });
+  runtime.run(_.values(this._processes), options, callback || function () {});
 };
 
 Network.prototype.defProc = function (func, name) {
@@ -103,6 +99,7 @@ Network.prototype.defProc = function (func, name) {
     }
   }
 
+  
   if (this._processes[name]) {
     throw new Error("Duplicate name specified in defProc:" + func);
   }
@@ -119,34 +116,26 @@ Network.prototype.initialize = function (proc, port, string) {
   var inport = new InputPort();
   inport.name = proc.name + "." + port;
   inport.conn = new IIPConnection(string);
-  proc.inports[proc.inports.length] = [proc.name + '.' + port, inport];
+  proc.inports[port] = inport;
 };
 
 Network.prototype.connect = function (upproc, upport, downproc, downport, capacity) {
   if (capacity == undefined) {
     capacity = 10;
   }
-  var outport = null;
-  for (var i = 0; i < upproc.outports.length; i++) {
-    outport = upproc.outports[i][1];
-    if (outport.name == upproc.name + "." + upport) {
+  var outport = upproc.outports[upport];
+    if (outport) {
       console.log('Cannot connect one output port (' + outport.name + ') to multiple input ports');
       return;
     }
-  }
+
 
   outport = new OutputPort();
   outport.name = upproc.name + "." + upport;
 
   var inportf = null;
-  var inport = null;
-  for (i = 0; i < downproc.inports.length; i++) {
-    inport = downproc.inports[i][1];
-    if (inport.name == downproc.name + "." + downport) {
-      inportf = inport;
-      break;
-    }
-  }
+  var inport = downproc.inports[downport];
+
   if (inportf == null) {
     inport = new InputPort();
     inport.name = downproc.name + "." + downport;
@@ -154,7 +143,6 @@ Network.prototype.connect = function (upproc, upport, downproc, downport, capaci
     var cnxt = new ProcessConnection(capacity);
     cnxt.name = downproc.name + "." + downport;
     inport.conn = cnxt;
-
   } else {
     inport = inportf;
     cnxt = inport.conn;
@@ -162,8 +150,8 @@ Network.prototype.connect = function (upproc, upport, downproc, downport, capaci
 
   outport.conn = cnxt;
 
-  upproc.outports[upproc.outports.length] = [upproc.name + '.' + upport, outport];
-  downproc.inports[downproc.inports.length] = [downproc.name + '.' + downport, inport];
+  upproc.outports[upport] = outport;
+  downproc.inports[downport] = inport;
   cnxt.up[cnxt.up.length] = upproc;
   cnxt.down = downproc;
   cnxt.upstreamProcsUnclosed++;
