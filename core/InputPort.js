@@ -34,14 +34,12 @@ InputPort.prototype.receive = function () {
     return ip;
   }
 
-  if (global.tracing)
-    console.log(proc.name + ' recv from ' + this.name);
+  trace('recv from ' + this.name);
 
   while (true) {
     if (conn.usedslots == 0) {
       if (conn.closed) {
-        if (global.tracing)
-          console.log(proc.name + ' recv EOS from ' + this.name);
+        trace('recv EOS from ' + this.name);
         return null;
       }
       proc.status = ProcessStatus.WAITING_TO_RECEIVE;
@@ -67,12 +65,8 @@ InputPort.prototype.receive = function () {
   if (conn.nxtget > conn.array.length - 1)
     conn.nxtget = 0;
   var cont = ip.contents;
-  if (global.tracing) {
-    if (ip.type != IP.NORMAL) {
-      cont = ["", "OPEN", "CLOSE"][ip.type] + ", " + cont;
-    }
-    console.log(proc.name + ' recv OK: ' + cont);
-  }
+  trace('recv OK: ' + ["", "OPEN", "CLOSE"][ip.type] + ", " + cont);
+
   conn.usedslots--;
   ip.owner = proc;
   proc.ownedIPs++;
