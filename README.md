@@ -116,7 +116,8 @@ network.run(fiberRuntime, {trace: true/false}, function success() {
 1. Generate an `.fbp` file that complies with the specification under [parsefbp](https://github.com/jpaulm/parsefbp).
 2. Get access to JSFBP: `var fbp = require('fbp')`
 3. Load the contents of the `.fbp` file into a String: `fs.readFile(__dirname + '/network.fbp' ...);`
-4. Create a new network: `var network = new fbp.Network.createFromGraph(fileContents);`
+4. Create a new network: `var network = new fbp.Network.createFromGraph(fileContents);` If you're using components
+   that are local to your application, use a second parameter giving the directory that contains your components. 
 5. Create a new runtime: `var fiberRuntime = new fbp.FiberRuntime();`
 6. Run it!
 ```
@@ -136,6 +137,9 @@ network.run(fiberRuntime, {trace: true/false}, function success() {
   possiblities:
     - If the component string starts `'./'` then the component is assumed to be one of he JSFBP components and is loaded.
   For example: `'./components/copier.js'`
+    - If the component string starts with `'/'` then the component is assumed to be local to the application. If your network has
+    local components, then the network needs to have been instantiated with a `{ componentRoot: 'dir' }` object so that
+    it knows where to find the components.
     - If the component string contains a `/`, then it assumed to be of the form `'package/component'`. Thus `package` is loaded
   and then `component` is retrieved from it. If `package` is `'jsfbp'`, then it is loaded from the JSFBP `components` directory.
     - Otherwise, the string is assumed to be a node module that _is_ an FBP component and it is simply
