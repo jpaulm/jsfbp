@@ -3,12 +3,13 @@
 var IP = require('./IP')
   , Fiber = require('fibers')
   , IIPConnection = require('./IIPConnection')
-  , ProcessStatus = require('./Process').Status;
+  , ProcessStatus = require('./Process').Status
+  , trace = require('./trace');
 
 var InputPort = module.exports = function () {
   this.name = null;
   this.conn = null;  // either ProcessConnection or IIPConnection
-  //this.closed = false;  
+  //this.closed = false;
 };
 
 InputPort.prototype.setRuntime = function (runtime) {
@@ -20,8 +21,11 @@ InputPort.prototype.receive = function () {
   var conn = this.conn;
 
   if (conn instanceof IIPConnection) {
-    if (global.tracing)
-      console.log(proc.name + ' recv IIP from port ' + this.name + ': ' + conn.contents);
+    if(conn.closed) {
+      trace('tried to read from closed IIPConnection to ' + this.name);
+      return null;
+    }
+    trace('recv IIP from port ' + this.name + ': ' + conn.contents);
     //var ip = new exports.IP(conn + '');
     var ip = proc.createIP(conn.contents);
     conn.closed = true;
