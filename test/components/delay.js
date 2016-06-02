@@ -12,13 +12,9 @@ describe('delay', function () {
 
     var result = [];
 
-    var sender = network.defProc(MockSender.generator([42]));
-    var delay = network.defProc('./components/delay.js');
-    var receiver = network.defProc(MockReceiver.generator(result));
-
-    sender.name = "Sender";
-    delay.name = "DELAY";
-    receiver.name = "RECVR";
+    var sender = network.defProc(MockSender.generator([42]), "sender");
+    var delay = network.defProc('./components/delay.js', "delay");
+    var receiver = network.defProc(MockReceiver.generator(result), "receiver");
 
     network.initialize(delay, 'INTVL', DELAY);
     network.connect(sender, 'OUT', delay, 'IN', 5);
@@ -44,13 +40,9 @@ describe('delay', function () {
 
     var result = [];
 
-    var sender = network.defProc(MockSender.generator([1, 2, 3]));
-    var delay = network.defProc('./components/delay.js');
-    var receiver = network.defProc(MockReceiver.generator(result));
-
-    sender.name = "Sender";
-    delay.name = "DELAY";
-    receiver.name = "RECVR";
+    var sender = network.defProc(MockSender.generator([1, 2, 3]), "sender");
+    var delay = network.defProc('./components/delay.js', "delay");
+    var receiver = network.defProc(MockReceiver.generator(result), "receiver");
 
     network.initialize(delay, 'INTVL', DELAY);
     network.connect(sender, 'OUT', delay, 'IN', 5);
