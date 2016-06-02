@@ -95,7 +95,7 @@ FiberRuntime.prototype.run = function (processes, options, callback) {
   this._list = processes;
   this._count = this._list.length;
 
-  this._tracing = global.tracing = Boolean(options.trace);
+  this._tracing = global.tracing = global.trace = Boolean(options.trace);
 
   var self = this;
 

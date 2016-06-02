@@ -9,7 +9,6 @@ var IP = require('./IP')
 var InputPort = module.exports = function () {
   this.name = null;
   this.conn = null;  // either ProcessConnection or IIPConnection
-  //this.closed = false;
 };
 
 InputPort.prototype.setRuntime = function (runtime) {
