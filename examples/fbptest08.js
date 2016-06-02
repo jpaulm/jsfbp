@@ -4,10 +4,10 @@ var fbp = require('..')
 // --- define network ---
 var network = new fbp.Network();
 
-var reader = network.defProc('./components/reader');
-var reverse = network.defProc('./components/reverse');
-var reverse2 = network.defProc('./components/reverse', 'reverse2');
-var recvr = network.defProc('./components/recvr');
+var reader = network.defProc('./components/reader', 'Read');
+var reverse = network.defProc('./components/reverse', 'Rev');
+var reverse2 = network.defProc('./components/reverse', 'Rev2');
+var recvr = network.defProc('./components/recvr', 'Recvr');
 
 network.initialize(reader, 'FILE', path.resolve(__dirname, 'data/text.txt'));
 network.connect(reader, 'OUT', reverse, 'IN', 5);
