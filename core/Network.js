@@ -95,8 +95,14 @@ Network.prototype.defProc = function (func, name) {
     func = loadComponent(func);
   }
   if (!func) {
-    throw new Error("No function passed to defProc");
+    throw new Error("No function passed to defProc: " + name);
   }
+  if (!name) {
+	    throw new Error("No name passed to defProc:" + func);
+	  }
+  if (this._processes[name]) {
+	    throw new Error("Duplicate name specified in defProc:" + func);
+	  }
   var s = name;
   if (s == null)
 	  s = func.name;
