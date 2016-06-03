@@ -3,9 +3,9 @@ var fbp = require('..');
 // --- define network ---
 var network = new fbp.Network();
 
-var gendata = network.defProc('./examples/components/gendata.js');
-var copier = network.defProc('./components/copier.js');
-var disc = network.defProc('./components/discard.js');
+var gendata = network.defProc('./examples/components/gendata.js', 'Gen');
+var copier = network.defProc('./components/copier.js', 'Copy');
+var disc = network.defProc('./components/discard.js', 'Disc');
 // var recvr = fbp.defProc(require('../components/recvr.js'), 'recvr'); // equivalent
 
 network.initialize(gendata, 'COUNT', '100000000');

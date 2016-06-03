@@ -8,8 +8,8 @@ describe('breader', function () {
 
     var result = [];
 
-    var breader = network.defProc('./components/breader.js');
-    var receiver = network.defProc(MockReceiver.generator(result));
+    var breader = network.defProc('./components/breader.js', 'breader');
+    var receiver = network.defProc(MockReceiver.generator(result), 'receiver');
 
     network.initialize(breader, 'FILE', __dirname+'/hello-world.txt');
     network.connect(breader, 'OUT', receiver, 'IN');

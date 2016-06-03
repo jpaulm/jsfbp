@@ -22,12 +22,10 @@ describe('bwriter', function () {
       108,
       100,
       0x0A
-    ,"IP.CLOSE"]));
-    var writer = network.defProc('./components/bwriter.js');
-    //var receiver = network.defProc('./components/recvr');
+    ,"IP.CLOSE"]), 'sender');
+    var writer = network.defProc('./components/bwriter.js', 'bwriter');
 
     network.initialize(writer, 'FILE', __dirname+'/goodbye-world.txt');
-    //network.connect(sender, 'OUT', receiver, 'IN');
     network.connect(sender, 'OUT', writer, 'IN');
 
     network.run(new fbp.FiberRuntime(), {trace: false}, function () {
