@@ -2,7 +2,7 @@
 
 
 var Fiber = require('fibers')
-  , Enum = require('./utils').Enum
+  , Enum = require('./Enum')
   , IP = require('./IP')
   , trace = require('./trace');
 
