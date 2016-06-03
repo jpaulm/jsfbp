@@ -131,22 +131,50 @@ FiberRuntime.prototype._hasDeadLock = function () {
 FiberRuntime.prototype._genInitialQueue = function () {
   var self = this;
   var queue = [];
-
+  //console.log(self._list);  //xxx
+  //console.log(Object.keys(self._list).length);
   // A process is selfstarting if its incoming ports are only connected to IIPs
+ /* ---------------------------------
   self._list.forEach(function(process) {
+<<<<<<< HEAD
+	console.log(process);  //xxx
+    var selfstarting = process.inports.reduce(function(currentlySelfstarting, inport) {
+      return currentlySelfstarting && (inport[1].conn instanceof IIPConnection);
+    }, true);
+    
+=======
 
     var selfstarting = true;
     process.inports.forEach(function(inPort) {
       selfstarting = selfstarting && inPort[1].conn instanceof IIPConnection;
     });
 
+>>>>>>> afac49158bea9b9df1715e8ec67485780e5e422d
     if(selfstarting) {
-      queue.push(process);
+        queue.push(process);
+      }
+      */
+   // -----------------------------
+    var selfstarting = true;
+    for (var key in self._list) {
+    	  if (!(self._list.hasOwnProperty(key)))
+    	      continue; 
+    	  //console.log(self._list[key]);
+    	  selfstarting = true;
+    	  self._list[key].inports.forEach(function(port) {
+    		    if (!(port[1].conn instanceof IIPConnection ))
+    		       selfstarting = false;
+    		  } , this);   	 
+    	 
+          if(selfstarting) {
+             queue.push(self._list[key]);
+          }
     }
-  });
+//--------------------------
+  
 
   return queue;
-};
+} 
 
 
 FiberRuntime.prototype._procState = function (proc) {
@@ -174,6 +202,7 @@ FiberRuntime.prototype._actualRun = function () {
   var setPortRuntime = function (port) {
     port[1].setRuntime(this);
   }.bind(this);
+
 
   this._list.forEach(function (process) {
     process.inports.forEach(setPortRuntime);
