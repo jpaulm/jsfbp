@@ -31,6 +31,24 @@ Process.Status = Enum([
   'DONE'
 ]);
 
+/*
+ * Given a set of ports an a base name XXX, returns all the ports in the set that
+ * have the name XXX[<index>]
+ */
+function getPortArray(ports, name) {
+  var re = new RegExp(name + '\\[\\d+\\]');
+
+  return Object.keys(ports)
+    .filter(function(portName) {
+      return re.test(portName);
+    })
+    .sort()
+    .map(function(portName) {
+      return ports[portName];
+    });
+}
+
+
 Process.prototype.getStatusString = function () {
   return Process.Status.__lookup(this.status);
 };
@@ -70,18 +88,6 @@ Process.prototype.dropIP = function (ip) {
   this.ownedIPs--;
   ip.owner = null;
 };
-
-function getPortArray(ports, name) {
-  var re = new RegExp(name + '\\[\\d+\\]');
-
-  var array = Object.keys(ports).filter(function(portName) {
-    return re.test(portName);
-  }).sort().map(function(portName) {
-    return ports[portName];
-  });
-
-  return array;
-}
 
 Process.prototype.openInputPort = function (name) {
   var port = this.inports[name];

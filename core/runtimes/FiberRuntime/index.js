@@ -150,24 +150,22 @@ var ProcState = Enum([
   "DATA_AVAILABLE"
 ]);
 FiberRuntime.prototype._procState = function (proc) {
-  // return 2 if all upstream processes closed down, 1 if no data in
-  // connections, 0 otherwise
+  var allDrained = true;
+  var hasData = false;
 
-  var state = _.reduce(proc.inports, function (currentState, port) {
+  _.forEach(proc.inports, function(port) {
     var connection = port.conn;
     if (connection instanceof IIPConnection) {
-      return currentState;
+      return;
     }
-    currentState.allDrained = currentState.allDrained && connection.usedslots == 0 && connection.closed;
-    currentState.hasData = currentState.hasData || connection.usedslots > 0;
-    return currentState;
-  }, {allDrained: true, hasData: false});
 
-  if (state.allDrained)
-    return ProcState.UPSTREAM_CLOSED;
-  if (!state.hasData)
-    return ProcState.NO_DATA;
-  return ProcState.DATA_AVAILABLE;
+    allDrained = allDrained && connection.usedslots == 0 && connection.closed;
+    hasData = hasData || connection.usedslots > 0;
+  });
+
+  return  allDrained  ? ProcState.UPSTREAM_CLOSED
+    :     !hasData    ? ProcState.NO_DATA
+    :                   ProcState.DATA_AVAILABLE;
 };
 
 // Fibre running scheduler
