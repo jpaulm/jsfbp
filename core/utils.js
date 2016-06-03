@@ -76,24 +76,3 @@ module.exports.findInputPortElementWithData = function (array) {
     trace('findIPE_with_data: resume');
   }
 };
-
-module.exports.Enum = function (constants) {
-  var _map = {};
-  var enumTable = {
-    __lookup: function (constantValue) {
-      return _map[constantValue] || null;
-    }
-  };
-
-  var counter = 1;
-  constants.forEach(function (name) {
-    if (name === '__lookup') {
-      throw 'You must not specify a enum constant named "__lookUp"! This name is reserved for the lookup function.';
-    }
-    enumTable[name] = counter;
-    _map[counter] = name;
-    counter++;
-  });
-
-  return Object.freeze(enumTable);
-};
