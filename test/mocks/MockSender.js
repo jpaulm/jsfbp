@@ -1,4 +1,3 @@
-var IP = require('../../core/IP');
 
 var MockSenderGenerator = function (inputArray) {
   initByPort = false;
@@ -17,7 +16,7 @@ var MockSenderGenerator = function (inputArray) {
     inputArray.forEach(function (item) {
       if(item === "IP.OPEN" || item === "IP.CLOSE") {
         var bracket = item.split('.')[1];
-        outport.send(proc.createIPBracket(IP[bracket]));
+        outport.send(proc.createIPBracket(proc.IPTypes[bracket]));
       } else {
         outport.send(proc.createIP(item));
       }

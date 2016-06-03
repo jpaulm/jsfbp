@@ -79,7 +79,7 @@ Process.prototype.createIPBracket = function (bktType, x) {
 Process.prototype.dropIP = function (ip) {
   var cont = ip.contents;
   if (ip.type != this.IPTypes.NORMAL) {
-    cont = ["", "OPEN", "CLOSE"][ip.type] + ", " + cont;
+    cont = this.IPTypes.__lookup(ip.type) + ", " + cont;
   }
   trace('IP dropped with: ' + cont);
 

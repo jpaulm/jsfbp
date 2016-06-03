@@ -18,7 +18,7 @@ OutputPort.prototype.send = function (ip) {
   var conn = this.conn;
   var cont = ip.contents;
   if (ip.type != proc.IPTypes.NORMAL) {
-    cont = ["", "OPEN", "CLOSE"][ip.type] + ", " + cont;
+    cont = proc.IPTypes.__lookup(ip.type) + ", " + cont;
   }
   trace('send to ' + this.name + ': ' + cont);
 

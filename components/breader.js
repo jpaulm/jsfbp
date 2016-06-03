@@ -7,7 +7,6 @@
  */
 
 var fs = require('fs');
-var IP = require('../core/IP');
 var trace = require('../core/trace');
 
 var READ_SIZE = 4;
@@ -30,11 +29,11 @@ module.exports = function reader(runtime) {
 
   var outport = this.openOutputPort('OUT');
   trace("Starting read");
-  outport.send(this.createIPBracket(IP.OPEN));
+  outport.send(this.createIPBracket(this.IPTypes.OPEN));
   readFile(runtime, this, fileDescriptor, outport);
 
   fs.closeSync(fileDescriptor);
-  outport.send(this.createIPBracket(IP.CLOSE));
+  outport.send(this.createIPBracket(this.IPTypes.CLOSE));
 
 };
 
