@@ -1,6 +1,8 @@
 'use strict';
 
-var Enum = require('./Enum')
+
+var Fiber = require('fibers')
+  , Enum = require('./utils').Enum
   , IP = require('./IP')
   , trace = require('./trace');
 
@@ -50,7 +52,7 @@ Process.prototype.createIPBracket = function (bktType, x) {
   this.ownedIPs++;
   ip.owner = this;
   trace("Bracket IP created: " + ["", "OPEN", "CLOSE"][ip.type] + ", " + ip.contents);
-  
+
   return ip;
 };
 
@@ -136,4 +138,25 @@ Process.prototype.openOutputPortArray = function (name) {
   }
 
   return array;
+};
+
+/**
+ * Yield the fiber that is running this process
+ *
+ * @param preStatus Process status will be set to this before yielding. If not set or set to `null`, the status is not changed
+ * @param postStatus Process status will be set to this after yielding. If not set, the status will be changed to ACTIVE
+ */
+Process.prototype.yield = function (preStatus, postStatus) {
+  if(preStatus !== undefined || preStatus !== null) {
+    this.status = preStatus;
+  }
+  this.yielded = true;
+  trace("Yielding with: " + Process.Status.__lookup(preStatus));
+  Fiber.yield();
+  if(postStatus !== undefined) {
+    this.status = postStatus
+  } else {
+    this.status = Process.Status.ACTIVE;
+  }
+  this.yielded = false;
 };

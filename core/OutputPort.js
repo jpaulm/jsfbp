@@ -40,11 +40,7 @@ OutputPort.prototype.send = function (ip) {
       this._runtime.pushToQueue(conn.down);  
     }
     if (conn.usedslots == conn.array.length) {
-      proc.status = ProcessStatus.WAITING_TO_SEND;
-      proc.yielded = true;
-      Fiber.yield();
-      //proc.status = ProcessStatus.ACTIVE;
-      proc.yielded = false;
+      proc.yield(ProcessStatus.WAITING_TO_SEND, ProcessStatus.WAITING_TO_SEND);
     }
     else {
       break;

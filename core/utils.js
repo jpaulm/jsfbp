@@ -66,13 +66,6 @@ module.exports.findInputPortElementWithData = function (array) {
       return inportWitData.inportElementWithData;
     }
 
-    proc.status = ProcessStatus.WAITING_TO_FIPE;
-    proc.yielded = true;
-    trace('findIPE_with_data: susp');
-
-    Fiber.yield();
-    proc.status = ProcessStatus.ACTIVE;
-    proc.yielded = false;
-    trace('findIPE_with_data: resume');
+    proc.yield(ProcessStatus.WAITING_TO_FIPE);
   }
 };
