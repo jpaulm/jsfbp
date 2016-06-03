@@ -2,7 +2,7 @@
 
 
 var Fiber = require('fibers')
-  , Enum = require('./utils').Enum
+  , Enum = require('./Enum')
   , IP = require('./IP')
   , trace = require('./trace');
 
@@ -31,6 +31,8 @@ Process.Status = Enum([
   'DONE'
 ]);
 
+Process.prototype.IPTypes = IP.Types;
+
 Process.prototype.getStatusString = function () {
   return Process.Status.__lookup(this.status);
 };
@@ -58,8 +60,8 @@ Process.prototype.createIPBracket = function (bktType, x) {
 
 Process.prototype.dropIP = function (ip) {
   var cont = ip.contents;
-  if (ip.type != IP.NORMAL) {
-    cont = ["", "OPEN", "CLOSE"][ip.type] + ", " + cont;
+  if (ip.type != this.IPTypes.NORMAL) {
+    cont = this.IPTypes.__lookup(ip.type) + ", " + cont;
   }
   trace('IP dropped with: ' + cont);
 

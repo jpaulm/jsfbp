@@ -8,8 +8,6 @@
 
 // checksequencewithinsubstreams.js
 
-var IP = require('../../core/IP');
-
 module.exports = function checksequencewithinsubstreams() {
   var inport = this.openInputPort('IN');
   var outport = this.openOutputPort('OUT');  //  optional
@@ -20,7 +18,7 @@ module.exports = function checksequencewithinsubstreams() {
     if (ip === null) {
       break;
     }
-    if (ip.type == IP.OPEN) {
+    if (ip.type == this.IPTypes.OPEN) {
       if (seq != -2) {
         console.log("Sequence error");
         return;
@@ -28,7 +26,7 @@ module.exports = function checksequencewithinsubstreams() {
       seq = -1;
       count = 5;
     }
-    else if (ip.type == IP.CLOSE) {
+    else if (ip.type == this.IPTypes.CLOSE) {
       if (seq < 0) {
         console.log("Stream out of sequence - case 2");
         return;

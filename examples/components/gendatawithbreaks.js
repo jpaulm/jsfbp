@@ -6,8 +6,6 @@
  *
  */
 
-var IP = require('../../core/IP');
-
 module.exports = function gendatawithbreaks() {
   var inport = this.openInputPort('IN');
   var outport = this.openOutputPort('OUT');
@@ -20,9 +18,9 @@ module.exports = function gendatawithbreaks() {
     this.dropIP(ip);
     var type = c.substring(0, 1);
     if (type == 'O')
-      ip = this.createIPBracket(IP.OPEN);
+      ip = this.createIPBracket(this.IPTypes.OPEN);
     else if (type == 'C')
-      ip = this.createIPBracket(IP.CLOSE);
+      ip = this.createIPBracket(this.IPTypes.CLOSE);
     else {
       c = c.substring(1);
       ip = this.createIP(c);

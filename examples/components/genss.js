@@ -1,7 +1,5 @@
 'use strict';
 
-var IP = require('../../core/IP');
-
 // generate substreams of length 5
 module.exports = function genss() {
   var inport = this.openInputPort('COUNT');
@@ -10,7 +8,7 @@ module.exports = function genss() {
   var count = ip.contents;
   this.dropIP(ip);
   //console.log(count);
-  var p = this.createIPBracket(IP.OPEN);
+  var p = this.createIPBracket(this.IPTypes.OPEN);
   outport.send(p);
 
   for (var i = 0; i < count; i++) {
@@ -20,14 +18,14 @@ module.exports = function genss() {
     }
     if (i < count - 1) {
       if (i % 5 == 5 - 1) {
-        p = this.createIPBracket(IP.CLOSE);
+        p = this.createIPBracket(this.IPTypes.CLOSE);
         outport.send(p);
 
-        p = this.createIPBracket(IP.OPEN);
+        p = this.createIPBracket(this.IPTypes.OPEN);
         outport.send(p);
       }
     }
   }
-  p = this.createIPBracket(IP.CLOSE);
+  p = this.createIPBracket(this.IPTypes.CLOSE);
   outport.send(p);
 };

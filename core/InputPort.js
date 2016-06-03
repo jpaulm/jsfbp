@@ -60,8 +60,7 @@ InputPort.prototype.receive = function () {
   if (conn.nxtget > conn.array.length - 1)
     conn.nxtget = 0;
   var cont = ip.contents;
-  trace('Received: ' + ["", "OPEN", "CLOSE"][ip.type] + (cont !== null) ? ", " + cont : "");
-
+  trace('Received: ' + proc.IPTypes.__lookup(ip.type) + (cont !== null) ? ", " + cont : "");
   conn.usedslots--;
   ip.owner = proc;
   proc.ownedIPs++;
