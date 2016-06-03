@@ -15,7 +15,7 @@ var readerm = network.defProc('./components/reader', 'readerm');
 var readerd = network.defProc('./components/reader', 'readerd');
 var readerc = network.defProc('./components/reader', 'readerc');
 var collate = network.defProc('./components/collate', 'coll');
-var compare = network.defProc('./examples/components/compare'. 'comp');
+var compare = network.defProc('./examples/components/compare', 'comp');
 var gendatawithbreaks = network.defProc('./examples/components/gendatawithbreaks', 'GDWB');
 //var display = network.defProc('./components/display');
 

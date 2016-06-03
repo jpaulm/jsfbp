@@ -1,7 +1,6 @@
 'use strict';
 
-var IP = require('./IP')
-  , Fiber = require('fibers')
+var Fiber = require('fibers')
   , IIPConnection = require('./IIPConnection')
   , ProcessStatus = require('./Process').Status
   , trace = require('./trace');
