@@ -4,7 +4,7 @@ var fbp = require('..')
 // --- define network ---
 var network = new fbp.Network();
 
-var reader = network.defProc('./components/reader.js', "Read');
+var reader = network.defProc('./components/reader.js', 'Read');
 var reader2 = network.defProc('./components/reader.js', 'Read2');
 var copier = network.defProc('./components/copier.js', 'Copy');
 var recvr = network.defProc('./components/recvr.js', 'Recvr');
