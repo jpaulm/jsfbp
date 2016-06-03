@@ -41,11 +41,7 @@ InputPort.prototype.receive = function () {
         trace('recv EOS from ' + this.name);
         return null;
       }
-      proc.status = ProcessStatus.WAITING_TO_RECEIVE;
-      proc.yielded = true;
-      Fiber.yield();
-      proc.status = ProcessStatus.ACTIVE;
-      proc.yielded = false;
+      proc.yield(ProcessStatus.WAITING_TO_RECEIVE);
     }
     else
       break;

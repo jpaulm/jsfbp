@@ -1,6 +1,7 @@
 'use strict';
 
-var Enum = require('./utils').Enum
+var Fiber = require('fibers')
+  , Enum = require('./utils').Enum
   , IP = require('./IP')
   , trace = require('./trace');
 
@@ -50,7 +51,7 @@ Process.prototype.createIPBracket = function (bktType, x) {
   this.ownedIPs++;
   ip.owner = this;
   trace("Bracket IP created: " + ["", "OPEN", "CLOSE"][ip.type] + ", " + ip.contents);
-  
+
   return ip;
 };
 
@@ -136,4 +137,19 @@ Process.prototype.openOutputPortArray = function (name) {
   }
 
   return array;
+};
+
+Process.prototype.yield = function (preStatus, postStatus) {
+  if(preStatus !== undefined || preStatus !== null) {
+    this.status = preStatus;
+  }
+  this.yielded = true;
+  trace("Yielding with: " + Enum.__lookup(preStatus));
+  Fiber.yield();
+  if(postStatus !== undefined) {
+    this.status = postStatus
+  } else {
+    this.status = Process.Status.ACTIVE;
+  }
+  this.yielded = false;
 };
