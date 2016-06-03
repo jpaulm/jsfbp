@@ -7,10 +7,10 @@ var Fiber = require('fibers');
 module.exports = function(message) {
   if(global.trace) {
     if (Fiber.current) {
-      var proc = Fiber.current.fbpProc;
+      var proc = Fiber.current.fbpProc || {name: "no-proc"};
       console.log("<"+proc.name+">" + ' ' + message);
     } else {
-      console.log("<null>: " + message);
+      console.log("<no-fiber>: " + message);
     }
   }
 

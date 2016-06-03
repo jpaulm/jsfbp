@@ -5,6 +5,7 @@
   "globals": {
     "expect": false,
     "MockSender": false,
-    "MockReceiver": false
+    "MockReceiver": false,
+    "TestFiber": false
   }
 }

@@ -1,18 +1,17 @@
 'use strict';
 
-var Fiber = require('fibers'), IIPConnection = require('../../IIPConnection'), Process = require('../../Process');
+var Fiber = require('fibers')
+  , IIPConnection = require('../../IIPConnection')
+  , Process = require('../../Process')
+  , trace = require('../../trace');
 
 Fiber.prototype.fbpProc = null;
 
 var FiberRuntime = module.exports = function () {
   this._queue = [];
   this._count = null;
-  this._tracing = false;
 };
 
-FiberRuntime.prototype.isTracing = function () {
-  return this._tracing;
-};
 
 // TOOD Better description of parameter and maybe function name as well
 FiberRuntime.prototype.pushToQueue = function (item) {
@@ -20,9 +19,7 @@ FiberRuntime.prototype.pushToQueue = function (item) {
 };
 
 FiberRuntime.prototype._close = function (proc) {
-  if (this._tracing) {
-    console.log(proc.name + ' closing');
-  }
+  trace('closing');
   proc.status = Process.Status.CLOSED;
   // console.log('cl' + count);
   this._count--;
@@ -55,9 +52,7 @@ FiberRuntime.prototype._close = function (proc) {
   if (proc.ownedIPs != 0) {
     console.log(proc.name + ' closed without disposing of all IPs');
   }
-  if (this._tracing) {
-    console.log(proc.name + ' closed');
-  }
+  trace('closed');
 };
 
 FiberRuntime.prototype.getCurrentProc = function () {
@@ -65,9 +60,7 @@ FiberRuntime.prototype.getCurrentProc = function () {
 };
 
 FiberRuntime.prototype.queueCallback = function (proc, result) {
-  if (this._tracing) {
-    console.log('queue ' + proc.name);
-  }
+  trace('queue');
   if (result != undefined) {
     proc.result = result;
   }
@@ -95,7 +88,7 @@ FiberRuntime.prototype.run = function (processes, options, callback) {
   this._list = processes;
   this._count = this._list.length;
 
-  this._tracing = global.tracing = Boolean(options.trace);
+  global.trace = Boolean(options.trace);
 
   var self = this;
 
@@ -113,9 +106,8 @@ FiberRuntime.prototype.run = function (processes, options, callback) {
 };
 
 FiberRuntime.prototype._createFiber = function (process) {
-  if (this._tracing) {
-    console.log('creating new fiber for ' + process.name);
-  }
+  trace('creating new fiber for ' + process.name);
+
   process.fiber = new Fiber(process.func.bind(process, this));
   process.fiber.fbpProc = process;
   process.status = Process.Status.ACTIVE;
@@ -144,11 +136,20 @@ FiberRuntime.prototype._genInitialQueue = function () {
   // A process is selfstarting if its incoming ports are only connected to IIPs
  /* ---------------------------------
   self._list.forEach(function(process) {
+<<<<<<< HEAD
 	console.log(process);  //xxx
     var selfstarting = process.inports.reduce(function(currentlySelfstarting, inport) {
       return currentlySelfstarting && (inport[1].conn instanceof IIPConnection);
     }, true);
     
+=======
+
+    var selfstarting = true;
+    process.inports.forEach(function(inPort) {
+      selfstarting = selfstarting && inPort[1].conn instanceof IIPConnection;
+    });
+
+>>>>>>> afac49158bea9b9df1715e8ec67485780e5e422d
     if(selfstarting) {
         queue.push(process);
       }
@@ -174,16 +175,6 @@ FiberRuntime.prototype._genInitialQueue = function () {
 
   return queue;
 } 
-
-FiberRuntime.prototype._logProcessInfo = function (proc) {
-  if (this._tracing) {
-    console.log({
-      name: proc.name,
-      yielded: proc.yielded,
-      cbpending: proc.cbpending
-    });
-  }
-};
 
 
 FiberRuntime.prototype._procState = function (proc) {
@@ -211,18 +202,12 @@ FiberRuntime.prototype._actualRun = function () {
   var setPortRuntime = function (port) {
     port[1].setRuntime(this);
   }.bind(this);
-  
-  //this._list.forEach(function (process) {
-  //  process.inports.forEach(setPortRuntime);
-  //  process.outports.forEach(setPortRuntime);
- // });
-  
-  for (var key in this._list) {
-	  if (!(this._list.hasOwnProperty(key)))
-	      continue; 
-	  this._list[key].inports.forEach(setPortRuntime);   	 
-	  this._list[key].outports.forEach(setPortRuntime); 
-  }
+
+
+  this._list.forEach(function (process) {
+    process.inports.forEach(setPortRuntime);
+    process.outports.forEach(setPortRuntime);
+  });
 
   while (true) {
     this._tick();
@@ -253,19 +238,15 @@ FiberRuntime.prototype._tick = function () {
     if (x.status != Process.Status.DONE) {
       x.status = Process.Status.ACTIVE;
 
-      if (this._tracing) {
-        console.log("Yield/return: state of future events queue: ");
-        console
-          .log("- " + x.name + " - status: "
-            + x.getStatusString());
-        console.log("--- ");
-        for (var i = 0; i < this._queue.length; i++) {
-          var y = this._queue[i];
-          console.log("- " + y.name + " - status: "
-            + y.getStatusString());
-        }
-        console.log("--- ");
+      trace("Yield/return: state of future events queue: ");
+      trace("- " + x.name + " - status: " + x.getStatusString());
+      trace("--- ");
+      for (var i = 0; i < this._queue.length; i++) {
+        var y = this._queue[i];
+        trace("- " + y.name + " - status: " + y.getStatusString());
       }
+      trace("--- ");
+
 
       if (x.fiber == null) {
         x = this._createFiber(x);

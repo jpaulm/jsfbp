@@ -1,7 +1,8 @@
 'use strict';
 
 var Enum = require('./utils').Enum
-  , IP = require('./IP');
+  , IP = require('./IP')
+  , trace = require('./trace');
 
 var Process = module.exports = function (name, func) {
   this.name = name;
@@ -36,9 +37,7 @@ Process.prototype.createIP = function (data) {
   var ip = new IP(data);
   this.ownedIPs++;
   ip.owner = this;
-  if (global.tracing) {
-    console.log("Normal IP created: " + ip.contents);
-  }
+  trace("Normal IP created: " + ip.contents);
   return ip;
 };
 
@@ -50,10 +49,8 @@ Process.prototype.createIPBracket = function (bktType, x) {
   ip.type = bktType;
   this.ownedIPs++;
   ip.owner = this;
-  if (global.tracing) {
-    var cont = ["", "OPEN", "CLOSE"][ip.type] + ", " + ip.contents;
-    console.log("Bracket IP created: " + cont);
-  }
+  trace("Bracket IP created: " + ["", "OPEN", "CLOSE"][ip.type] + ", " + ip.contents);
+  
   return ip;
 };
 
@@ -62,9 +59,8 @@ Process.prototype.dropIP = function (ip) {
   if (ip.type != IP.NORMAL) {
     cont = ["", "OPEN", "CLOSE"][ip.type] + ", " + cont;
   }
-  if (global.tracing) {
-    console.log(this.name + ' IP dropped with: ' + cont);
-  }
+  trace('IP dropped with: ' + cont);
+
   if (ip.owner != this) {
     console.log(this.name + ' IP being dropped not owned by this Process: ' + cont);
     return;
