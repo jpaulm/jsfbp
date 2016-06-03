@@ -139,6 +139,12 @@ Process.prototype.openOutputPortArray = function (name) {
   return array;
 };
 
+/**
+ * Yield the fiber that is running this process
+ * 
+ * @param preStatus Process status will be set to this before yielding. If not set or set to `null`, the status is not changed
+ * @param postStatus Process status will be set to this after yielding. If not set, the status will be changed to ACTIVE
+ */
 Process.prototype.yield = function (preStatus, postStatus) {
   if(preStatus !== undefined || preStatus !== null) {
     this.status = preStatus;
