@@ -137,9 +137,9 @@ FiberRuntime.prototype._genInitialQueue = function () {
 
     var selfstarting = true;
     process.inports.forEach(function(inPort) {
-      selfstarting = selfstarting && inPort.conn instanceof IIPConnection;
+      selfstarting = selfstarting && inPort[1].conn instanceof IIPConnection;
     });
-    
+
     if(selfstarting) {
       queue.push(process);
     }
@@ -174,7 +174,7 @@ FiberRuntime.prototype._actualRun = function () {
   var setPortRuntime = function (port) {
     port[1].setRuntime(this);
   }.bind(this);
-  
+
   this._list.forEach(function (process) {
     process.inports.forEach(setPortRuntime);
     process.outports.forEach(setPortRuntime);
