@@ -7,7 +7,6 @@
  */
 
 var fs = require('fs');
-var IP = require('../core/IP');
 var trace = require('../core/trace');
 
 module.exports = function reader(runtime) {
@@ -29,7 +28,7 @@ module.exports = function reader(runtime) {
   var inPort = this.openInputPort('IN');
   trace("Starting read");
   var bracket = inPort.receive();
-  if(bracket.type != IP.OPEN) {
+  if(bracket.type != this.IPTypes.OPEN) {
     console.log("ERROR: Received non OPEN bracket");
     console.log(bracket);
     return;
@@ -44,7 +43,7 @@ module.exports = function reader(runtime) {
 function writeFile(runtime, proc, fileDescriptor, inPort) {
   do {
     var inIP = inPort.receive();
-    if(inIP.type == IP.NORMAL) {
+    if(inIP.type == proc.IPTypes.NORMAL) {
       var writeResult = runtime.runAsyncCallback(writeData(fileDescriptor, inIP.contents));
       if (writeResult[0]) {
         console.error(writeResult[0]);
@@ -56,7 +55,7 @@ function writeFile(runtime, proc, fileDescriptor, inPort) {
       }
     }
     proc.dropIP(inIP);
-  } while (inIP.type != IP.CLOSE);
+  } while (inIP.type != proc.IPTypes.CLOSE);
 }
 
 function openFile(path, flags) {
