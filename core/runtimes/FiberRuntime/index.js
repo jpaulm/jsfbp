@@ -128,11 +128,10 @@ FiberRuntime.prototype._genInitialQueue = function () {
   var queue = [];
 
   // A process is selfstarting if its incoming ports are only connected to IIPs
-  self._processList.forEach(function(process) {
-
+  _.forEach(self._processList, function(process) {
     var selfstarting = true;
-    process.inports.forEach(function(inPort) {
-      selfstarting = selfstarting && inPort[1].conn instanceof IIPConnection;
+    _.forEach(process.inports, function(inport) {
+      selfstarting = selfstarting && (inport.conn instanceof IIPConnection);
     });
 
     if(selfstarting) {
