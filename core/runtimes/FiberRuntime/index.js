@@ -117,7 +117,7 @@ FiberRuntime.prototype._createFiber = function (process) {
 };
 
 FiberRuntime.prototype._hasDeadLock = function () {
-  //console.log("Deadlock test");
+  // We have a deadlock if no processes in the list are ACTIVE or have a callback pending
   return !_.some(this._processList, function(process) {
     return process.cbpending || process.status == Process.Status.ACTIVE
   });

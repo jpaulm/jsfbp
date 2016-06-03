@@ -133,10 +133,9 @@ Network.prototype.connect = function (upproc, upport, downproc, downport, capaci
   outport = new OutputPort();
   outport.name = upproc.name + "." + upport;
 
-  var inportf = null;
   var inport = downproc.inports[downport];
 
-  if (inportf == null) {
+  if (inport == null) {
     inport = new InputPort();
     inport.name = downproc.name + "." + downport;
 
@@ -144,7 +143,6 @@ Network.prototype.connect = function (upproc, upport, downproc, downport, capaci
     cnxt.name = downproc.name + "." + downport;
     inport.conn = cnxt;
   } else {
-    inport = inportf;
     cnxt = inport.conn;
   }
 
@@ -152,10 +150,10 @@ Network.prototype.connect = function (upproc, upport, downproc, downport, capaci
 
   upproc.outports[upport] = outport;
   downproc.inports[downport] = inport;
+  
   cnxt.up[cnxt.up.length] = upproc;
   cnxt.down = downproc;
   cnxt.upstreamProcsUnclosed++;
-  //console.log(cnxt);
 };
 
 Network.prototype.sinitialize = function (sinport, string) {
