@@ -1,6 +1,6 @@
 'use strict';
 
-var Enum = require('./utils').Enum
+var Enum = require('./Enum')
   , IP = require('./IP')
   , trace = require('./trace');
 

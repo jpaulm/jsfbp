@@ -1,4 +1,4 @@
-var Enum = require('../../core/utils.js').Enum;
+var Enum = require('../../core/Enum');
 
 describe('utils', function () {
   it('should create an enum and provide a lookup function', function () {
