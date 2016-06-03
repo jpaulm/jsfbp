@@ -1,6 +1,10 @@
 'use strict';
 
 var fbp = require('../..');
+var _ = require('lodash');
+var EOL = require('os').EOL;
+
+var eolBytes = _.invokeMap(EOL.split(''), 'charCodeAt', 0);
 
 describe('breader', function () {
   it('should read a file and output its contents as bytes', function (done) {
@@ -16,7 +20,7 @@ describe('breader', function () {
 
     var fiberRuntime = new fbp.FiberRuntime();
     network.run(fiberRuntime, {trace: false}, function() {
-      expect(result).to.deep.equal([72, 101, 108, 108, 111, 0x20, 87, 111, 114, 108, 100, 0x0A]);
+      expect(result).to.deep.equal([72, 101, 108, 108, 111, 0x20, 87, 111, 114, 108, 100].concat(eolBytes));
       done();
     });
   });

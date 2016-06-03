@@ -3,6 +3,11 @@
 var fbp = require('../..');
 var fs = require('fs');
 
+var _ = require('lodash');
+var EOL = require('os').EOL;
+
+var eolBytes = _.invokeMap(EOL.split(''), 'charCodeAt', 0);
+
 describe('bwriter', function () {
   it('should write incoming IPs to a file', function (done) {
     var network = new fbp.Network();
@@ -20,9 +25,9 @@ describe('bwriter', function () {
       111,
       114,
       108,
-      100,
-      0x0A
-    ,"IP.CLOSE"]), 'sender');
+      100]
+      .concat(eolBytes)
+      .concat("IP.CLOSE")), 'sender');
     var writer = network.defProc('./components/bwriter.js', 'bwriter');
 
     network.initialize(writer, 'FILE', __dirname+'/goodbye-world.txt');
