@@ -42,7 +42,7 @@
     "doc": "docs"
   },
   "scripts": {
-    "test": "mocha --ui mocha-fibers --recursive -R spec --require test/test_helper.js test/components test/core",
+    "test": "npm install && mocha --ui mocha-fibers --recursive -R spec --require test/test_helper.js test/components test/core",
     "lint": "eslint components core examples test index.js"
   }
 }
