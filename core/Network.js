@@ -108,14 +108,14 @@ Network.prototype.defProc = function (func, name) {
     }
   }
 
-  
+
   if (this._processes[name]) {
     throw new Error("Duplicate name specified in defProc:" + func);
   }
 
   var proc = new Process(name, func);
 
-  trace('Created Process with name: ' + name);
+  proc.trace('defined');
 
   this._processes[name] = proc;
   return proc;
@@ -159,7 +159,7 @@ Network.prototype.connect = function (upproc, upport, downproc, downport, capaci
 
   upproc.outports[upport] = outport;
   downproc.inports[downport] = inport;
-  
+
   cnxt.up[cnxt.up.length] = upproc;
   cnxt.down = downproc;
   cnxt.upstreamProcsUnclosed++;
