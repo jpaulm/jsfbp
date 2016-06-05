@@ -12,11 +12,20 @@ var Process = module.exports = function (name, func) {
   this.fiber = null;
   this.inports = {};
   this.outports = {};
-  this.status = Process.Status.NOT_INITIALIZED;
+  this._status = Process.Status.NOT_INITIALIZED;
   this.ownedIPs = 0;
   this.cbpending = false;
   this.yielded = false;
   this.result = null; // [data, err]
+
+  this.trace('Created with status: ' + Process.Status.__lookup(this._status),this.name);
+  Object.defineProperty(this, 'status', {
+    get: function() { return this._status; },
+    set: function(status) {
+      this.trace('Transition from ' + Process.Status.__lookup(this._status) + ' to ' + Process.Status.__lookup(status));
+      this._status = status;
+    }
+  })
 };
 
 Process.Status = Enum([
@@ -32,6 +41,8 @@ Process.Status = Enum([
 ]);
 
 Process.prototype.IPTypes = IP.Types;
+
+Process.prototype.trace = trace;
 
 /*
  * Given a set of ports an a base name XXX, returns all the ports in the set that
@@ -59,7 +70,7 @@ Process.prototype.createIP = function (data) {
   var ip = new IP(data);
   this.ownedIPs++;
   ip.owner = this;
-  trace("Normal IP created: " + ip.contents);
+  this.trace("Normal IP created: " + ip.contents);
   return ip;
 };
 
@@ -71,7 +82,7 @@ Process.prototype.createIPBracket = function (bktType, x) {
   ip.type = bktType;
   this.ownedIPs++;
   ip.owner = this;
-  trace("Bracket IP created: " + ["", "OPEN", "CLOSE"][ip.type] + ", " + ip.contents);
+  this.trace("Bracket IP created: " + this.IPTypes.__lookup(ip.type) + ", " + ip.contents);
 
   return ip;
 };
@@ -81,7 +92,7 @@ Process.prototype.dropIP = function (ip) {
   if (ip.type != this.IPTypes.NORMAL) {
     cont = this.IPTypes.__lookup(ip.type) + ", " + cont;
   }
-  trace('IP dropped with: ' + cont);
+  this.trace('IP dropped with: ' + cont);
 
   if (ip.owner != this) {
     console.log(this.name + ' IP being dropped not owned by this Process: ' + cont);
@@ -146,7 +157,7 @@ Process.prototype.yield = function (preStatus, postStatus) {
     this.status = preStatus;
   }
   this.yielded = true;
-  trace("Yielding with: " + Process.Status.__lookup(preStatus));
+  this.trace("Yielding with: " + Process.Status.__lookup(preStatus));
   Fiber.yield();
   if(postStatus !== undefined) {
     this.status = postStatus

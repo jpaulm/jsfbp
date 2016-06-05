@@ -21,7 +21,7 @@ FiberRuntime.prototype.pushToQueue = function (item) {
 };
 
 FiberRuntime.prototype._close = function (proc) {
-  trace('closing');
+  proc.trace('closing');
   proc.status = Process.Status.CLOSED;
   // console.log('cl' + count);
   this._count--;
@@ -54,7 +54,7 @@ FiberRuntime.prototype._close = function (proc) {
   if (proc.ownedIPs != 0) {
     console.log(proc.name + ' closed without disposing of all IPs');
   }
-  trace('closed');
+  proc.trace('closed');
 };
 
 FiberRuntime.prototype.getCurrentProc = function () {
@@ -62,7 +62,7 @@ FiberRuntime.prototype.getCurrentProc = function () {
 };
 
 FiberRuntime.prototype.queueCallback = function (proc, result) {
-  trace('queue');
+  proc.trace('queueCallback');
   if (result != undefined) {
     proc.result = result;
   }
@@ -90,7 +90,7 @@ FiberRuntime.prototype.run = function (processes, options, callback) {
   this._processList = _.keyBy(processes, 'name');
   this._count = _.size(this._processList);
 
-  global.trace = Boolean(options.trace);
+  global.trace = global.trace || Boolean(options.trace);
 
   var self = this;
 
@@ -196,6 +196,24 @@ FiberRuntime.prototype._actualRun = function () {
   }
 };
 
+FiberRuntime.prototype._showQueueState = function (x) {
+  var queue = this._queue;
+  trace("Yield/return: state of future events queue: ");
+  trace("--- This Process");
+  trace("- " + x.name + " - status: " + x.getStatusString());
+  trace("--- Queue");
+  _.forEach(queue, function(process) {
+    trace("- " + process.name + " - status: " + process.getStatusString());
+  });
+  if(_.size(this._processList) > _.size(queue)) {
+    trace("--- Other Processes");
+    _.forEach(_.difference(_.values(this._processList), queue.concat(x)), function (process) {
+      trace("- " + process.name + " - status: " + process.getStatusString());
+    });
+  }
+  trace("--- ");
+};
+
 FiberRuntime.prototype._tick = function () {
 
   var x = this._queue.shift();
@@ -203,21 +221,13 @@ FiberRuntime.prototype._tick = function () {
   while (x != undefined) {
 
     if (x.status != Process.Status.DONE) {
-      x.status = Process.Status.ACTIVE;
-
-      trace("Yield/return: state of future events queue: ");
-      trace("- " + x.name + " - status: " + x.getStatusString());
-      trace("--- ");
-      for (var i = 0; i < this._queue.length; i++) {
-        var y = this._queue[i];
-        trace("- " + y.name + " - status: " + y.getStatusString());
-      }
-      trace("--- ");
-
-
       if (x.fiber == null) {
         x = this._createFiber(x);
+      } else {
+        x.status = Process.Status.ACTIVE;
       }
+
+      this._showQueueState(x);
 
       while (true) {
         var procState = this._procState(x);
@@ -228,9 +238,11 @@ FiberRuntime.prototype._tick = function () {
           if (!x.cbpending) {
             x.status = Process.Status.ACTIVE;
 
+            x.trace('Start process run');
             // --------------------------
             x.fiber.run(x.result);
             // ---------------------------
+            x.trace('End process run');
 
           }
           procState = this._procState(x);
