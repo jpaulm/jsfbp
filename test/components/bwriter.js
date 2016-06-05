@@ -38,7 +38,7 @@ describe('bwriter', function () {
         if(err) {
           return done(err);
         }
-        expect(data).to.equal("Goodbye World\n");
+        expect(data).to.equal("Goodbye World"+EOL);
         done();
       });
     });
