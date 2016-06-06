@@ -11,7 +11,7 @@ Fiber.prototype.fbpProc = null;
 
 var FiberRuntime = module.exports = function () {
   this._queue = [];
-  this._count = null;
+  this._openProcessCount = 0;
 };
 
 
@@ -20,11 +20,11 @@ FiberRuntime.prototype.pushToQueue = function (item) {
   this._queue.push(item);
 };
 
-FiberRuntime.prototype._close = function (proc) {
+FiberRuntime.prototype._closeProcess = function (proc) {
   proc.trace('closing');
   proc.status = Process.Status.CLOSED;
-  // console.log('cl' + count);
-  this._count--;
+
+  this._openProcessCount--;
   _.forEach(proc.outports, function (outPort) {
     var conn = outPort.conn;
     if (conn.down.status == Process.Status.WAITING_TO_RECEIVE
@@ -88,7 +88,7 @@ FiberRuntime.prototype.runAsyncCallback = function (cb) {
 
 FiberRuntime.prototype.run = function (processes, options, callback) {
   this._processList = _.keyBy(processes, 'name');
-  this._count = _.size(this._processList);
+  this._openProcessCount = _.size(this._processList);
 
   global.trace = global.trace || Boolean(options.trace);
 
@@ -181,7 +181,7 @@ FiberRuntime.prototype._actualRun = function () {
   while (true) {
     this._tick();
 
-    if (this._count <= 0) {
+    if (this._openProcessCount <= 0) {
       break;
     }
 
@@ -214,6 +214,7 @@ FiberRuntime.prototype._showQueueState = function (x) {
   trace("--- ");
 };
 
+
 FiberRuntime.prototype._tick = function () {
 
   var x = this._queue.shift();
@@ -232,7 +233,7 @@ FiberRuntime.prototype._tick = function () {
       while (true) {
         var procState = this._procState(x);
         if (x.status == Process.Status.DORMANT && ProcState.UPSTREAM_CLOSED == procState) {
-          this._close(x);
+          this._closeProcess(x);
           break;
         } else if (x.status != Process.Status.CLOSED) {
           if (!x.cbpending) {
@@ -253,7 +254,7 @@ FiberRuntime.prototype._tick = function () {
           } else if (!x.cbpending) {
 
             if (ProcState.UPSTREAM_CLOSED == procState) {
-              this._close(x);
+              this._closeProcess(x);
               break;
             } else if (ProcState.NO_DATA == procState) {
               x.status = Process.Status.DORMANT;
