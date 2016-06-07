@@ -5,6 +5,7 @@ var Fiber = require('fibers');
 var Process = require('../core/Process');
 
 global.expect = chai.expect;
+global.trace = true;
 
 global.MockSender = require('./mocks/MockSender');
 

@@ -4,6 +4,8 @@
 var Fiber = require('fibers')
   , Enum = require('./Enum')
   , IP = require('./IP')
+  , IIPConnection = require('./IIPConnection')
+  , _ = require('lodash')
   , trace = require('./trace');
 
 var Process = module.exports = function (name, func) {
@@ -22,7 +24,13 @@ var Process = module.exports = function (name, func) {
   Object.defineProperty(this, 'status', {
     get: function() { return this._status; },
     set: function(status) {
+      if(status === this._status) {
+        return;
+      }
       this.trace('Transition from ' + Process.Status.__lookup(this._status) + ' to ' + Process.Status.__lookup(status));
+      if(status === Process.Status.ACTIVE && _.includes([Process.Status.NOT_INITIALIZED, Process.Status.DORMANT], this._status)) {
+        this.trace('Activating component');
+      }
       this._status = status;
     }
   })
@@ -66,6 +74,14 @@ Process.prototype.getStatusString = function () {
   return Process.Status.__lookup(this.status);
 };
 
+Process.prototype.isSelfStarting = function () {
+  var selfstarting = true;
+  _.forEach(this.inports, function (inport) {
+    selfstarting = selfstarting && (inport.conn instanceof IIPConnection);
+  });
+  return selfstarting;
+};
+
 Process.prototype.createIP = function (data) {
   var ip = new IP(data);
   this.ownedIPs++;
@@ -100,6 +116,13 @@ Process.prototype.dropIP = function (ip) {
   }
   this.ownedIPs--;
   ip.owner = null;
+};
+
+Process.prototype.addInputPort = function(port) {
+  this.inports[port.portName] = port;
+};
+Process.prototype.addOutputPort = function(port) {
+  this.outports[port.portName] = port;
 };
 
 Process.prototype.openInputPort = function (name) {
@@ -156,13 +179,16 @@ Process.prototype.yield = function (preStatus, postStatus) {
   if(preStatus !== undefined || preStatus !== null) {
     this.status = preStatus;
   }
+  if(postStatus === undefined) {
+    postStatus = Process.Status.ACTIVE;
+  }
+
   this.yielded = true;
   this.trace("Yielding with: " + Process.Status.__lookup(preStatus));
   Fiber.yield();
-  if(postStatus !== undefined) {
+  if(postStatus !== this.status) {
     this.status = postStatus
-  } else {
-    this.status = Process.Status.ACTIVE;
   }
+
   this.yielded = false;
 };

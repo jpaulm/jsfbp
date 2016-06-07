@@ -1,16 +1,151 @@
 'use strict';
+var Fiber = require('fibers')
+  , ProcessStatus = require('./Process').Status
+  , _ = require('lodash')
+  , FIFO = require('./FIFO');
 
-module.exports = function (size) {
+var ProcessConnection = function (size) {
   this.name = null;
-  this.nxtget = 0;
-  this.nxtput = 0;
-  this.down = null;  // downstream process
-  this.usedslots = 0;
-  this.array = [];
-  this.up = [];    // list of upstream processes
+  this.contents = new FIFO();
+  this.capacity = size;
+
+  this.downStreamProcess = null;  // downstream process
+  this.upSteamProcesses = [];    // list of upstream processes
   this.upstreamProcsUnclosed = 0;
-  for (var i = 0; i < size; i++) {
-    this.array[i] = null;
-  }
+
+  this._runtime = null;
+
   this.closed = false;
 };
+
+ProcessConnection.prototype.setRuntime = function (runtime) {
+  this._runtime = runtime;
+};
+
+ProcessConnection.prototype.hasData = function () {
+  return !this.contents.isEmpty();
+};
+
+ProcessConnection.prototype.getData = function () {
+  var proc = Fiber.current.fbpProc;
+
+  proc.trace('Requesting IP from ' + this.name);
+
+  while (!this.hasData()) {
+      if (this.closed) {
+        proc.trace('recv EOS from ' + this.name);
+        return null;
+      }
+
+      proc.yield(ProcessStatus.WAITING_TO_RECEIVE);
+  }
+
+  var runtime = this._runtime;
+  var queueProcess = function (process) {
+    if (process.status == ProcessStatus.WAITING_TO_SEND) {
+      runtime.queueForExecution(process);
+    }
+  };
+  this.upSteamProcesses.forEach(queueProcess);
+
+  var ip = this.contents.dequeue();
+  var cont = ip.contents;
+  proc.trace('Received: ' + proc.IPTypes.__lookup(ip.type) + (cont !== null) ? ", " + cont : "");
+  ip.owner = proc;
+  proc.ownedIPs++;
+  return ip;
+};
+
+ProcessConnection.prototype.putData = function (ip, portName) {
+  var proc = Fiber.current.fbpProc;
+  var cont = ip.contents;
+
+  if (ip.type != proc.IPTypes.NORMAL) {
+    cont = proc.IPTypes.__lookup(ip.type) + ", " + cont;
+  }
+  proc.trace('send to ' + portName + ': ' + cont);
+
+  if (ip.owner != proc) {
+    console.log(proc.name + ' IP being sent not owned by this Process: ' + cont);
+    return;
+  }
+  if (this.closed) {
+    console.log(proc.name + ' sending to closed connection: ' + this.name);
+    return -1;
+  }
+  while (true) {
+    var downStreamStatus = this.downStreamProcess.status;
+    if (downStreamStatus == ProcessStatus.WAITING_TO_RECEIVE ||
+      downStreamStatus == ProcessStatus.NOT_INITIALIZED ||
+      downStreamStatus == ProcessStatus.DORMANT ||
+      downStreamStatus == ProcessStatus.WAITING_TO_FIPE) {
+
+      this._runtime.queueForExecution(this.downStreamProcess);
+    }
+    if (this.contents.length >= this.capacity) {
+      proc.yield(ProcessStatus.WAITING_TO_SEND, ProcessStatus.WAITING_TO_SEND);
+    }
+    else {
+      break;
+    }
+  }
+  this.contents.enqueue(ip);
+
+  proc.ownedIPs--;
+  proc.trace('send OK: ' + cont);
+
+  return 0;
+};
+
+
+ProcessConnection.prototype.closeFromUpstream = function () {
+
+  var status = this.downStreamProcess.status;
+  if (status == ProcessStatus.WAITING_TO_RECEIVE
+    || status == ProcessStatus.NOT_INITIALIZED) {
+    this._runtime.queueForExecution(this.downStreamProcess);
+  }
+  this.upstreamProcsUnclosed--;
+  if ((this.upstreamProcsUnclosed) <= 0) {
+    this.closed = true;
+  }
+
+};
+
+ProcessConnection.prototype.closeFromDownstream = function () {
+  var runtime = this._runtime;
+  this.upSteamProcesses.forEach(function (up) {
+    if (up.status == ProcessStatus.CLOSED) {
+      up.status = ProcessStatus.DONE;
+      runtime.pushToQueue(up);
+    }
+  });
+};
+
+ProcessConnection.prototype.closeFromInPort = function () {
+  var proc = Fiber.current.fbpProc;
+
+  this.closed = true;
+  console.log(proc.name + ': ' + this.contents.length + ' IPs dropped because of close on ' + this.name);
+  this.purge();
+  var runtime = this._runtime;
+
+  _.forEach(this.upSteamProcesses, function(process) {
+    runtime.pushToQueue(process);
+  });
+};
+
+ProcessConnection.prototype.connectProcesses = function (upproc, outport, downproc, inport) {
+  inport.conn = this;
+  outport.conn = this;
+
+  this.upSteamProcesses.push(upproc);
+  this.downStreamProcess = downproc;
+  this.upstreamProcsUnclosed++
+};
+
+ProcessConnection.prototype.purge = function () {
+  this.contents = new FIFO();
+};
+
+module.exports = ProcessConnection;

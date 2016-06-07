@@ -10,9 +10,9 @@ var IIPConnection = require('./IIPConnection')
 
 var Network = module.exports = function (options) {
   this._processes = {};
-    if(options) {
-        this.componentRoot = options.componentRoot;
-    }
+  if (options) {
+    this.componentRoot = options.componentRoot;
+  }
 };
 
 /*
@@ -34,11 +34,11 @@ function loadComponent(componentName, localRoot) {
       moduleLocation = path.resolve(path.join(__dirname, '..', 'components', componentField + '.js'));
       componentField = undefined;
     } else if (moduleLocation === '') {
-        moduleLocation = path.join(localRoot, componentField);
-        componentField = undefined;
+      moduleLocation = path.join(localRoot, componentField);
+      componentField = undefined;
     }
   }
-    trace("Trying to load: " +require.resolve(moduleLocation));
+  trace("Trying to load: " + require.resolve(moduleLocation));
   var component = require(moduleLocation);
 
   if (componentField) {
@@ -86,12 +86,13 @@ Network.prototype.getProcessByName = function (processName) {
 
 Network.prototype.run = function (runtime, options, callback) {
   options = options || {};
+  callback = callback || function () {};
 
   _.forEach(this._processes, function (process) {
     _.invokeMap(process.inports, 'setRuntime', runtime);
     _.invokeMap(process.outports, 'setRuntime', runtime);
   });
-  runtime.run(_.values(this._processes), options, callback || function () {});
+  runtime.run(_.values(this._processes), options, callback );
 };
 
 Network.prototype.defProc = function (func, name) {
@@ -101,13 +102,13 @@ Network.prototype.defProc = function (func, name) {
   if (!func) {
     throw new Error("No function passed to defProc: " + name);
   }
+
   if (!name) {
     name = func.name;
-    if(!name) {
+    if (!name) {
       throw new Error("No name passed to defProc:" + func);
     }
   }
-
 
   if (this._processes[name]) {
     throw new Error("Duplicate name specified in defProc:" + func);
@@ -121,48 +122,35 @@ Network.prototype.defProc = function (func, name) {
   return proc;
 };
 
-Network.prototype.initialize = function (proc, port, string) {
-  var inport = new InputPort();
-  inport.name = proc.name + "." + port;
+Network.prototype.initialize = function (proc, portName, string) {
+  var inport = new InputPort(proc, portName);
   inport.conn = new IIPConnection(string);
-  proc.inports[port] = inport;
 };
 
-Network.prototype.connect = function (upproc, upport, downproc, downport, capacity) {
-  if (capacity == undefined) {
+Network.prototype.connect = function (upproc, upPortName, downproc, downPortName, capacity) {
+  if (capacity === undefined) {
     capacity = 10;
   }
-  var outport = upproc.outports[upport];
-    if (outport) {
-      console.log('Cannot connect one output port (' + outport.name + ') to multiple input ports');
-      return;
-    }
+  var outport = upproc.outports[upPortName];
+  if (outport) {
+    console.log('Cannot connect one output port (' + outport.name + ') to multiple input ports');
+    return;
+  }
 
+  outport = new OutputPort(upproc, upPortName);
 
-  outport = new OutputPort();
-  outport.name = upproc.name + "." + upport;
-
-  var inport = downproc.inports[downport];
+  var inport = downproc.inports[downPortName];
 
   if (inport == null) {
-    inport = new InputPort();
-    inport.name = downproc.name + "." + downport;
+    inport = new InputPort(downproc, downPortName);
 
     var cnxt = new ProcessConnection(capacity);
-    cnxt.name = downproc.name + "." + downport;
-    inport.conn = cnxt;
+    cnxt.name = inport.name;
   } else {
     cnxt = inport.conn;
   }
 
-  outport.conn = cnxt;
-
-  upproc.outports[upport] = outport;
-  downproc.inports[downport] = inport;
-
-  cnxt.up[cnxt.up.length] = upproc;
-  cnxt.down = downproc;
-  cnxt.upstreamProcsUnclosed++;
+  cnxt.connectProcesses(upproc, outport, downproc, inport);
 };
 
 Network.prototype.sinitialize = function (sinport, string) {
