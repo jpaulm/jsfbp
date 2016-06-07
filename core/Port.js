@@ -13,16 +13,16 @@ var Port = function (process, portName) {
 };
 
 Object.defineProperty(Port.prototype, 'name', {
-  get () {
+  get: function () {
     return this.processName + "." + this.portName;
   }
 });
 
 Object.defineProperty(Port.prototype, 'conn', {
-  get () {
+  get: function () {
     return this._conn;
   },
-  set (c) {
+  set: function (c) {
     this._conn = c;
     if (this._runtime) {
       this._conn.setRuntime(this._runtime);
@@ -31,7 +31,7 @@ Object.defineProperty(Port.prototype, 'conn', {
 });
 
 Object.defineProperty(Port.prototype, 'runtime', {
-  set (r) {
+  set: function (r) {
     this._runtime = r;
     if (this._conn) {
       this._conn.setRuntime(this._runtime);
