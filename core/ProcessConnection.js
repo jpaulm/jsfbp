@@ -1,30 +1,25 @@
 'use strict';
 var Fiber = require('fibers')
   , ProcessStatus = require('./Process').Status
+  , Connection = require('./Connection')
   , _ = require('lodash')
   , FIFO = require('./FIFO');
 
 var ProcessConnection = function (size) {
+  this.parent.constructor.call(this);
+
   this.name = null;
-  this.contents = new FIFO();
   this.capacity = size;
 
   this.downStreamProcess = null;  // downstream process
   this.upSteamProcesses = [];    // list of upstream processes
   this.upstreamProcsUnclosed = 0;
-
-  this._runtime = null;
-
-  this.closed = false;
 };
 
-ProcessConnection.prototype.setRuntime = function (runtime) {
-  this._runtime = runtime;
-};
+ProcessConnection.prototype = Object.create(Connection.prototype);
+ProcessConnection.prototype.constructor = ProcessConnection;
+ProcessConnection.prototype.parent = Connection.prototype;
 
-ProcessConnection.prototype.hasData = function () {
-  return !this.contents.isEmpty();
-};
 
 ProcessConnection.prototype.getData = function () {
   var proc = Fiber.current.fbpProc;
@@ -127,7 +122,7 @@ ProcessConnection.prototype.closeFromInPort = function () {
 
   this.closed = true;
   console.log(proc.name + ': ' + this.contents.length + ' IPs dropped because of close on ' + this.name);
-  this.purge();
+  this.purgeData();
   var runtime = this._runtime;
 
   _.forEach(this.upSteamProcesses, function(process) {
@@ -142,10 +137,6 @@ ProcessConnection.prototype.connectProcesses = function (upproc, outport, downpr
   this.upSteamProcesses.push(upproc);
   this.downStreamProcess = downproc;
   this.upstreamProcsUnclosed++
-};
-
-ProcessConnection.prototype.purge = function () {
-  this.contents = new FIFO();
 };
 
 module.exports = ProcessConnection;

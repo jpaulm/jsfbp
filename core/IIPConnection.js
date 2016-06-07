@@ -1,14 +1,16 @@
 'use strict';
-var Fiber = require('fibers');
+var Fiber = require('fibers')
+  , Connection = require('./Connection');
 
 var IIPConnection = function (data) {
-  this.contents = data;
-  this.closed = false;
+  this.parent.constructor.call(this);
+  this.contents.enqueue(data);
 };
 
-IIPConnection.prototype.setRuntime = function (runtime) {
-  this._runtime = runtime;
-};
+IIPConnection.prototype = Object.create(Connection.prototype);
+IIPConnection.prototype.constructor = IIPConnection;
+IIPConnection.prototype.parent = Connection.prototype;
+
 
 IIPConnection.prototype.getData = function (portName) {
   var proc = Fiber.current.fbpProc;
@@ -18,17 +20,12 @@ IIPConnection.prototype.getData = function (portName) {
   }
   proc.trace('recv IIP from port ' + portName + ': ' + this.contents);
 
-  var ip = proc.createIP(this.contents);
+  var ip = proc.createIP(this.contents.dequeue());
   this.close();
   ip.owner = proc;
   return ip;
 };
 
-var close = function () {
-  this.closed = true;
-};
-
-IIPConnection.prototype.close = close;
-IIPConnection.prototype.closeFromDownstream = close;
+IIPConnection.prototype.closeFromDownstream = IIPConnection.prototype.close;
 
 module.exports = IIPConnection;

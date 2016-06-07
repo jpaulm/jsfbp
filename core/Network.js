@@ -10,6 +10,7 @@ var IIPConnection = require('./IIPConnection')
 
 var Network = module.exports = function (options) {
   this._processes = {};
+  this._connections = [];
   if (options) {
     this.componentRoot = options.componentRoot;
   }
@@ -88,10 +89,8 @@ Network.prototype.run = function (runtime, options, callback) {
   options = options || {};
   callback = callback || function () {};
 
-  _.forEach(this._processes, function (process) {
-    _.invokeMap(process.inports, 'setRuntime', runtime);
-    _.invokeMap(process.outports, 'setRuntime', runtime);
-  });
+  _.invokeMap(this._connections, 'setRuntime', runtime);
+  
   runtime.run(_.values(this._processes), options, callback );
 };
 
@@ -146,6 +145,7 @@ Network.prototype.connect = function (upproc, upPortName, downproc, downPortName
 
     var cnxt = new ProcessConnection(capacity);
     cnxt.name = inport.name;
+    this._connections.push(cnxt);
   } else {
     cnxt = inport.conn;
   }
