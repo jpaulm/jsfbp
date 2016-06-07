@@ -2,8 +2,7 @@
 var Fiber = require('fibers')
   , ProcessStatus = require('./Process').Status
   , Connection = require('./Connection')
-  , _ = require('lodash')
-  , FIFO = require('./FIFO');
+  , _ = require('lodash');
 
 var ProcessConnection = function (size) {
   this.parent.constructor.call(this);
