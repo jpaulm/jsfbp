@@ -4,3 +4,4 @@ node_modules/
 npm-debug.log
 test/components/goodbye-world.txt
 examples/data/text_new.txt
+examples/isolate-*-v8.log

@@ -2,27 +2,31 @@
 
 var Port = require('./Port');
 
-class InputPort extends Port {
-  constructor(process, port) {
-    super(process, port);
+var InputPort  = function (process, port) {
+  this.parent.constructor.call(this, process, port);
+
     if(process) {
       process.addInputPort(this);
     } else {
       console.log("No process passed to input port: " + port);
     }
-  }
+  };
 
-  receive() {
+InputPort.prototype = Object.create(Port.prototype);
+InputPort.prototype.constructor = InputPort;
+InputPort.prototype.parent = Port.prototype;
+
+InputPort.prototype.receive = function () {
     var conn = this.conn;
     return conn.getData();
-  }
+  };
 
-  close() {
+InputPort.prototype.close = function() {
     var conn = this.conn;
     conn.closeFromInPort();
     this.closed = true;
-  }
-}
+
+};
 
 
 module.exports = InputPort;

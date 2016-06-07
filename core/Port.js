@@ -1,33 +1,47 @@
 'use strict';
 
-class Port {
-  constructor(process, portName) {
-    if(process) {
-      this.processName = process.name;
-    } else {
-      this.processName = '';
-    }
-    this.portName = portName;
-    this.closed = false;
-    this._conn = null;
-    this._runtime = null;
+var Port = function (process, portName) {
+  if (process) {
+    this.processName = process.name;
+  } else {
+    this.processName = '';
   }
-  
-  get name() { return this.processName + "." + this.portName;}
-  
-  get conn() { return this._conn; }
-  set conn(c) { this._conn = c; if (this._runtime) { this._conn.setRuntime(this._runtime); }}
-  
-  set runtime(r) {
-    this._runtime = r;
-    if(this._conn) {
+  this.portName = portName;
+  this.closed = false;
+  this._conn = null;
+  this._runtime = null;
+};
+
+Object.defineProperty(Port.prototype, 'name', {
+  get () {
+    return this.processName + "." + this.portName;
+  }
+});
+
+Object.defineProperty(Port.prototype, 'conn', {
+  get () {
+    return this._conn;
+  },
+  set (c) {
+    this._conn = c;
+    if (this._runtime) {
       this._conn.setRuntime(this._runtime);
     }
   }
-  setRuntime(runtime) {
-    this.runtime = runtime;
+});
+
+Object.defineProperty(Port.prototype, 'runtime', {
+  set (r) {
+    this._runtime = r;
+    if (this._conn) {
+      this._conn.setRuntime(this._runtime);
+    }
   }
-}
+});
+
+Port.prototype.setRuntime = function (runtime) {
+  this.runtime = runtime;
+};
 
 
 module.exports = Port;

@@ -3,17 +3,20 @@
 
 var Port = require('./Port');
 
-class OutputPort extends Port {
-  constructor(process, port) {
-    super(process, port);
+var OutputPort = function (process, port) {
+  this.parent.constructor.call(this, process, port);
     process.addOutputPort(this);
-  }
-  
-  send(ip) {
+  };
+
+OutputPort.prototype = Object.create(Port.prototype);
+OutputPort.prototype.constructor = OutputPort;
+OutputPort.prototype.parent = Port.prototype;
+
+OutputPort.prototype.send = function(ip) {
     var conn = this.conn;
 
     return conn.putData(ip, this.name);
-  }
-}
+
+};
 
 module.exports = OutputPort;
