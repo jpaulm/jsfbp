@@ -121,7 +121,9 @@ ProcessConnection.prototype.closeFromInPort = function () {
   var proc = Fiber.current.fbpProc;
 
   this.closed = true;
-  console.log(proc.name + ': ' + this.contents.length + ' IPs dropped because of close on ' + this.name);
+  if(this.hasData()) {
+    console.log(proc.name + ': ' + this.contents.length + ' IPs dropped because of close on ' + this.name);
+  }
   this.purgeData();
   var runtime = this._runtime;
 
