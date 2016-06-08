@@ -50,9 +50,9 @@ function writeFile(runtime, proc, fileDescriptor, inPort) {
     if (inIP.type == proc.IPTypes.NORMAL) {
       buffer.writeUInt8(inIP.contents, byteCount);
       byteCount++;
-      if(byteCount === WRITE_SIZE) {
+      if (byteCount === WRITE_SIZE) {
         var success = writeBuffer(runtime, fileDescriptor, buffer, byteCount);
-        if(!success) {
+        if (!success) {
           return;
         }
         byteCount = 0;
@@ -60,7 +60,7 @@ function writeFile(runtime, proc, fileDescriptor, inPort) {
     }
     proc.dropIP(inIP);
   } while (inIP.type != proc.IPTypes.CLOSE);
-  if(byteCount > 0) {
+  if (byteCount > 0) {
     writeBuffer(runtime, fileDescriptor, buffer, byteCount);
   }
 }
