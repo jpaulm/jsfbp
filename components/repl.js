@@ -13,7 +13,7 @@ module.exports = function repl() {
       if(ip.type === this.IPTypes.NORMAL) {
         array[i].send(this.createIP(ip.contents));
       } else {
-        array[i].send(this.createIPBracket(ip.type));
+        array[i].send(this.createIPBracket(ip.type, ip.contents));
       }
     }
     this.dropIP(ip);

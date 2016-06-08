@@ -45,7 +45,5 @@ describe('repl', function () {
       expect(result2).to.deep.equal([fbp.IPTypes.OPEN, fbp.IPTypes.NORMAL, fbp.IPTypes.NORMAL, fbp.IPTypes.NORMAL, fbp.IPTypes.CLOSE]);
       done();
     });
-
-
   })
 });
