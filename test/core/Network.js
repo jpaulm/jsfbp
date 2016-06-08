@@ -56,4 +56,12 @@ describe('Network', function () {
       Network.createFromGraph("'' -> IN RECVR(jsfbp/recvr)");
     }).not.to.throw(Error);
   });
+
+  it('supports connection capacity', function () {
+    var network = Network.createFromGraph("'2' -> IN GEN(jsfbp/gendata) OUT -> (100) IN RECVR(jsfbp/recvr)");
+    expect(network._connections[0].capacity).to.equal(100);
+
+    network = Network.createFromGraph("'2' -> IN GEN(jsfbp/gendata) OUT ->  IN RECVR(jsfbp/recvr)");
+    expect(network._connections[0].capacity).to.equal(10);
+  })
 });

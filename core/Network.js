@@ -78,7 +78,7 @@ Network.createFromGraph = function (graphString, localRoot) {
       network.initialize(processes[target.process], getPort(target), connection.data);
     } else {
       var source = connection.src;
-      network.connect(processes[source.process], getPort(source), processes[target.process], getPort(target));
+      network.connect(processes[source.process], getPort(source), processes[target.process], getPort(target), connection.capacity);
     }
 
   });
@@ -140,7 +140,7 @@ Network.prototype.initialize = function (proc, portName, string) {
 };
 
 Network.prototype.connect = function (upproc, upPortName, downproc, downPortName, capacity) {
-  if (capacity === undefined) {
+  if (!capacity) {
     capacity = 10;
   }
   var outport = upproc.outports[upPortName];
