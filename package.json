@@ -43,6 +43,7 @@
   },
   "scripts": {
     "test": "npm install && mocha --ui mocha-fibers --recursive -R spec --require test/test_helper.js test/components test/core",
-    "lint": "eslint components core examples test index.js"
+    "lint": "eslint components core examples test index.js",
+    "ws": "js-beautify -r -s 2 -a -n -k -f core/*.js components/*.js core/runtimes/FiberRuntime/index.js "
   }
 }

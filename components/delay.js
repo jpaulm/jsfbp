@@ -1,7 +1,7 @@
 'use strict';
 
 module.exports = function delay(runtime) {
-//  var proc = fbp.getCurrentProc();
+  //  var proc = fbp.getCurrentProc();
   var inport = this.openInputPort('IN');
   var intvlport = this.openInputPort('INTVL');
   var outport = this.openOutputPort('OUT');

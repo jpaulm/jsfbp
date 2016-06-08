@@ -11,19 +11,17 @@ function getInportWithData(inportArray) {
     var conn = inport ? inport.conn : false;
     if (!conn) {
       return false;
-    }
-    else if (conn.usedslots > 0) {  // connection has data
+    } else if (conn.usedslots > 0) { // connection has data
       return true;
     }
 
-    allDrained = allDrained && conn.closed;  // no data but not all closed, so suspend
+    allDrained = allDrained && conn.closed; // no data but not all closed, so suspend
     return false;
   });
 
   if (inportElementWithData >= 0) {
     trace('findIPE_with_data - found: ' + inportElementWithData);
-  }
-  else if(allDrained) {
+  } else if (allDrained) {
     trace('findIPE_with_data: all drained');
   } else {
     inportElementWithData = null;
@@ -62,7 +60,7 @@ module.exports.findInputPortElementWithData = function (array) {
   while (true) {
     var inportWitData = getInportWithData(array);
 
-    if(inportWitData.inportElementWithData  !== null) {
+    if (inportWitData.inportElementWithData !== null) {
       return inportWitData.inportElementWithData;
     }
 

@@ -28,7 +28,7 @@ module.exports = function reader(runtime) {
   var inPort = this.openInputPort('IN');
   trace("Starting read");
   var bracket = inPort.receive();
-  if(bracket.type != this.IPTypes.OPEN) {
+  if (bracket.type != this.IPTypes.OPEN) {
     console.log("ERROR: Received non OPEN bracket");
     console.log(bracket);
     return;
@@ -43,13 +43,13 @@ module.exports = function reader(runtime) {
 function writeFile(runtime, proc, fileDescriptor, inPort) {
   do {
     var inIP = inPort.receive();
-    if(inIP.type == proc.IPTypes.NORMAL) {
+    if (inIP.type == proc.IPTypes.NORMAL) {
       var writeResult = runtime.runAsyncCallback(writeData(fileDescriptor, inIP.contents));
       if (writeResult[0]) {
         console.error(writeResult[0]);
         return;
       }
-      if(writeResult[1] !== 1) {
+      if (writeResult[1] !== 1) {
         console.error("Insufficient data written!");
         return;
       }
@@ -70,9 +70,8 @@ function writeData(fd, byte) {
   return function (done) {
     var writeBuffer = new Buffer(1);
     writeBuffer[0] = byte;
-    fs.write(fd, writeBuffer, 0, 1, null, function(err, written) {
+    fs.write(fd, writeBuffer, 0, 1, null, function (err, written) {
       done([err, written]);
     });
   }
 }
-

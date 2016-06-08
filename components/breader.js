@@ -65,9 +65,8 @@ function openFile(path, flags) {
 
 function readData(fd, size) {
   return function (done) {
-    fs.read(fd,new Buffer(size), 0, size, null, function(err, bytesRead, buffer) {
+    fs.read(fd, new Buffer(size), 0, size, null, function (err, bytesRead, buffer) {
       done([err, bytesRead, buffer]);
     });
   }
 }
-
