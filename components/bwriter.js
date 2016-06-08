@@ -9,6 +9,8 @@
 var fs = require('fs');
 var trace = require('../core/trace');
 
+var WRITE_SIZE = 4;
+
 module.exports = function reader(runtime) {
   var filePort = this.openInputPort('FILE');
   var ip = filePort.receive();
@@ -41,21 +43,26 @@ module.exports = function reader(runtime) {
 };
 
 function writeFile(runtime, proc, fileDescriptor, inPort) {
+  var buffer = new Buffer(WRITE_SIZE);
+  var byteCount = 0;
   do {
     var inIP = inPort.receive();
     if (inIP.type == proc.IPTypes.NORMAL) {
-      var writeResult = runtime.runAsyncCallback(writeData(fileDescriptor, inIP.contents));
-      if (writeResult[0]) {
-        console.error(writeResult[0]);
-        return;
-      }
-      if (writeResult[1] !== 1) {
-        console.error("Insufficient data written!");
-        return;
+      buffer.writeUInt8(inIP.contents, byteCount);
+      byteCount++;
+      if(byteCount === WRITE_SIZE) {
+        var success = writeBuffer(runtime, fileDescriptor, buffer, byteCount);
+        if(!success) {
+          return;
+        }
+        byteCount = 0;
       }
     }
     proc.dropIP(inIP);
   } while (inIP.type != proc.IPTypes.CLOSE);
+  if(byteCount > 0) {
+    writeBuffer(runtime, fileDescriptor, buffer, byteCount);
+  }
 }
 
 function openFile(path, flags) {
@@ -66,11 +73,23 @@ function openFile(path, flags) {
   }
 }
 
-function writeData(fd, byte) {
+function writeBuffer(runtime, fileDescriptor, writeBuffer, byteCount) {
+  var writeResult = runtime.runAsyncCallback(writeData(fileDescriptor, writeBuffer, byteCount));
+  if (writeResult[0]) {
+    console.error(writeResult[0]);
+    return false;
+  }
+  if (writeResult[1] !== byteCount) {
+    console.error("Insufficient data written!");
+    return false;
+  }
+
+  return true;
+}
+
+function writeData(fd, writeBuffer, count) {
   return function (done) {
-    var writeBuffer = new Buffer(1);
-    writeBuffer[0] = byte;
-    fs.write(fd, writeBuffer, 0, 1, null, function (err, written) {
+    fs.write(fd, writeBuffer, 0, count, null, function (err, written) {
       done([err, written]);
     });
   }
