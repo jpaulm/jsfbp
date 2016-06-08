@@ -5,7 +5,7 @@ module.exports = function () {
   this.dropIP(sizeIP);
 
   var outPort = this.openOutputPort('OUT');
-  for(var i = 0; i < size; i++) {
+  for (var i = 0; i < size; i++) {
     outPort.send(this.createIP(i));
   }
 };
