@@ -20,7 +20,7 @@ var MockReceiverGenerator = function (outputArray) {
   return MockReceiver;
 };
 
-MockReceiver = MockReceiverGenerator();
+var MockReceiver = MockReceiverGenerator();
 MockReceiver.generator = MockReceiverGenerator;
 
 

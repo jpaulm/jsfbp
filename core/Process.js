@@ -71,7 +71,7 @@ Process.prototype.createIPBracket = function (bktType, x) {
   ip.type = bktType;
   this.ownedIPs++;
   ip.owner = this;
-  trace("Bracket IP created: " + ["", "OPEN", "CLOSE"][ip.type] + ", " + ip.contents);
+  trace("Bracket IP created: " + IP.Types.__lookup(ip.type) + ", " + ip.contents);
 
   return ip;
 };
