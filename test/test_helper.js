@@ -9,6 +9,8 @@ global.expect = chai.expect;
 global.MockSender = require('./mocks/MockSender');
 
 global.MockReceiver = require('./mocks/MockReceiver');
+global.TypeReceiver = require('./mocks/TypeReceiver');
+
 
 global.TestFiber = function(action) {
   Fiber(function() {
