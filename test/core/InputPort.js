@@ -13,7 +13,7 @@ var getTestInPort = function (connection) {
   var fiberRuntime = new FiberRuntime();
   var inPort = new InputPort();
   inPort.name = "Test InPort";
-  inPort.setRuntime(fiberRuntime);
+  connection.setRuntime(fiberRuntime);
   inPort.conn = connection;
   return inPort;
 };

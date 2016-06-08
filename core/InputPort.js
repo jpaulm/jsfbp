@@ -1,88 +1,32 @@
 'use strict';
 
-var Fiber = require('fibers')
-  , IIPConnection = require('./IIPConnection')
-  , ProcessStatus = require('./Process').Status
-  , trace = require('./trace');
+var Port = require('./Port');
 
-var InputPort = module.exports = function () {
-  this.name = null;
-  this.conn = null;  // either ProcessConnection or IIPConnection
-  //this.closed = false;
-};
+var InputPort  = function (process, port) {
+  this.parent.constructor.call(this, process, port);
 
-InputPort.prototype.setRuntime = function (runtime) {
-  this._runtime = runtime;
-};
+    if(process) {
+      process.addInputPort(this);
+    } else {
+      console.log("No process passed to input port: " + port);
+    }
+  };
+
+InputPort.prototype = Object.create(Port.prototype);
+InputPort.prototype.constructor = InputPort;
+InputPort.prototype.parent = Port.prototype;
 
 InputPort.prototype.receive = function () {
-  var proc = Fiber.current.fbpProc;
-  var conn = this.conn;
+    var conn = this.conn;
+    return conn.getData(this.name);
+  };
 
-  if (conn instanceof IIPConnection) {
-    if(conn.closed) {
-      trace('tried to read from closed IIPConnection to ' + this.name);
-      return null;
-    }
-    trace('recv IIP from port ' + this.name + ': ' + conn.contents);
-    //var ip = new exports.IP(conn + '');
-    var ip = proc.createIP(conn.contents);
-    conn.closed = true;
-    ip.user = proc;
-    //console.log(conn);
-    return ip;
-  }
+InputPort.prototype.close = function() {
+    var conn = this.conn;
+    conn.closeFromInPort();
+    this.closed = true;
 
-  trace('Requesting IP from ' + this.name);
-
-  while (true) {
-    if (conn.usedslots == 0) {
-      if (conn.closed) {
-        trace('recv EOS from ' + this.name);
-        return null;
-      }
-      proc.yield(ProcessStatus.WAITING_TO_RECEIVE);
-    }
-    else
-      break;
-  }
-  //if (conn.usedslots == conn.array.length)
-  for (var i = 0; i < conn.up.length; i++) {
-    if (conn.up[i].status == ProcessStatus.WAITING_TO_SEND) {
-      conn.up[i].status = ProcessStatus.READY_TO_EXECUTE;
-      this._runtime.pushToQueue(conn.up[i]);
-    }
-  }
-
-  ip = conn.array[conn.nxtget];
-  conn.array[conn.nxtget] = null;
-  conn.nxtget++;
-  if (conn.nxtget > conn.array.length - 1)
-    conn.nxtget = 0;
-  var cont = ip.contents;
-  trace('Received: ' + proc.IPTypes.__lookup(ip.type) + (cont !== null) ? ", " + cont : "");
-  conn.usedslots--;
-  ip.owner = proc;
-  proc.ownedIPs++;
-  return ip;
 };
 
-InputPort.prototype.close = function () {
-  var proc = Fiber.current.fbpProc;
-  var conn = this.conn;
-  conn.closed = true;
-  console.log(proc.name + ': ' + conn.usedslots + ' IPs dropped because of close on ' + conn.name);
-  while (true) {
-    conn.array[conn.nxtget] = null;
-    conn.nxtget++;
-    if (conn.nxtget > conn.array.length - 1)
-      conn.nxtget = 0;
-    conn.usedslots--;
-    if (conn.usedslots <= 0)
-      break;
-  }
-  for (var i = 0; i < conn.up.length; i++) {
-    if (conn.up[i].status == ProcessStatus.WAITING_TO_SEND)
-      this._runtime.pushToQueue(conn.up[i]);
-  }
-};
+
+module.exports = InputPort;

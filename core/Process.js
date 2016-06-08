@@ -4,6 +4,8 @@
 var Fiber = require('fibers')
   , Enum = require('./Enum')
   , IP = require('./IP')
+  , IIPConnection = require('./IIPConnection')
+  , _ = require('lodash')
   , trace = require('./trace');
 
 var Process = module.exports = function (name, func) {
@@ -12,11 +14,26 @@ var Process = module.exports = function (name, func) {
   this.fiber = null;
   this.inports = {};
   this.outports = {};
-  this.status = Process.Status.NOT_INITIALIZED;
+  this._status = Process.Status.NOT_INITIALIZED;
   this.ownedIPs = 0;
   this.cbpending = false;
   this.yielded = false;
   this.result = null; // [data, err]
+
+  this.trace('Created with status: ' + Process.Status.__lookup(this._status),this.name);
+  Object.defineProperty(this, 'status', {
+    get: function() { return this._status; },
+    set: function(status) {
+      if(status === this._status) {
+        return;
+      }
+      this.trace('Transition from ' + Process.Status.__lookup(this._status) + ' to ' + Process.Status.__lookup(status));
+      if(status === Process.Status.ACTIVE && _.includes([Process.Status.NOT_INITIALIZED, Process.Status.DORMANT], this._status)) {
+        this.trace('Activating component');
+      }
+      this._status = status;
+    }
+  })
 };
 
 Process.Status = Enum([
@@ -32,6 +49,8 @@ Process.Status = Enum([
 ]);
 
 Process.prototype.IPTypes = IP.Types;
+
+Process.prototype.trace = trace;
 
 /*
  * Given a set of ports an a base name XXX, returns all the ports in the set that
@@ -55,11 +74,19 @@ Process.prototype.getStatusString = function () {
   return Process.Status.__lookup(this.status);
 };
 
+Process.prototype.isSelfStarting = function () {
+  var selfstarting = true;
+  _.forEach(this.inports, function (inport) {
+    selfstarting = selfstarting && (inport.conn instanceof IIPConnection);
+  });
+  return selfstarting;
+};
+
 Process.prototype.createIP = function (data) {
   var ip = new IP(data);
   this.ownedIPs++;
   ip.owner = this;
-  trace("Normal IP created: " + ip.contents);
+  this.trace("Normal IP created: " + ip.contents);
   return ip;
 };
 
@@ -71,7 +98,7 @@ Process.prototype.createIPBracket = function (bktType, x) {
   ip.type = bktType;
   this.ownedIPs++;
   ip.owner = this;
-  trace("Bracket IP created: " + IP.Types.__lookup(ip.type) + ", " + ip.contents);
+  this.trace("Bracket IP created: " + this.IPTypes.__lookup(ip.type) + ", " + ip.contents);
 
   return ip;
 };
@@ -81,7 +108,7 @@ Process.prototype.dropIP = function (ip) {
   if (ip.type != this.IPTypes.NORMAL) {
     cont = this.IPTypes.__lookup(ip.type) + ", " + cont;
   }
-  trace('IP dropped with: ' + cont);
+  this.trace('IP dropped with: ' + cont);
 
   if (ip.owner != this) {
     console.log(this.name + ' IP being dropped not owned by this Process: ' + cont);
@@ -89,6 +116,13 @@ Process.prototype.dropIP = function (ip) {
   }
   this.ownedIPs--;
   ip.owner = null;
+};
+
+Process.prototype.addInputPort = function(port) {
+  this.inports[port.portName] = port;
+};
+Process.prototype.addOutputPort = function(port) {
+  this.outports[port.portName] = port;
 };
 
 Process.prototype.openInputPort = function (name) {
@@ -145,13 +179,16 @@ Process.prototype.yield = function (preStatus, postStatus) {
   if(preStatus !== undefined || preStatus !== null) {
     this.status = preStatus;
   }
-  this.yielded = true;
-  trace("Yielding with: " + Process.Status.__lookup(preStatus));
-  Fiber.yield();
-  if(postStatus !== undefined) {
-    this.status = postStatus
-  } else {
-    this.status = Process.Status.ACTIVE;
+  if(postStatus === undefined) {
+    postStatus = Process.Status.ACTIVE;
   }
+
+  this.yielded = true;
+  this.trace("Yielding with: " + Process.Status.__lookup(preStatus));
+  Fiber.yield();
+  if(postStatus !== this.status) {
+    this.status = postStatus
+  }
+
   this.yielded = false;
 };
