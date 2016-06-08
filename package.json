@@ -31,12 +31,13 @@
   "main": "index.js",
   "devDependencies": {
     "chai": "^3.5.0",
+    "dummy-module": "*",
     "eslint": "^2.10.2",
     "eslint-config-defaults": "^9.0.0",
+    "js-beautify": "^1.6.3",
     "mocha": "^2.1.0",
     "mocha-fibers": "^1.1.0",
-    "ws": "^1.1.0",
-    "dummy-module": "*"
+    "ws": "^1.1.0"
   },
   "directories": {
     "doc": "docs"
@@ -44,6 +45,6 @@
   "scripts": {
     "test": "npm install && mocha --ui mocha-fibers --recursive -R spec --require test/test_helper.js test/components test/core",
     "lint": "eslint components core examples test index.js",
-    "ws": "js-beautify -r -s 2 -a -n -k -f core/*.js components/*.js core/runtimes/FiberRuntime/index.js "
+    "ws": "js-beautify -r -f core/*.js components/*.js core/runtimes/FiberRuntime/index.js "
   }
 }
