@@ -18,7 +18,7 @@ InputPort.prototype.parent = Port.prototype;
 
 InputPort.prototype.receive = function () {
     var conn = this.conn;
-    return conn.getData();
+    return conn.getData(this.name);
   };
 
 InputPort.prototype.close = function() {

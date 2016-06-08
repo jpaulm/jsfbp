@@ -90,8 +90,17 @@ Network.prototype.run = function (runtime, options, callback) {
   callback = callback || function () {};
 
   _.invokeMap(this._connections, 'setRuntime', runtime);
-  
-  runtime.run(_.values(this._processes), options, callback );
+
+  try {
+    runtime.run(_.values(this._processes), options, callback );
+  } catch (e) {
+    console.log('Connections');
+    console.log('-----------');
+    this._connections.forEach(function (connection) {
+      console.log(connection.name +': ' + connection.pendingIPCount() + '/' + connection.capacity);
+    });
+    throw e;
+  }
 };
 
 Network.prototype.defProc = function (func, name) {

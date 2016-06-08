@@ -22,4 +22,8 @@ Connection.prototype.purgeData = function () {
   this.contents = new FIFO();
 };
 
+Connection.prototype.pendingIPCount = function () {
+  return this.contents.length;
+};
+
 module.exports = Connection;
