@@ -11,7 +11,22 @@ var trace = require('../core/trace');
 
 var WRITE_SIZE = 4;
 
+function getChunkSize() {
+  var size = WRITE_SIZE;
+  var sizePort = this.openInputPort('SIZE');
+  if (sizePort) {
+    var sizeIP = sizePort.receive();
+    if (sizeIP) {
+      size = parseInt(sizeIP.contents, 10);
+    }
+    this.dropIP(sizeIP);
+  }
+  return size;
+}
+
 module.exports = function reader(runtime) {
+  var chunkSize = getChunkSize.call(this);
+
   var filePort = this.openInputPort('FILE');
   var ip = filePort.receive();
   var fname = ip.contents;
@@ -28,7 +43,7 @@ module.exports = function reader(runtime) {
   trace("Got fd: " + fileDescriptor);
 
   var inPort = this.openInputPort('IN');
-  trace("Starting read");
+  trace("Starting write");
   var bracket = inPort.receive();
   if (bracket.type != this.IPTypes.OPEN) {
     console.log("ERROR: Received non OPEN bracket");
@@ -37,20 +52,20 @@ module.exports = function reader(runtime) {
   }
   this.dropIP(bracket);
 
-  writeFile(runtime, this, fileDescriptor, inPort);
+  writeFile(runtime, this, fileDescriptor, inPort, chunkSize);
 
   fs.closeSync(fileDescriptor);
 };
 
-function writeFile(runtime, proc, fileDescriptor, inPort) {
-  var buffer = new Buffer(WRITE_SIZE);
+function writeFile(runtime, proc, fileDescriptor, inPort, size) {
+  var buffer = new Buffer(size);
   var byteCount = 0;
   do {
     var inIP = inPort.receive();
     if (inIP.type == proc.IPTypes.NORMAL) {
       buffer.writeUInt8(inIP.contents, byteCount);
       byteCount++;
-      if (byteCount === WRITE_SIZE) {
+      if (byteCount === size) {
         var success = writeBuffer(runtime, fileDescriptor, buffer, byteCount);
         if (!success) {
           return;

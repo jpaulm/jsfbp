@@ -11,7 +11,22 @@ var trace = require('../core/trace');
 
 var READ_SIZE = 4;
 
+function getChunkSize() {
+  var size = READ_SIZE;
+  var sizePort = this.openInputPort('SIZE');
+  if (sizePort) {
+    var sizeIP = sizePort.receive();
+    if (sizeIP) {
+      size = parseInt(sizeIP.contents, 10);
+    }
+    this.dropIP(sizeIP);
+  }
+  return size;
+}
+
 module.exports = function reader(runtime) {
+  var chunkSize = getChunkSize.call(this);
+
   var inport = this.openInputPort('FILE');
   var ip = inport.receive();
   var fname = ip.contents;
@@ -30,16 +45,16 @@ module.exports = function reader(runtime) {
   var outport = this.openOutputPort('OUT');
   trace("Starting read");
   outport.send(this.createIPBracket(this.IPTypes.OPEN));
-  readFile(runtime, this, fileDescriptor, outport);
+  readFile(runtime, this, fileDescriptor, outport, chunkSize);
 
   fs.closeSync(fileDescriptor);
   outport.send(this.createIPBracket(this.IPTypes.CLOSE));
 
 };
 
-function readFile(runtime, proc, fileDescriptor, outport) {
+function readFile(runtime, proc, fileDescriptor, outport, chunkSize) {
   do {
-    var readResult = runtime.runAsyncCallback(readData(fileDescriptor, READ_SIZE));
+    var readResult = runtime.runAsyncCallback(readData(fileDescriptor, chunkSize));
     if (readResult[0]) {
       console.error(readResult[0]);
       return;
@@ -52,7 +67,7 @@ function readFile(runtime, proc, fileDescriptor, outport) {
       trace("Got byte: " + byte);
       outport.send(proc.createIP(byte));
     }
-  } while (bytesRead === READ_SIZE);
+  } while (bytesRead === chunkSize);
 }
 
 function openFile(path, flags) {
