@@ -12,7 +12,7 @@ describe('bwriter', function () {
   it('should write incoming IPs to a file', function (done) {
     var network = new fbp.Network();
 
-    var sender = network.defProc(MockSender.generator(["IP.OPEN",
+    var sender = network.defineProcess(MockSender.generator(["IP.OPEN",
       71,
       111,
       111,
@@ -28,7 +28,7 @@ describe('bwriter', function () {
       100]
       .concat(eolBytes)
       .concat("IP.CLOSE")), 'sender');
-    var writer = network.defProc('./components/bwriter.js', 'bwriter');
+    var writer = network.defineProcess('./components/bwriter.js', 'bwriter');
 
     network.initialize(writer, 'FILE', __dirname+'/goodbye-world.txt');
     network.connect(sender, 'OUT', writer, 'IN');
@@ -47,7 +47,7 @@ describe('bwriter', function () {
   it('supports setting chunk sizes', function (done) {
     var network = new fbp.Network();
 
-    var sender = network.defProc(MockSender.generator(["IP.OPEN",
+    var sender = network.defineProcess(MockSender.generator(["IP.OPEN",
       71,
       111,
       111,
@@ -63,7 +63,7 @@ describe('bwriter', function () {
       100]
       .concat(eolBytes)
       .concat("IP.CLOSE")), 'sender');
-    var writer = network.defProc('./components/bwriter.js', 'bwriter');
+    var writer = network.defineProcess('./components/bwriter.js', 'bwriter');
 
     network.initialize(writer, 'FILE', __dirname+'/goodbye-world.txt');
     network.initialize(writer, 'SIZE', '30');

@@ -99,7 +99,7 @@ Networks can be generated programmatically or by loading in an FBP file.
 1. Get access to JSFBP: `var fbp = require('fbp')`
 2. Create a new network: `var network = new fbp.Network();`
 3. Define your network:
- - Add processes: `network.defProc(...)`  Note: when several processes use the same component, `defProc` takes the process name as a second argument. 
+ - Add processes: `network.defineProcess(...)`  Note: when several processes use the same component, `defineProcess` takes the process name as a second argument.
  - Connect output ports to input ports: `network.connect(...)`
  - Specify IIPs: `network.initialize(...)`
 4. Create a new runtime: `var fiberRuntime = new fbp.FiberRuntime();`
@@ -131,7 +131,7 @@ network.run(fiberRuntime, {trace: true/false}, function success() {
 
  ### Useful methods
  
-- `Network#defProc(component[, name])` Creates a process from a component, defined by the first parameter.
+- `Network#defineProcess(component[, name])` Creates a process from a component, defined by the first parameter.
   
   - The first parameter can be a function or a string. When a string is used, the component is loaded according to three
   possiblities:

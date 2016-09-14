@@ -11,13 +11,13 @@ var fbp = require('..')
 // --- define network ---
 var network = new fbp.Network();
 
-var readerm = network.defProc('./components/reader', 'readerm');
-var readerd = network.defProc('./components/reader', 'readerd');
-var readerc = network.defProc('./components/reader', 'readerc');
-var collate = network.defProc('./components/collate', 'coll');
-var compare = network.defProc('./examples/components/compare', 'comp');
-var gendatawithbreaks = network.defProc('./examples/components/gendatawithbreaks', 'GDWB');
-//var display = network.defProc('./components/display');
+var readerm = network.defineProcess('./components/reader', 'readerm');
+var readerd = network.defineProcess('./components/reader', 'readerd');
+var readerc = network.defineProcess('./components/reader', 'readerc');
+var collate = network.defineProcess('./components/collate', 'coll');
+var compare = network.defineProcess('./examples/components/compare', 'comp');
+var gendatawithbreaks = network.defineProcess('./examples/components/gendatawithbreaks', 'GDWB');
+//var display = network.defineProcess('./components/display');
 
 network.initialize(readerm, 'FILE', path.resolve(__dirname, 'data/mfile'));
 network.connect(readerm, 'OUT', collate, 'IN[0]');

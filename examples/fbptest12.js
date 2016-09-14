@@ -4,9 +4,9 @@ var fbp = require('..')
 // --- define network ---
 var network = new fbp.Network();
 
-var reader = network.defProc('./components/reader', 'Read');
-var copier = network.defProc('./components/copier', 'Copy');
-var writer = network.defProc('./components/writer', 'Write');
+var reader = network.defineProcess('./components/reader', 'Read');
+var copier = network.defineProcess('./components/copier', 'Copy');
+var writer = network.defineProcess('./components/writer', 'Write');
 
 network.initialize(reader, 'FILE', path.resolve(__dirname, 'data/text.txt'));
 network.connect(reader, 'OUT', copier, 'IN', 1);

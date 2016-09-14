@@ -7,10 +7,14 @@
  * This method provides better performance than just using Array#push and Array#unshift
  */
 var FIFO = function () {
-  this.queue = [];
-  this.cursor = 0;
-  this.length = 0;
+  initializeFIFO.call(this);
 };
+
+function initializeFIFO() {
+  this.queue = [];
+  this.length = 0;
+  this.cursor = 0;
+}
 
 FIFO.prototype.enqueue = function (value) {
   this.queue.push(value);
@@ -33,6 +37,10 @@ FIFO.prototype.dequeue = function () {
 
 FIFO.prototype.isEmpty = function () {
   return this.length === 0;
+};
+
+FIFO.prototype.purge = function () {
+  initializeFIFO.call(this);
 };
 
 module.exports = FIFO;

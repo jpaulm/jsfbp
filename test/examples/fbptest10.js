@@ -12,9 +12,9 @@ describe('fbptest10', function() {
 // --- define network ---
     var network = new fbp.Network();
 
-    var gendata = network.defProc('./examples/components/gendata', 'Gen');
-    var copier = network.defProc('./examples/components/copier_nonlooper', 'CNL');
-    var recvr = network.defProc('./components/recvr', 'Recvr');
+    var gendata = network.defineProcess('./examples/components/gendata', 'Gen');
+    var copier = network.defineProcess('./examples/components/copier_nonlooper', 'CNL');
+    var recvr = network.defineProcess('./components/recvr', 'Recvr');
 
     network.initialize(gendata, 'COUNT', '200');
     network.connect(gendata, 'OUT', copier, 'IN', 10);

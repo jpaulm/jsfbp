@@ -8,9 +8,9 @@ describe('copier', function () {
 
     var result = [];
 
-    var sender = network.defProc(MockSender.generator([1, 2, 3, 4, 5]), "sender");
-    var copier = network.defProc('./components/copier.js', "copier");
-    var receiver = network.defProc(MockReceiver.generator(result), "receiver");
+    var sender = network.defineProcess(MockSender.generator([1, 2, 3, 4, 5]), "sender");
+    var copier = network.defineProcess('./components/copier.js', "copier");
+    var receiver = network.defineProcess(MockReceiver.generator(result), "receiver");
 
     network.connect(sender, 'OUT', copier, 'IN');
     network.connect(copier, 'OUT', receiver, 'IN');

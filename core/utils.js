@@ -1,7 +1,7 @@
 'use strict';
 
 var Fiber = require('fibers'),
-  ProcessStatus = require('./Process').Status,
+  ProcessStatus = require('./Component').Status,
   trace = require('./trace');
 
 function getInportWithData(inportArray) {

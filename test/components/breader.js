@@ -12,8 +12,8 @@ describe('breader', function () {
 
     var result = [];
 
-    var breader = network.defProc('./components/breader.js', 'breader');
-    var receiver = network.defProc(MockReceiver.generator(result), 'receiver');
+    var breader = network.defineProcess('./components/breader.js', 'breader');
+    var receiver = network.defineProcess(MockReceiver.generator(result), 'receiver');
 
     network.initialize(breader, 'FILE', __dirname+'/hello-world.txt');
     network.connect(breader, 'OUT', receiver, 'IN');
@@ -30,8 +30,8 @@ describe('breader', function () {
 
     var result = [];
 
-    var breader = network.defProc('./components/breader.js', 'breader');
-    var receiver = network.defProc(MockReceiver.generator(result), 'receiver');
+    var breader = network.defineProcess('./components/breader.js', 'breader');
+    var receiver = network.defineProcess(MockReceiver.generator(result), 'receiver');
 
     network.initialize(breader, 'FILE', __dirname+'/hello-world.txt');
     network.initialize(breader, 'SIZE', '100');

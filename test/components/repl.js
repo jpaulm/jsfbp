@@ -9,10 +9,10 @@ describe('repl', function () {
     var result1 = [];
     var result2 = [];
 
-    var sender = network.defProc(MockSender.generator([1, 2, 3, 4, 5]), "sender");
-    var repl = network.defProc('./components/repl.js', "repl");
-    var receiver1 = network.defProc(MockReceiver.generator(result1), "receiver1");
-    var receiver2 = network.defProc(MockReceiver.generator(result2), "receiver2");
+    var sender = network.defineProcess(MockSender.generator([1, 2, 3, 4, 5]), "sender");
+    var repl = network.defineProcess('./components/repl.js', "repl");
+    var receiver1 = network.defineProcess(MockReceiver.generator(result1), "receiver1");
+    var receiver2 = network.defineProcess(MockReceiver.generator(result2), "receiver2");
 
     network.connect(sender, 'OUT', repl, 'IN');
     network.connect(repl, 'OUT[0]', receiver1, 'IN');
@@ -31,10 +31,10 @@ describe('repl', function () {
     var result1 = [];
     var result2 = [];
 
-    var sender = network.defProc(MockSender.generator(["IP.OPEN", 7, 6, 5, "IP.CLOSE"]), 'sender');
-    var repl = network.defProc('./components/repl.js', "repl");
-    var receiver1 = network.defProc(MockReceiver.generator(result1), "receiver1");
-    var receiver2 = network.defProc(TypeReceiver.generator(result2), "receiver2");
+    var sender = network.defineProcess(MockSender.generator(["IP.OPEN", 7, 6, 5, "IP.CLOSE"]), 'sender');
+    var repl = network.defineProcess('./components/repl.js', "repl");
+    var receiver1 = network.defineProcess(MockReceiver.generator(result1), "receiver1");
+    var receiver2 = network.defineProcess(TypeReceiver.generator(result2), "receiver2");
 
     network.connect(sender, 'OUT', repl, 'IN');
     network.connect(repl, 'OUT[0]', receiver1, 'IN');

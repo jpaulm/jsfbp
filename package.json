@@ -24,8 +24,10 @@
   },
   "homepage": "https://github.com/jpaulm/jsfbp",
   "dependencies": {
+    "bluebird": "^3.4.1",
     "fibers": "^1.0.5",
     "lodash": "^4.13.1",
+    "node-ipc": "^7.0.0",
     "parsefbp": "^0.3.0"
   },
   "main": "index.js",
@@ -36,14 +38,13 @@
     "eslint-config-defaults": "^9.0.0",
     "js-beautify": "^1.6.3",
     "mocha": "^2.1.0",
-    "mocha-fibers": "^1.1.0",
     "ws": "^1.1.0"
   },
   "directories": {
     "doc": "docs"
   },
   "scripts": {
-    "test": "npm install && mocha --ui mocha-fibers --recursive -R spec --require test/test_helper.js test/components test/core",
+    "test": "npm install && mocha --ui bdd --recursive -R spec --require test/test_helper.js test/core",
     "lint": "eslint components core examples test index.js",
     "ws": "js-beautify -r -f core/*.js components/*.js core/runtimes/FiberRuntime/index.js "
   }

@@ -1,31 +1,49 @@
-var IIPConnection = require('./IIPConnection'),
-  InputPort = require('./InputPort'),
-  OutputPort = require('./OutputPort'),
-  path = require('path'),
-  Process = require('./Process'),
-  ProcessConnection = require('./ProcessConnection'),
+var path = require('path'),
   parseFBP = require('parsefbp'),
-  trace = require('./trace'),
-  _ = require('lodash');
+  _ = require('lodash'),
+  fork = require('child_process').fork,
+  Promise = require('bluebird');
+
+
+
+/*
+ _connections Definition for process P with inports I,J and outport O
+ Remote processes are R and S
+ IIP into P.J
+
+ R.O -> P.I
+ P.O -> S.I
+ 'foo' -> P.J
+
+ {
+  R: {
+    out: { O: { process: 'P', port: 'I', capacity: 20 } },
+    in :{}
+  },
+  P: {
+    out: { O: { process: 'S', port: 'I' } },
+    in: { I: [ { process: 'R', port: 'O' } ], J: [ { data: 'foo' } ] }
+  },
+  S: {
+    out: {},
+    in: { I: [ { process: 'P', port: 'O' } ] }
+  }
+ }
+ */
 
 var Network = module.exports = function (options) {
   this._processes = {};
-  this._connections = [];
+
+  this._connections = {};
   if (options) {
     this.componentRoot = options.componentRoot;
   }
 };
 
-/*
- * This function provides support for loading
- * - components that come _with_ this module -> './components/copier.js'
- * - components that are inside a package -> 'package/component'
- * - components that are simply a node module -> 'component'
- * - components that are local to the application trying to load them
- */
-function loadComponent(componentName, localRoot) {
-  var moduleLocation = componentName;
+function locateComponent(componentName, localRoot) {
   var componentField;
+  var moduleLocation;
+
   if (componentName.match('^[.]{1,2}/')) {
     moduleLocation = path.resolve(path.join(__dirname, '..', componentName));
   } else if (componentName.indexOf('/') >= 0) {
@@ -38,15 +56,10 @@ function loadComponent(componentName, localRoot) {
       moduleLocation = path.join(localRoot, componentField);
       componentField = undefined;
     }
-  }
-  trace("Trying to load: " + require.resolve(moduleLocation));
-  var component = require(moduleLocation);
-
-  if (componentField) {
-    return component[componentField]
   } else {
-    return component;
+    moduleLocation = componentName;
   }
+  return {moduleLocation: moduleLocation, componentField: componentField};
 }
 
 function getPort(connectionEnd) {
@@ -65,126 +78,199 @@ Network.createFromGraph = function (graphString, localRoot) {
   var network = new Network({
     componentRoot: localRoot
   });
-  var processes = {};
 
-  Object.keys(graphDefinition.processes).forEach(function (processName) {
-    var processDefinition = graphDefinition.processes[processName];
-    processes[processName] = network.defProc(processDefinition.component, processName);
+  _.forEach(graphDefinition.processes, function (processDefinition, processName) {
+    network.defineProcess(processDefinition.component, processName);
   });
 
   graphDefinition.connections.forEach(function (connection) {
     var target = connection.tgt;
     if ('data' in connection) {
-      network.initialize(processes[target.process], getPort(target), connection.data);
+      network.initialize(target.process, getPort(target), connection.data);
     } else {
       var source = connection.src;
-      network.connect(processes[source.process], getPort(source), processes[target.process], getPort(target), connection.capacity);
+      network.connect(source.process, getPort(source), target.process, getPort(target), connection.capacity);
     }
-
   });
+
   return network;
+};
+
+/**
+ * Given a `processName`, this returns an object that describes the connections to and from the process
+ * @param {string} processName
+ * @returns {*}
+ */
+Network.prototype.getProcessConnections = function (processName) {
+  if(typeof processName !== "string") {
+    throw new Error("Non-string passed to getProcessConnections. Did you pass a process instead of its name?");
+  }
+  if (!this._connections[processName]) {
+    this._connections[processName] = {out: {}, in: {}}
+  }
+
+  return this._connections[processName];
+};
+
+
+function attachInputToProcess(network, processName, portName, input) {
+  var processConnections = network.getProcessConnections(processName);
+
+  if (!processConnections.in[portName]) {
+    processConnections.in[portName] = [];
+  }
+
+  processConnections.in[portName].push(input);
+
+}
+
+Network.prototype.initialize = function (process, portName, string) {
+  var processName = (typeof process === "string") ? process : process.name;
+  attachInputToProcess(this, processName, portName, {data: string});
+};
+
+Network.prototype.defineProcess = function (moduleName, name) {
+  if (!name) {
+    throw new Error("No name passed to defineProcess:" + moduleName);
+  } else if (this._processes[name]) {
+    throw new Error("Duplicate name specified in defineProcess:" + moduleName);
+  } else {
+    var moduleLocation = locateComponent(moduleName, this.componentRoot || '');
+    this._processes[name] = {
+      name: name,
+      location: moduleLocation
+    };
+    return this._processes[name];
+  }
 };
 
 Network.prototype.getProcessByName = function (processName) {
   return this._processes[processName];
 };
 
-Network.prototype.run = function (runtime, options, callback) {
-  options = options || {};
-  callback = callback || function () {};
+Network.prototype.getProcessList = function () {
+  return _.keys(this._processes);
+};
 
-  _.invokeMap(this._connections, 'setRuntime', runtime);
-
-  try {
-    runtime.run(_.values(this._processes), options, callback);
-  } catch (e) {
-    console.log('Connections');
-    console.log('-----------');
-    this._connections.forEach(function (connection) {
-      console.log(connection.name + ': ' + connection.pendingIPCount() + '/' + connection.capacity);
-    });
-    throw e;
+Network.prototype.getProcessPorts = function (processName) {
+  var connections = this.getProcessConnections(processName);
+  return {
+    in: _.keys(connections.in),
+    out: _.keys(connections.out)
   }
 };
 
-Network.prototype.defProc = function (func, name) {
-  if (typeof func === "string") {
-    func = loadComponent(func, this.componentRoot || '');
-  }
-  if (!func) {
-    throw new Error("No function passed to defProc: " + name);
-  }
+Network.prototype.connect = function (upstreamProcess, upstreamPortName, downstreamProcess, downstreamPortName, capacity) {
+  var upstreamProcessName = (typeof upstreamProcess === 'string') ? upstreamProcess : upstreamProcess.name;
+  var downstreamProcessName = (typeof downstreamProcess === "string") ? downstreamProcess : downstreamProcess.name;
+  attachInputToProcess(this, downstreamProcessName, downstreamPortName, {process: upstreamProcessName, port: upstreamPortName});
 
-  if (!name) {
-    name = func.name;
-    if (!name) {
-      throw new Error("No name passed to defProc:" + func);
-    }
-  }
-
-  if (this._processes[name]) {
-    throw new Error("Duplicate name specified in defProc:" + func);
-  }
-
-  var proc = new Process(name, func);
-
-  proc.trace('defined');
-
-  this._processes[name] = proc;
-  return proc;
-};
-
-Network.prototype.initialize = function (proc, portName, string) {
-  var inport = new InputPort(proc, portName);
-  inport.conn = new IIPConnection(string);
-};
-
-Network.prototype.connect = function (upproc, upPortName, downproc, downPortName, capacity) {
-  if (!capacity) {
-    capacity = 10;
-  }
-  var outport = upproc.outports[upPortName];
-  if (outport) {
-    console.log('Cannot connect one output port (' + outport.name + ') to multiple input ports');
+  var upstreamConnections = this.getProcessConnections(upstreamProcessName);
+  var processOutPorts = upstreamConnections.out;
+  if (processOutPorts[upstreamPortName]) {
+    console.log('Cannot connect one output port (' + upstreamProcess + '.' + upstreamPortName + ') to multiple input ports');
     return;
   }
 
-  outport = new OutputPort(upproc, upPortName);
 
-  var inport = downproc.inports[downPortName];
-
-  if (inport == null) {
-    inport = new InputPort(downproc, downPortName);
-
-    var cnxt = new ProcessConnection(capacity);
-    cnxt.name = inport.name;
-    this._connections.push(cnxt);
-  } else {
-    cnxt = inport.conn;
-  }
-
-  cnxt.connectProcesses(upproc, outport, downproc, inport);
+  processOutPorts[upstreamPortName] = {process: downstreamProcessName, port: downstreamPortName, capacity: capacity || 10};
 };
 
-Network.prototype.sinitialize = function (sinport, string) {
+function getPortInfo(sinport) {
   var i = sinport.lastIndexOf('.');
   var procname = sinport.substring(0, i);
   var port = sinport.substring(i + 1);
   var proc = this._processes[procname];
+  return {port: port, proc: proc};
+}
 
-  this.initialize(proc, port, string);
+Network.prototype.sinitialize = function (sinport, string) {
+  var other = getPortInfo.call(this, sinport);
+
+  this.initialize(other.proc, other.port, string);
 };
 
 Network.prototype.sconnect = function (soutport, sinport, capacity) {
+  var up = getPortInfo.call(this, soutport);
+  var down = getPortInfo.call(this, sinport);
 
-  var i = soutport.lastIndexOf('.');
-  var procname = soutport.substring(0, i);
-  var upport = soutport.substring(i + 1);
-  var upproc = this._processes[procname];
-  i = sinport.lastIndexOf('.');
-  procname = sinport.substring(0, i);
-  var downport = sinport.substring(i + 1);
-  var downproc = this._processes[procname];
+  this.connect(up.proc, up.port, down.proc, down.port, capacity);
+};
 
-  this.connect(upproc, upport, downproc, downport, capacity);
+function determineTarget(message, network) {
+  var connections = network.getProcessConnections(message.from.process);
+  if(!connections) {
+    throw new Error("No connections found for process: " + message.from.process);
+  }
+  return connections.out[message.from.portName];
+}
+
+function routeMessageThroughNetwork(message, network) {
+  if(!network._processes[message.from.process]) {
+    throw new Error(message.from.process + " is not part of this Network");
+  } else {
+    var target = determineTarget(message, network);
+    if(!target) {
+      throw new Error("No connection exists for " + message.from.process + "." + message.from.portName);
+    }
+    message.to = {
+      process: target.process,
+      portName: target.port
+    };
+  }
+}
+
+function sendMessage(message, network) {
+  var targetProcess = network.getProcessByName(message.to.process);
+  sendMessageToProcess(message, targetProcess);
+}
+
+function sendMessageToProcess(message, process) {
+  process.details.child.send(message);
+}
+
+Network.prototype.run = function (options, callback) {
+  options = options || {};
+  callback = callback || function () {};
+
+  var networkProcesses = this._processes;
+  var network = this;
+
+  var processPromises = _.map(networkProcesses, function (details, processName) {
+    details.child = fork('core/Process.js');
+
+    details.child.send('initialize', {
+      componentLocation: details.location,
+      name: processName,
+      ports: this.getProcessPorts(processName)
+    });
+
+    var processPromise = new Promise();
+
+
+    details.child.on('message', function (message) {
+      if(message.type === "initializationComplete") {
+        processPromise.resolve(processName);
+        details.state = "INITIALIZED";
+        details.child.send({ type: 'startWhenReady' });
+
+      } else if (message.type === "stateChange") {
+        if(details.state !== message.oldState) {
+          throw new Error("Invalid state change for " + processName +
+            "; currentState: " + details.state + ", expectedState: " +message.oldState);
+        }
+        details.state = message.newState;
+
+      } else {
+        routeMessageThroughNetwork(message, network);
+        sendMessage(message, network);
+      }
+    });
+
+    return processPromise;
+  });
+
+  Promise.all(processPromises)
+    .then(_.partial(callback, null))
+    .catch(callback);
 };

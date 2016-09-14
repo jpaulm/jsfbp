@@ -3,9 +3,9 @@ var fbp = require('../..');
 // --- define network ---
 var network = new fbp.Network();
 
-var receiver = network.defProc(require('../../components/wsrecv'));
-var simproc = network.defProc(require('./wssimproc'));
-var send = network.defProc(require('./wsbroadcast'));
+var receiver = network.defineProcess(require('../../components/wsrecv'));
+var simproc = network.defineProcess(require('./wssimproc'));
+var send = network.defineProcess(require('./wsbroadcast'));
 
 network.initialize(receiver, 'PORTNO', '9003');
 network.connect(receiver, 'WSSOUT', send, 'WSSIN', 6);

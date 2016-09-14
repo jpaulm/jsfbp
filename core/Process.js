@@ -1,196 +1,204 @@
-'use strict';
+/**
+ * Created by danrumney on 6/15/16.
+ */
+var DefaultRuntime = require('./DefaultRuntime')
+  , trace = require('./trace')
+  , _ = require('lodash')
+  , Fiber = require('fibers')
+  , IP = require('../core/IP')
+  , FIFO = require('./FIFO');
 
-
-var Fiber = require('fibers'),
-  Enum = require('./Enum'),
-  IP = require('./IP'),
-  IIPConnection = require('./IIPConnection'),
-  _ = require('lodash'),
-  trace = require('./trace');
-
-var Process = module.exports = function (name, func) {
-  this.name = name;
-  this.func = func;
-  this.fiber = null;
-  this.inports = {};
-  this.outports = {};
-  this._status = Process.Status.NOT_INITIALIZED;
-  this.ownedIPs = 0;
-  this.cbpending = false;
-  this.yielded = false;
-  this.result = null; // [data, err]
-
-  this.trace('Created with status: ' + Process.Status.__lookup(this._status), this.name);
-  Object.defineProperty(this, 'status', {
-    get: function () {
-      return this._status;
-    },
-    set: function (status) {
-      if (status === this._status) {
-        return;
-      }
-      this.trace('Transition from ' + Process.Status.__lookup(this._status) + ' to ' + Process.Status.__lookup(status));
-      if (status === Process.Status.ACTIVE && _.includes([Process.Status.NOT_INITIALIZED, Process.Status.DORMANT], this._status)) {
-        this.trace('Activating component');
-      }
-      this._status = status;
-    }
-  })
-};
-
-Process.Status = Enum([
-  'NOT_INITIALIZED',
-  'ACTIVE', // (includes waiting on callback ...)
-  'WAITING_TO_RECEIVE',
-  'WAITING_TO_FIPE',
-  'WAITING_TO_SEND',
-  'READY_TO_EXECUTE',
-  'DORMANT',
-  'CLOSED',
-  'DONE'
-]);
-
-Process.prototype.IPTypes = IP.Types;
-
-Process.prototype.trace = trace;
 
 /*
- * Given a set of ports an a base name XXX, returns all the ports in the set that
- * have the name XXX[<index>]
+ * This function provides support for loading
+ * - components that come _with_ this module -> './components/copier.js'
+ * - components that are inside a package -> 'package/component'
+ * - components that are simply a node module -> 'component'
+ * - components that are local to the application trying to load them
  */
-function getPortArray(ports, name) {
-  var re = new RegExp(name + '\\[\\d+\\]');
 
-  return Object.keys(ports)
-    .filter(function (portName) {
-      return re.test(portName);
-    })
-    .sort()
-    .map(function (portName) {
-      return ports[portName];
-    });
+function loadComponent(componentDetails) {
+  var moduleLocation = componentDetails.moduleLocation;
+  var componentField = componentDetails.componentField;
+
+  trace("Trying to load: " + require.resolve(moduleLocation));
+  var component = require(moduleLocation);
+
+  if (componentField) {
+    return component[componentField]
+  } else {
+    return component;
+  }
 }
 
 
-Process.prototype.getStatusString = function () {
-  return Process.Status.__lookup(this.status);
+function _receive(portName) {
+  if(this.inports[portName].closed) {
+    console.log('Reading from closed port: "' + portName +'"');
+    return null;
+  }
+  this.runtime.dispatch('readyForIP').from(portName);
+  var ip = this.runtime.wait();
+  ip.owner = this.name;
+  this.ownedIPs++;
+  return ip;
+}
+
+function _send(portName, ip) {
+  if(ip.owner !== this.name) {
+    throw 'Cannot send an IP that this process does not own';
+  }
+  var sendQueue = this.outQueues[portName];
+  while (sendQueue.length >= this.getCapacity(portName)) {
+    this.runtime.wait();
+  }
+  sendQueue.enqueue(ip);
+  this.runtime.dispatch('ipAvailable').from(portName);
+}
+
+function _closePort(portName, ports) {
+  this[ports][portName].closed = true;
+  this.runtime.dispatch('closing').from(portName);
+}
+
+/*
+ * Process object definition starts here
+ */
+
+var DEFAULT_CAPACITY = 20;
+
+var Process = function (options) {
+  this.name = options.name;
+  this.componentModule = options.component;
+
+  var process = this;
+  this.inports = _.reduce(options.ports.in, function (ports, portName) {
+    ports[portName] = {
+      name: portName,
+      process: process,
+      receive: _receive.bind(process, portName),
+      close: _closePort.bind(process, portName, 'inports'),
+      closed: true
+    };
+    return ports;
+  }, {});
+  this.outports = options.ports.out;
+  this.outQueues = {};
+
+  this.ownedIPs = 0;
+
+  var runtime = this.runtime = options.runtime || new DefaultRuntime(this.name);
+  runtime.setOutQueues(this.outQueues);
+
+
+
+  this.runtime.addHandler('incomingIP', function (message) {
+    runtime.resume(message.ip);
+  });
+
+  this.runtime.addHandler('pullIP', function (message) {
+    var portName = message.to.portName;
+    var ip = runtime.outQueues[portName].dequeue();
+    ip.owner = null;
+    runtime.dispatch('sendIP', ip).from(portName);
+    process.ownedIPs--;
+    runtime.resume();
+  });
+
+  this.runtime.addHandler('downstreamClosed', function (message) {
+    var portName = message.to.portName;
+    const pendingIPs = runtime.outQueues[portName].length;
+    if(pendingIPs > 0) {
+      console.error('Connection closed from "' + portName + '" results in ' + pendingIPs + ' IPs being dropped');
+    }
+    runtime.outQueues[portName].purge();
+    process.outports[portName].closed = true;
+  });
 };
 
-Process.prototype.isSelfStarting = function () {
-  var selfstarting = true;
-  _.forEach(this.inports, function (inport) {
-    selfstarting = selfstarting && (inport.conn instanceof IIPConnection);
-  });
-  return selfstarting;
+Process.prototype.openInputPort = function (portName) {
+  if (this.inports[portName]) {
+    this.inports[portName].closed = false;
+    return this.inports[portName];
+  } else {
+    console.error('Port "' + portName + '" does not exist in process "' + this.name + '"');
+    return null;
+  }
 };
+
+Process.prototype.openOutputPort = function (portName) {
+  if (this.outports[portName]) {
+    this.outQueues[portName] = new FIFO();
+    this.outports[portName].closed = false;
+    return {
+      name: portName,
+      process: this,
+      send: _send.bind(this, portName),
+      close: _closePort.bind(this, portName, 'outports'),
+      capacity: this.outports[portName].capacity || DEFAULT_CAPACITY
+    };
+  } else {
+    console.error('Port "' + portName + '" does not exist in process "' + this.name + '"');
+    return null;
+  }
+};
+
+Process.prototype.getCapacity = function (portName) {
+  return this.outports[portName].capacity || DEFAULT_CAPACITY;
+};
+
+Process.prototype.activateComponent = function () {
+  if (!this.fiber) {
+    this.fiber = Fiber(this.componentModule.bind(this));
+  }
+  this.fiber.run();
+};
+
+if (process.send) {
+  (function (networkName, componentLocation, processName, ports) {
+    console.log(ports);
+    var component = loadComponent(componentLocation);
+    var fbpProcess = new Process(processName, component, ports);
+
+    process.on('startWhenReady', function () {
+        fbpProcess.activateComponent();
+      });
+  }).apply(process.argv.slice(2));
+} else {
+  module.exports = Process;
+}
+
 
 Process.prototype.createIP = function (data) {
-  var ip = new IP(data);
+  var ip = IP.create(IP.Types.NORMAL, data, this.name);
   this.ownedIPs++;
-  ip.owner = this;
-  this.trace("Normal IP created: " + ip.contents);
+  trace("Normal IP created: " + ip.contents);
   return ip;
 };
 
-Process.prototype.createIPBracket = function (bktType, x) {
-  if (x == undefined) {
-    x = null;
-  }
-  var ip = new IP(x);
-  ip.type = bktType;
+Process.prototype.cloneIP = function (ip) {
+  var clonedIP = IP.create(ip.type, ip.data, this.name);
   this.ownedIPs++;
-  ip.owner = this;
-  this.trace("Bracket IP created: " + this.IPTypes.__lookup(ip.type) + ", " + ip.contents);
+  trace("IP cloned: " + ip);
+  return clonedIP;
+};
+
+Process.prototype.createIPBracket = function (bktType, x) {
+  var ip = IP.create(bktType, x, this.name);
+  this.ownedIPs++;
+
+  trace("Bracket IP created: " + this.IPTypes.__lookup(ip.type) + ", " + ip.contents);
 
   return ip;
 };
 
 Process.prototype.dropIP = function (ip) {
-  var cont = ip.contents;
-  if (ip.type != this.IPTypes.NORMAL) {
-    cont = this.IPTypes.__lookup(ip.type) + ", " + cont;
-  }
-  this.trace('IP dropped with: ' + cont);
-
-  if (ip.owner != this) {
-    console.log(this.name + ' IP being dropped not owned by this Process: ' + cont);
+  if (ip.owner != this.name) {
+    console.log(this.name + ' IP being dropped not owned by this Component: ' + ip);
     return;
   }
+
+  trace('IP dropped: ' + ip);
   this.ownedIPs--;
   ip.owner = null;
-};
-
-Process.prototype.addInputPort = function (port) {
-  this.inports[port.portName] = port;
-};
-Process.prototype.addOutputPort = function (port) {
-  this.outports[port.portName] = port;
-};
-
-Process.prototype.openInputPort = function (name) {
-  var port = this.inports[name];
-  if (port) {
-    return port;
-  } else {
-    console.log('Port ' + this.name + '.' + name + ' not found');
-    return null;
-  }
-};
-
-Process.prototype.openInputPortArray = function (name) {
-  var array = getPortArray(this.inports, name);
-
-  if (array.length === 0) {
-    console.log('Port ' + this.name + '.' + name + ' not found');
-    return null;
-  }
-
-  return array;
-};
-
-Process.prototype.openOutputPort = function (name, opt) {
-  var port = this.outports[name];
-  if (port) {
-    return port;
-  } else {
-    if (opt != 'OPTIONAL') {
-      console.log('Port ' + this.name + '.' + name + ' not found');
-    }
-    return null;
-  }
-};
-
-Process.prototype.openOutputPortArray = function (name) {
-  var array = getPortArray(this.outports, name);
-
-  if (array.length === 0) {
-    console.log('Port ' + this.name + '.' + name + ' not found');
-    return null;
-  }
-
-  return array;
-};
-
-/**
- * Yield the fiber that is running this process
- *
- * @param preStatus Process status will be set to this before yielding. If not set or set to `null`, the status is not changed
- * @param postStatus Process status will be set to this after yielding. If not set, the status will be changed to ACTIVE
- */
-Process.prototype.yield = function (preStatus, postStatus) {
-  if (preStatus !== undefined || preStatus !== null) {
-    this.status = preStatus;
-  }
-  if (postStatus === undefined) {
-    postStatus = Process.Status.ACTIVE;
-  }
-
-  this.yielded = true;
-  this.trace("Yielding with: " + Process.Status.__lookup(preStatus));
-  Fiber.yield();
-  if (postStatus !== this.status) {
-    this.status = postStatus
-  }
-
-  this.yielded = false;
 };
