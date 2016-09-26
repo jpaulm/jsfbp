@@ -1,12 +1,21 @@
 {
+  "plugins": [
+      "chai-expect"
+    ]
+  ,
   "env": {
     "mocha":true
   },
   "globals": {
     "expect": false,
-    "MockSender": false,
-    "MockReceiver": false,
+    "is": false,
+    "describe": false,
+    "ComponentScaffold": false,
     "TypeReceiver": false,
     "TestFiber": false
+  },
+  "rules": {
+    "chai-expect/missing-assertion": 2,
+    "chai-expect/terminating-properties": 1
   }
 }

@@ -1,39 +1,48 @@
 'use strict';
 
-var fbp = require('../..');
+var bwriter = require('../../components/bwriter');
 var fs = require('fs');
-
 var _ = require('lodash');
-var EOL = require('os').EOL;
 
-var eolBytes = _.invokeMap(EOL.split(''), 'charCodeAt', 0);
+var EOL = require('os').EOL;
+const EOL_BYTES = _.invokeMap(EOL.split(''), 'charCodeAt', 0);
+
+const GOODBYE_CONTENT = [ComponentScaffold.openIP(),
+  71,
+  111,
+  111,
+  100,
+  98,
+  121,
+  101,
+  0x20,
+  87,
+  111,
+  114,
+  108,
+  100]
+  .concat(EOL_BYTES)
+  .concat(ComponentScaffold.closeIP());
+
 
 describe('bwriter', function () {
   it('should write incoming IPs to a file', function (done) {
-    var network = new fbp.Network();
+    var scaffold = new ComponentScaffold({
+        iips: {
+          'FILE': __dirname+'/goodbye-world.txt'
+        },
+        inports: {
+          IN: GOODBYE_CONTENT
+        },
+        outports: {},
+        droppedIPs: [__dirname+'/goodbye-world.txt'].concat(GOODBYE_CONTENT)
+      }
+    );
 
-    var sender = network.defProc(MockSender.generator(["IP.OPEN",
-      71,
-      111,
-      111,
-      100,
-      98,
-      121,
-      101,
-      0x20,
-      87,
-      111,
-      114,
-      108,
-      100]
-      .concat(eolBytes)
-      .concat("IP.CLOSE")), 'sender');
-    var writer = network.defProc('./components/bwriter.js', 'bwriter');
-
-    network.initialize(writer, 'FILE', __dirname+'/goodbye-world.txt');
-    network.connect(sender, 'OUT', writer, 'IN');
-
-    network.run(new fbp.FiberRuntime(), {trace: false}, function () {
+    scaffold.run(bwriter, function () {
+      scaffold.verifyOutputs(expect);
+      scaffold.verifyDroppedIPs(expect);
+      scaffold.runTests(it);
       fs.readFile(__dirname+'/goodbye-world.txt', 'utf-8', function(err, data) {
         if(err) {
           return done(err);
@@ -45,31 +54,24 @@ describe('bwriter', function () {
   });
 
   it('supports setting chunk sizes', function (done) {
-    var network = new fbp.Network();
+    var scaffold = new ComponentScaffold({
+        iips: {
+          'FILE': __dirname+'/goodbye-world.txt',
+          'SIZE': 100
+        },
+        inports: {
+          IN: GOODBYE_CONTENT
+        },
+        outports: {},
+        droppedIPs: [100,
+          __dirname+'/goodbye-world.txt'].concat(GOODBYE_CONTENT)
+      }
+    );
 
-    var sender = network.defProc(MockSender.generator(["IP.OPEN",
-      71,
-      111,
-      111,
-      100,
-      98,
-      121,
-      101,
-      0x20,
-      87,
-      111,
-      114,
-      108,
-      100]
-      .concat(eolBytes)
-      .concat("IP.CLOSE")), 'sender');
-    var writer = network.defProc('./components/bwriter.js', 'bwriter');
-
-    network.initialize(writer, 'FILE', __dirname+'/goodbye-world.txt');
-    network.initialize(writer, 'SIZE', '30');
-    network.connect(sender, 'OUT', writer, 'IN');
-
-    network.run(new fbp.FiberRuntime(), {trace: false}, function () {
+    scaffold.run(bwriter, function () {
+      scaffold.verifyOutputs(expect);
+      scaffold.verifyDroppedIPs(expect);
+      scaffold.runTests(it);
       fs.readFile(__dirname+'/goodbye-world.txt', 'utf-8', function(err, data) {
         if(err) {
           return done(err);

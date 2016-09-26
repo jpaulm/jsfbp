@@ -34,9 +34,11 @@
     "dummy-module": "*",
     "eslint": "^2.10.2",
     "eslint-config-defaults": "^9.0.0",
+    "eslint-plugin-chai-expect": "^1.1.1",
     "js-beautify": "^1.6.3",
     "mocha": "^2.1.0",
     "mocha-fibers": "^1.1.0",
+    "synchronize": "^2.0.0",
     "ws": "^1.1.0"
   },
   "directories": {

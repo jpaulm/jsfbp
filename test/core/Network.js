@@ -31,7 +31,7 @@ describe('Network', function () {
     expect(process.func).to.be.an('function');
   });
 
-  it('can be created from an FBP file', function (done) {
+  it.skip('can be created from an FBP file', function (done) {
     fs.readFile(__dirname + '/network.fbp', function (err, graph) {
       if (err) {
         return done(err);

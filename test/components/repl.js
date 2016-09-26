@@ -1,49 +1,43 @@
 'use strict';
 
-var fbp = require('../..');
+var repl = require('../../components/repl');
 
 describe('repl', function () {
-  it('should replicate multiple IPs', function (done) {
-    var network = new fbp.Network();
+  it('should replicate multiple IPs', function () {
+    var scaffold = new ComponentScaffold({
+        inports: {
+          IN: [1, 2, 3, 4, 5]
+        },
+        outports: {
+          'OUT[0]': [1, 2, 3, 4, 5],
+          'OUT[1]': [1, 2, 3, 4, 5]
+        },
+        droppedIPs: []
+      }
+    );
 
-    var result1 = [];
-    var result2 = [];
-
-    var sender = network.defProc(MockSender.generator([1, 2, 3, 4, 5]), "sender");
-    var repl = network.defProc('./components/repl.js', "repl");
-    var receiver1 = network.defProc(MockReceiver.generator(result1), "receiver1");
-    var receiver2 = network.defProc(MockReceiver.generator(result2), "receiver2");
-
-    network.connect(sender, 'OUT', repl, 'IN');
-    network.connect(repl, 'OUT[0]', receiver1, 'IN');
-    network.connect(repl, 'OUT[1]', receiver2, 'IN');
-
-    network.run(new fbp.FiberRuntime(), {trace: false}, function () {
-      expect(result1).to.deep.equal([1, 2, 3, 4, 5]);
-      expect(result2).to.deep.equal([1, 2, 3, 4, 5]);
-      done();
-    });
+    scaffold.run(repl);
+    scaffold.verifyOutputs(expect);
+    scaffold.verifyDroppedIPs(expect);
+    scaffold.runTests(it);
   });
 
-  it('should replicate brackets', function (done) {
-    var network = new fbp.Network();
+  it('should replicate brackets', function () {
+    var scaffold = new ComponentScaffold({
+        inports: {
+          IN: [ComponentScaffold.openIP(), 7, 6, 5, ComponentScaffold.closeIP()]
+        },
+        outports: {
+          'OUT[0]': [ComponentScaffold.openIP(), 7, 6, 5, ComponentScaffold.closeIP()],
+          'OUT[1]': [ComponentScaffold.openIP(), 7, 6, 5, ComponentScaffold.closeIP()]
+        },
+        droppedIPs: []
+      }
+    );
 
-    var result1 = [];
-    var result2 = [];
-
-    var sender = network.defProc(MockSender.generator(["IP.OPEN", 7, 6, 5, "IP.CLOSE"]), 'sender');
-    var repl = network.defProc('./components/repl.js', "repl");
-    var receiver1 = network.defProc(MockReceiver.generator(result1), "receiver1");
-    var receiver2 = network.defProc(TypeReceiver.generator(result2), "receiver2");
-
-    network.connect(sender, 'OUT', repl, 'IN');
-    network.connect(repl, 'OUT[0]', receiver1, 'IN');
-    network.connect(repl, 'OUT[1]', receiver2, 'IN');
-
-    network.run(new fbp.FiberRuntime(), {trace: false}, function () {
-      expect(result1).to.deep.equal([7, 6, 5]);
-      expect(result2).to.deep.equal([fbp.IPTypes.OPEN, fbp.IPTypes.NORMAL, fbp.IPTypes.NORMAL, fbp.IPTypes.NORMAL, fbp.IPTypes.CLOSE]);
-      done();
-    });
-  })
+    scaffold.run(repl);
+    scaffold.verifyOutputs(expect);
+    scaffold.verifyDroppedIPs(expect);
+    scaffold.runTests(it);
+  });
 });

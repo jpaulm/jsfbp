@@ -1,66 +1,71 @@
 'use strict';
 
-var fbp = require('../..');
+var randdelay = require('../../components/randdelay');
 
 describe('randdelay', function () {
   it('should randomly delay a single IP', function (done) {
-    var DELAY = 1000;
+    var DELAY = 500;
     var DELAY_MAX_DIFF = 150;
     this.timeout(DELAY + DELAY_MAX_DIFF);
 
-    var network = new fbp.Network();
+    var scaffold = new ComponentScaffold({
+        iips: {
+          'INTVL': DELAY
+        },
+        inports: {
+          IN: [ 42 ]
+        },
+        outports: {
+          OUT: [ 42 ]
+        },
+        droppedIPs: [DELAY]
+      }
+    );
 
-    var result = [];
-
-    var sender = network.defProc(MockSender.generator([42]), "sender");
-    var delay = network.defProc('./components/randdelay.js', "randdelay");
-    var receiver = network.defProc(MockReceiver.generator(result), "receiver");
-
-    network.initialize(delay, 'INTVL', DELAY);
-    network.connect(sender, 'OUT', delay, 'IN');
-    network.connect(delay, 'OUT', receiver, 'IN');
 
     var startTime = Date.now();
+    scaffold.run(randdelay, function () {
+      scaffold.verifyOutputs(expect);
+      scaffold.verifyDroppedIPs(expect);
+      scaffold.runTests(it);
 
-    network.run(new fbp.FiberRuntime(), {trace: false}, function () {
-      expect(result).to.deep.equal([42]);
       var diffTime = Date.now() - startTime;
-      expect(Math.abs(diffTime - DELAY)).to.be.within(0, DELAY);
+      expect(Math.abs(diffTime - DELAY)).to.be.below(DELAY);
+
       done();
     });
   });
 
   it('should randomly delay multiple IPs', function (done) {
-    var DELAY = 1000;
+    var DELAY = 500;
     var DELAY_MAX_DIFF = 300;
     var DELAY_TOTAL = DELAY * 5;
     this.timeout(DELAY_TOTAL + DELAY_MAX_DIFF);
 
-    var network = new fbp.Network();
+    var scaffold = new ComponentScaffold({
+        iips: {
+          'INTVL': DELAY
+        },
+        inports: {
+          IN: [ 1, 2, 3, 4, 5 ]
+        },
+        outports: {
+          OUT: [ 1, 2, 3, 4, 5 ]
+        },
+        droppedIPs: [DELAY]
+      }
+    );
 
-    var result = [];
-    var startTime;
 
-    var i = 0;
-    var mockReceiver = MockReceiver.generator(result, function receive() {
-      i++;
+    var startTime = Date.now();
+    scaffold.run(randdelay, function () {
+      scaffold.verifyOutputs(expect);
+      scaffold.verifyDroppedIPs(expect);
+      scaffold.runTests(it);
+
       var diffTime = Date.now() - startTime;
-      expect(Math.abs(diffTime - DELAY)).to.be.within(0, DELAY * i + DELAY_MAX_DIFF);
-      console.log("DELAY " + diffTime);
-    });
+      expect(Math.abs(diffTime - DELAY_TOTAL)).to.be.below(DELAY_TOTAL);
 
-    var sender = network.defProc(MockSender.generator([1, 2, 3, 4, 5]), "sender");
-    var delay = network.defProc('./components/randdelay.js', "delay");
-    var receiver = network.defProc(mockReceiver, "receiver");
-
-    network.initialize(delay, 'INTVL', DELAY);
-    network.connect(sender, 'OUT', delay, 'IN');
-    network.connect(delay, 'OUT', receiver, 'IN');
-
-    startTime = Date.now();
-
-    network.run(new fbp.FiberRuntime(), {trace: false}, function () {
-      expect(result).to.have.members([1, 2, 3, 4, 5]);
       done();
     });
   });
