@@ -26,6 +26,7 @@
   "dependencies": {
     "fibers": "^1.0.5",
     "lodash": "^4.13.1",
+    "synchronize": "^2.0.0",
     "parsefbp": "^0.3.0"
   },
   "main": "index.js",
@@ -38,7 +39,6 @@
     "js-beautify": "^1.6.3",
     "mocha": "^2.1.0",
     "mocha-fibers": "^1.1.0",
-    "synchronize": "^2.0.0",
     "ws": "^1.1.0"
   },
   "directories": {

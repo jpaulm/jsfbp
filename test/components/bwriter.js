@@ -5,9 +5,9 @@ var fs = require('fs');
 var _ = require('lodash');
 
 var EOL = require('os').EOL;
-const EOL_BYTES = _.invokeMap(EOL.split(''), 'charCodeAt', 0);
+var EOL_BYTES = _.invokeMap(EOL.split(''), 'charCodeAt', 0);
 
-const GOODBYE_CONTENT = [ComponentScaffold.openIP(),
+var GOODBYE_CONTENT = [ComponentScaffold.openIP(),
   71,
   111,
   111,
