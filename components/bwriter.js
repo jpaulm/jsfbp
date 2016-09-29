@@ -8,24 +8,12 @@
 
 var fs = require('fs');
 var trace = require('../core/trace');
+var _ioHelper = require('./_ioHelper');
 
 var WRITE_SIZE = 4;
 
-function getChunkSize() {
-  var size = WRITE_SIZE;
-  var sizePort = this.openInputPort('SIZE');
-  if (sizePort) {
-    var sizeIP = sizePort.receive();
-    if (sizeIP) {
-      size = parseInt(sizeIP.contents, 10);
-    }
-    this.dropIP(sizeIP);
-  }
-  return size;
-}
-
 module.exports = function reader(runtime) {
-  var chunkSize = getChunkSize.call(this);
+  var chunkSize = _ioHelper.getChunkSize.call(this, WRITE_SIZE);
 
   var filePort = this.openInputPort('FILE');
   var ip = filePort.receive();
@@ -33,7 +21,7 @@ module.exports = function reader(runtime) {
   this.dropIP(ip);
 
   trace("Opening file: " + fname);
-  var openResult = runtime.runAsyncCallback(openFile(fname, 'w', this));
+  var openResult = runtime.runAsyncCallback(_ioHelper.openFile(fname, 'w', this));
 
   var fileDescriptor = openResult[1];
   if (fileDescriptor == undefined) {
@@ -80,13 +68,6 @@ function writeFile(runtime, proc, fileDescriptor, inPort, size) {
   }
 }
 
-function openFile(path, flags) {
-  return function (done) {
-    fs.open(path, flags, function (err, fd) {
-      done([err, fd]);
-    });
-  }
-}
 
 function writeBuffer(runtime, fileDescriptor, writeBuffer, byteCount) {
   var writeResult = runtime.runAsyncCallback(writeData(fileDescriptor, writeBuffer, byteCount));

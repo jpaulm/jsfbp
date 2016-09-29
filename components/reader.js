@@ -1,6 +1,6 @@
 'use strict';
 
-var fs = require('fs');
+var _ioHelper = require('./_ioHelper');
 
 // Reader based on Bruno Jouhier's code
 module.exports = function reader(runtime) {
@@ -9,7 +9,7 @@ module.exports = function reader(runtime) {
   var fname = ip.contents;
   this.dropIP(ip);
 
-  var result = runtime.runAsyncCallback(myReadFile(fname, "utf8", this));
+  var result = runtime.runAsyncCallback(_ioHelper.readFile(fname, "utf8", this));
 
   if (result[0] == undefined) {
     console.log(result[1]);
@@ -24,11 +24,3 @@ module.exports = function reader(runtime) {
   }.bind(this));
 
 };
-
-function myReadFile(path, options) {
-  return function (done) {
-    fs.readFile(path, options, function (err, data) {
-      done([data, err]);
-    });
-  };
-}

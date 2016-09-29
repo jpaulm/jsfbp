@@ -50,10 +50,6 @@ var ProcessContainer = function (processDetails) {
   this.process.send({
     type: "INITIALIZE",
     details: processDetails
-  }, function (error) {
-    if (error) {
-      console.error(error);
-    }
   });
 
 };
