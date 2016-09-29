@@ -11,14 +11,11 @@ IIPConnection.prototype = Object.create(Connection.prototype);
 IIPConnection.prototype.constructor = IIPConnection;
 IIPConnection.prototype.parent = Connection.prototype;
 
-
-IIPConnection.prototype.getData = function (portName) {
+IIPConnection.prototype.getData = function () {
   var proc = Fiber.current.fbpProc;
   if (this.closed) {
-    proc.trace('tried to read from closed IIPConnection to ' + portName);
     return null;
   }
-  proc.trace('recv IIP from port ' + portName + ': ' + this.contents);
 
   var ip = proc.createIP(this.contents.dequeue());
   this.close();

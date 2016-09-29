@@ -23,11 +23,8 @@ ProcessConnection.prototype.parent = Connection.prototype;
 ProcessConnection.prototype.getData = function () {
   var proc = Fiber.current.fbpProc;
 
-  proc.trace('Requesting IP from ' + this.name);
-
   while (!this.hasData()) {
     if (this.closed) {
-      proc.trace('recv EOS from ' + this.name);
       return null;
     }
 
@@ -43,21 +40,18 @@ ProcessConnection.prototype.getData = function () {
   this.upSteamProcesses.forEach(queueProcess);
 
   var ip = this.contents.dequeue();
-  var cont = ip.contents;
-  proc.trace('Received: ' + proc.IPTypes.__lookup(ip.type) + (cont !== null) ? ", " + cont : "");
   ip.owner = proc;
   proc.ownedIPs++;
   return ip;
 };
 
-ProcessConnection.prototype.putData = function (ip, portName) {
+ProcessConnection.prototype.putData = function (ip) {
   var proc = Fiber.current.fbpProc;
   var cont = ip.contents;
 
   if (ip.type != proc.IPTypes.NORMAL) {
     cont = proc.IPTypes.__lookup(ip.type) + ", " + cont;
   }
-  proc.trace('send to ' + portName + ': ' + cont);
 
   if (ip.owner != proc) {
     console.log(proc.name + ' IP being sent not owned by this Process: ' + cont);
@@ -85,7 +79,6 @@ ProcessConnection.prototype.putData = function (ip, portName) {
   this.contents.enqueue(ip);
 
   proc.ownedIPs--;
-  proc.trace('send OK: ' + cont);
 
   return 0;
 };

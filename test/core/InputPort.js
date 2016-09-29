@@ -18,7 +18,7 @@ var getTestInPort = function (connection) {
   return inPort;
 };
 
-describe('InputPort', function() {
+describe.skip('InputPort', function() {
 
 
   it('can receive IIPs', function(done) {

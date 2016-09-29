@@ -1,32 +1,25 @@
 'use strict';
+var util = require('util');
+var EventEmitter = require('events').EventEmitter;
 
 var Port = function (process, portName) {
+  EventEmitter.call(this);
   if (process) {
     this.processName = process.name;
+    this.process = process;
   } else {
     this.processName = '';
   }
   this.portName = portName;
   this.closed = false;
-  this._conn = null;
 };
+util.inherits(Port, EventEmitter);
+
 
 Object.defineProperty(Port.prototype, 'name', {
   get: function () {
     return this.processName + "." + this.portName;
   }
 });
-
-Object.defineProperty(Port.prototype, 'conn', {
-  get: function () {
-    return this._conn;
-  },
-  set: function (c) {
-    this._conn = c;
-  }
-});
-
-
-
 
 module.exports = Port;

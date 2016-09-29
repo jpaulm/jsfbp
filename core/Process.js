@@ -4,55 +4,122 @@
 var Fiber = require('fibers'),
   Enum = require('./Enum'),
   IP = require('./IP'),
-  IIPConnection = require('./IIPConnection'),
-  _ = require('lodash'),
-  trace = require('./trace');
+  InputPort = require('./InputPort'),
+  OutputPort = require('./OutputPort'),
+  osProcess = require('process');
 
-var Process = module.exports = function (name, func) {
-  this.name = name;
-  this.func = func;
-  this.fiber = null;
+var Process = module.exports = function () {
   this.inports = {};
   this.outports = {};
   this._status = Process.Status.NOT_INITIALIZED;
   this.ownedIPs = 0;
-  this.cbpending = false;
-  this.yielded = false;
-  this.result = null; // [data, err]
+  console.log("Process created\n");
 
-  this.trace('Created with status: ' + Process.Status.__lookup(this._status), this.name);
-  Object.defineProperty(this, 'status', {
-    get: function () {
-      return this._status;
-    },
-    set: function (status) {
-      if (status === this._status) {
-        return;
-      }
-      this.trace('Transition from ' + Process.Status.__lookup(this._status) + ' to ' + Process.Status.__lookup(status));
-      if (status === Process.Status.ACTIVE && _.includes([Process.Status.NOT_INITIALIZED, Process.Status.DORMANT], this._status)) {
-        this.trace('Activating component');
-      }
-      this._status = status;
+  osProcess.once('message', function (message) {
+    if (message.type !== "INITIALIZE") {
+      throw new Error("Uninitialized Process received message that wasn't 'INITIALIZE'");
     }
-  })
+    var details = message.details;
+
+    this.component = require(details.component.moduleLocation);
+    if (details.component.componentField) {
+      this.component = details.component.componentField;
+    }
+
+    var process = this;
+
+    details.in.forEach(function (portName) {
+      var inputPort = new InputPort(process, portName);
+      inputPort.on("ipRequested", function (e) {
+        osProcess.send('message', {
+          type: "IP_REQUESTED",
+          details: {
+            process: process.name,
+            port: e.portName
+          }
+        });
+        process.setStatus(Process.Status.WAITING_TO_RECEIVE);
+
+        osProcess.once('message', function (message) {
+          if (message.type === 'IP_INBOUND') {
+            var details = message.details;
+            var ip = details.ip;
+            Fiber.current.run(ip);
+          }
+        });
+      });
+      return inputPort;
+    });
+
+    details.out.forEach(function (portName) {
+      var outputPort = new OutputPort(process, portName);
+      outputPort.on("ipSubmitted", function (e) {
+        osProcess.send('message', {
+          type: "IP_AVAILABLE",
+          details: {
+            process: process.name,
+            port: e.portName,
+            ip: e.ip
+          }
+        });
+        osProcess.once('message', function (message) {
+          if (message.type === 'IP_ACCEPTED') {
+            process.setStatus(Process.Status.ACTIVE);
+            Fiber.current.run();
+          }
+        });
+        process.setStatus(Process.Status.WAITING_TO_SEND);
+      });
+      return outputPort;
+    });
+    this.selfStarting = details.selfStarting;
+    this.name = details.name;
+
+    console.log("Process initialized: " + this);
+    this.setStatus(Process.Status.INITIALIZED);
+  }.bind(this))
+
 };
 
 Process.Status = Enum([
   'NOT_INITIALIZED',
-  'ACTIVE', // (includes waiting on callback ...)
+  'INITIALIZED',
+  'ACTIVE',
   'WAITING_TO_RECEIVE',
-  'WAITING_TO_FIPE',
   'WAITING_TO_SEND',
-  'READY_TO_EXECUTE',
   'DORMANT',
   'CLOSED',
   'DONE'
 ]);
 
+Process.prototype.setStatus = function (newStatus) {
+  var oldStatus = this._status;
+  this._status = newStatus;
+
+  osProcess.send({
+    type: "STATUS_UPDATE",
+    name: this.name,
+    oldStatus: oldStatus,
+    newStatus: newStatus
+  }, function (error) {
+    if (error) {
+      console.error(error);
+    }
+  });
+};
+
 Process.prototype.IPTypes = IP.Types;
 
-Process.prototype.trace = trace;
+Process.prototype.toString = function () {
+  return "Process: { \n" +
+    "  name: " + this.name + "\n" +
+    "  inports: " + Object.keys(this.inports) + "\n" +
+    "  outports: " + Object.keys(this.outports) + "\n" +
+    "  status: " + this.getStatusString() + "\n" +
+    "  selfStarting: " + this.isSelfStarting() + "\n" +
+    "}";
+};
+
 
 /*
  * Given a set of ports an a base name XXX, returns all the ports in the set that
@@ -71,24 +138,18 @@ function getPortArray(ports, name) {
     });
 }
 
-
 Process.prototype.getStatusString = function () {
-  return Process.Status.__lookup(this.status);
+  return Process.Status.__lookup(this._status);
 };
 
 Process.prototype.isSelfStarting = function () {
-  var selfstarting = true;
-  _.forEach(this.inports, function (inport) {
-    selfstarting = selfstarting && (inport.conn instanceof IIPConnection);
-  });
-  return selfstarting;
+  return this.selfStarting;
 };
 
 Process.prototype.createIP = function (data) {
   var ip = new IP(data);
   this.ownedIPs++;
   ip.owner = this;
-  this.trace("Normal IP created: " + ip.contents);
   return ip;
 };
 
@@ -96,13 +157,18 @@ Process.prototype.createIPBracket = function (bktType, x) {
   if (x == undefined) {
     x = null;
   }
-  var ip = new IP(x);
+  var ip = this.createIP(x);
   ip.type = bktType;
-  this.ownedIPs++;
-  ip.owner = this;
-  this.trace("Bracket IP created: " + this.IPTypes.__lookup(ip.type) + ", " + ip.contents);
 
   return ip;
+};
+
+Process.prototype.disownIP = function (ip) {
+  if (ip.owner != this) {
+    throw new Error(this.name + ' IP being disowned is not owned by this Process: ' + ip);
+  }
+  this.ownedIPs--;
+  ip.owner = null;
 };
 
 Process.prototype.dropIP = function (ip) {
@@ -110,14 +176,8 @@ Process.prototype.dropIP = function (ip) {
   if (ip.type != this.IPTypes.NORMAL) {
     cont = this.IPTypes.__lookup(ip.type) + ", " + cont;
   }
-  this.trace('IP dropped with: ' + cont);
 
-  if (ip.owner != this) {
-    console.log(this.name + ' IP being dropped not owned by this Process: ' + cont);
-    return;
-  }
-  this.ownedIPs--;
-  ip.owner = null;
+  this.disownIP(ip);
 };
 
 Process.prototype.addInputPort = function (port) {
@@ -186,7 +246,7 @@ Process.prototype.yield = function (preStatus, postStatus) {
   }
 
   this.yielded = true;
-  this.trace("Yielding with: " + Process.Status.__lookup(preStatus));
+
   Fiber.yield();
   if (postStatus !== this.status) {
     this.status = postStatus
@@ -194,3 +254,5 @@ Process.prototype.yield = function (preStatus, postStatus) {
 
   this.yielded = false;
 };
+
+new Process();

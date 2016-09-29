@@ -1,6 +1,7 @@
 'use strict';
 
 var Port = require('./Port');
+var Fiber = require('fibers');
 
 var InputPort = function (process, port) {
   this.parent.constructor.call(this, process, port);
@@ -17,8 +18,14 @@ InputPort.prototype.constructor = InputPort;
 InputPort.prototype.parent = Port.prototype;
 
 InputPort.prototype.receive = function () {
-  var conn = this.conn;
-  return conn.getData(this.name);
+  if (this.closed) {
+    return null;
+  }
+
+  this.emit("ipRequested", {
+    portName: this.name
+  });
+  return Fiber.yield();
 };
 
 InputPort.prototype.close = function () {
