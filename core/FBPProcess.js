@@ -5,19 +5,18 @@ var Fiber = require('fibers'),
   Enum = require('./Enum'),
   IP = require('./IP'),
   InputPort = require('./InputPort'),
-  OutputPort = require('./OutputPort'),
-  osProcess = require('process');
+  OutputPort = require('./OutputPort');
 
-var Process = module.exports = function () {
+var FBPProcess = module.exports = function () {
   this.inports = {};
   this.outports = {};
-  this._status = Process.Status.NOT_INITIALIZED;
+  this._status = FBPProcess.Status.NOT_INITIALIZED;
   this.ownedIPs = 0;
-  console.log("Process created\n");
+  console.log("FBPProcess created\n");
 
-  osProcess.once('message', function (message) {
+  process.once('message', function (message) {
     if (message.type !== "INITIALIZE") {
-      throw new Error("Uninitialized Process received message that wasn't 'INITIALIZE'");
+      throw new Error("Uninitialized FBPProcess received message that wasn't 'INITIALIZE'");
     }
     var details = message.details;
 
@@ -31,16 +30,16 @@ var Process = module.exports = function () {
     details.in.forEach(function (portName) {
       var inputPort = new InputPort(process, portName);
       inputPort.on("ipRequested", function (e) {
-        osProcess.send('message', {
+        process.send('message', {
           type: "IP_REQUESTED",
           details: {
             process: process.name,
             port: e.portName
           }
         });
-        process.setStatus(Process.Status.WAITING_TO_RECEIVE);
+        process.setStatus(FBPProcess.Status.WAITING_TO_RECEIVE);
 
-        osProcess.once('message', function (message) {
+        process.once('message', function (message) {
           if (message.type === 'IP_INBOUND') {
             var details = message.details;
             var ip = details.ip;
@@ -54,7 +53,7 @@ var Process = module.exports = function () {
     details.out.forEach(function (portName) {
       var outputPort = new OutputPort(process, portName);
       outputPort.on("ipSubmitted", function (e) {
-        osProcess.send('message', {
+        process.send('message', {
           type: "IP_AVAILABLE",
           details: {
             process: process.name,
@@ -62,26 +61,26 @@ var Process = module.exports = function () {
             ip: e.ip
           }
         });
-        osProcess.once('message', function (message) {
+        process.once('message', function (message) {
           if (message.type === 'IP_ACCEPTED') {
-            process.setStatus(Process.Status.ACTIVE);
+            process.setStatus(FBPProcess.Status.ACTIVE);
             Fiber.current.run();
           }
         });
-        process.setStatus(Process.Status.WAITING_TO_SEND);
+        process.setStatus(FBPProcess.Status.WAITING_TO_SEND);
       });
       return outputPort;
     });
     this.selfStarting = details.selfStarting;
     this.name = details.name;
 
-    console.log("Process initialized: " + this);
-    this.setStatus(Process.Status.INITIALIZED);
+    console.log("FBPProcess initialized: " + this);
+    this.setStatus(FBPProcess.Status.INITIALIZED);
   }.bind(this))
 
 };
 
-Process.Status = Enum([
+FBPProcess.Status = Enum([
   'NOT_INITIALIZED',
   'INITIALIZED',
   'ACTIVE',
@@ -92,11 +91,11 @@ Process.Status = Enum([
   'DONE'
 ]);
 
-Process.prototype.setStatus = function (newStatus) {
+FBPProcess.prototype.setStatus = function (newStatus) {
   var oldStatus = this._status;
   this._status = newStatus;
 
-  osProcess.send({
+  process.send({
     type: "STATUS_UPDATE",
     name: this.name,
     oldStatus: oldStatus,
@@ -108,10 +107,10 @@ Process.prototype.setStatus = function (newStatus) {
   });
 };
 
-Process.prototype.IPTypes = IP.Types;
+FBPProcess.prototype.IPTypes = IP.Types;
 
-Process.prototype.toString = function () {
-  return "Process: { \n" +
+FBPProcess.prototype.toString = function () {
+  return "FBPProcess: { \n" +
     "  name: " + this.name + "\n" +
     "  inports: " + Object.keys(this.inports) + "\n" +
     "  outports: " + Object.keys(this.outports) + "\n" +
@@ -138,22 +137,22 @@ function getPortArray(ports, name) {
     });
 }
 
-Process.prototype.getStatusString = function () {
-  return Process.Status.__lookup(this._status);
+FBPProcess.prototype.getStatusString = function () {
+  return FBPProcess.Status.__lookup(this._status);
 };
 
-Process.prototype.isSelfStarting = function () {
+FBPProcess.prototype.isSelfStarting = function () {
   return this.selfStarting;
 };
 
-Process.prototype.createIP = function (data) {
+FBPProcess.prototype.createIP = function (data) {
   var ip = new IP(data);
   this.ownedIPs++;
   ip.owner = this;
   return ip;
 };
 
-Process.prototype.createIPBracket = function (bktType, x) {
+FBPProcess.prototype.createIPBracket = function (bktType, x) {
   if (x == undefined) {
     x = null;
   }
@@ -163,15 +162,15 @@ Process.prototype.createIPBracket = function (bktType, x) {
   return ip;
 };
 
-Process.prototype.disownIP = function (ip) {
+FBPProcess.prototype.disownIP = function (ip) {
   if (ip.owner != this) {
-    throw new Error(this.name + ' IP being disowned is not owned by this Process: ' + ip);
+    throw new Error(this.name + ' IP being disowned is not owned by this FBPProcess: ' + ip);
   }
   this.ownedIPs--;
   ip.owner = null;
 };
 
-Process.prototype.dropIP = function (ip) {
+FBPProcess.prototype.dropIP = function (ip) {
   var cont = ip.contents;
   if (ip.type != this.IPTypes.NORMAL) {
     cont = this.IPTypes.__lookup(ip.type) + ", " + cont;
@@ -180,14 +179,14 @@ Process.prototype.dropIP = function (ip) {
   this.disownIP(ip);
 };
 
-Process.prototype.addInputPort = function (port) {
+FBPProcess.prototype.addInputPort = function (port) {
   this.inports[port.portName] = port;
 };
-Process.prototype.addOutputPort = function (port) {
+FBPProcess.prototype.addOutputPort = function (port) {
   this.outports[port.portName] = port;
 };
 
-Process.prototype.openInputPort = function (name) {
+FBPProcess.prototype.openInputPort = function (name) {
   var port = this.inports[name];
   if (port) {
     return port;
@@ -197,7 +196,7 @@ Process.prototype.openInputPort = function (name) {
   }
 };
 
-Process.prototype.openInputPortArray = function (name) {
+FBPProcess.prototype.openInputPortArray = function (name) {
   var array = getPortArray(this.inports, name);
 
   if (array.length === 0) {
@@ -208,7 +207,7 @@ Process.prototype.openInputPortArray = function (name) {
   return array;
 };
 
-Process.prototype.openOutputPort = function (name, opt) {
+FBPProcess.prototype.openOutputPort = function (name, opt) {
   var port = this.outports[name];
   if (port) {
     return port;
@@ -220,7 +219,7 @@ Process.prototype.openOutputPort = function (name, opt) {
   }
 };
 
-Process.prototype.openOutputPortArray = function (name) {
+FBPProcess.prototype.openOutputPortArray = function (name) {
   var array = getPortArray(this.outports, name);
 
   if (array.length === 0) {
@@ -234,15 +233,15 @@ Process.prototype.openOutputPortArray = function (name) {
 /**
  * Yield the fiber that is running this process
  *
- * @param preStatus Process status will be set to this before yielding. If not set or set to `null`, the status is not changed
- * @param postStatus Process status will be set to this after yielding. If not set, the status will be changed to ACTIVE
+ * @param preStatus FBPProcess status will be set to this before yielding. If not set or set to `null`, the status is not changed
+ * @param postStatus FBPProcess status will be set to this after yielding. If not set, the status will be changed to ACTIVE
  */
-Process.prototype.yield = function (preStatus, postStatus) {
+FBPProcess.prototype.yield = function (preStatus, postStatus) {
   if (preStatus !== undefined || preStatus !== null) {
     this.status = preStatus;
   }
   if (postStatus === undefined) {
-    postStatus = Process.Status.ACTIVE;
+    postStatus = FBPProcess.Status.ACTIVE;
   }
 
   this.yielded = true;
@@ -255,4 +254,4 @@ Process.prototype.yield = function (preStatus, postStatus) {
   this.yielded = false;
 };
 
-new Process();
+new FBPProcess();

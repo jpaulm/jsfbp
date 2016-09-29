@@ -2,7 +2,7 @@
 
 var Fiber = require('fibers'),
   IIPConnection = require('../../IIPConnection'),
-  Process = require('../../Process'),
+  Process = require('../../FBPProcess'),
   _ = require('lodash'),
   trace = require('../../trace'),
   Enum = require('../../Enum');

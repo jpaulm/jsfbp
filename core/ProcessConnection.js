@@ -1,6 +1,6 @@
 'use strict';
 var Fiber = require('fibers'),
-  ProcessStatus = require('./Process').Status,
+  ProcessStatus = require('./FBPProcess').Status,
   Connection = require('./Connection'),
   _ = require('lodash');
 
@@ -54,7 +54,7 @@ ProcessConnection.prototype.putData = function (ip) {
   }
 
   if (ip.owner != proc) {
-    console.log(proc.name + ' IP being sent not owned by this Process: ' + cont);
+    console.log(proc.name + ' IP being sent not owned by this FBPProcess: ' + cont);
     return;
   }
   if (this.closed) {

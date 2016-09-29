@@ -11,10 +11,10 @@ var FIFO = require('./FIFO');
 var ProcessContainer = function (processDetails) {
   EventEmitter.call(this);
 
-  console.log("Creating Process");
-  this.process = fork(__dirname + '/Process.js');
+  console.log("Creating FBPProcess");
+  this.process = fork(__dirname + '/FBPProcess.js');
   if (!this.process) {
-    console.error("Process not created");
+    console.error("FBPProcess not created");
   }
 
   this.outgoingConnections = _.reduce(processDetails.capacities, function (connections, capacity, portName) {

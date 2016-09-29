@@ -94,7 +94,7 @@ describe('Network', function () {
     }).to.throw(Error);
   });
 
-  it('requires Process to be given a name', function () {
+  it('requires FBPProcess to be given a name', function () {
     var network = new Network();
     expect(function () {
       network.defineProcess('./componenent/copier.js');
