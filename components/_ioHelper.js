@@ -1,5 +1,13 @@
 var fs = require('fs');
 
+function makeFBPFSCallback(fsFunction, path, flags) {
+  return function (done) {
+    fs[fsFunction].call(fs, path, flags, function (err, fd) {
+      done([err, fd]);
+    });
+  }
+}
+
 module.exports = {
   getChunkSize: function (defaultSize) {
     var size = defaultSize || 1;
@@ -15,18 +23,10 @@ module.exports = {
   },
 
   openFile: function (path, flags) {
-    return function (done) {
-      fs.open(path, flags, function (err, fd) {
-        done([err, fd]);
-      });
-    }
+    return makeFBPFSCallback('open', path, flags);
   },
 
   readFile: function (path, flags) {
-    return function (done) {
-      fs.read(path, flags, function (err, fd) {
-        done([err, fd]);
-      });
-    }
+    return makeFBPFSCallback('read', path, flags);
   }
 };

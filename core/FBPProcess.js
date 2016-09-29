@@ -124,10 +124,10 @@ FBPProcess.prototype.toString = function () {
  * Given a set of ports an a base name XXX, returns all the ports in the set that
  * have the name XXX[<index>]
  */
-function getPortArray(ports, name) {
-  var re = new RegExp(name + '\\[\\d+\\]');
+function getPortArray(ports, processName, portName) {
+  var re = new RegExp(portName + '\\[\\d+\\]');
 
-  return Object.keys(ports)
+  var portArray = Object.keys(ports)
     .filter(function (portName) {
       return re.test(portName);
     })
@@ -135,6 +135,13 @@ function getPortArray(ports, name) {
     .map(function (portName) {
       return ports[portName];
     });
+
+  if (portArray.length === 0) {
+    console.log('Port ' + processName + '.' + portName + ' not found');
+    return null;
+  }
+
+  return portArray;
 }
 
 FBPProcess.prototype.getStatusString = function () {
@@ -197,14 +204,7 @@ FBPProcess.prototype.openInputPort = function (name) {
 };
 
 FBPProcess.prototype.openInputPortArray = function (name) {
-  var array = getPortArray(this.inports, name);
-
-  if (array.length === 0) {
-    console.log('Port ' + this.name + '.' + name + ' not found');
-    return null;
-  }
-
-  return array;
+  return getPortArray(this.inports, this.name, name);
 };
 
 FBPProcess.prototype.openOutputPort = function (name, opt) {
@@ -220,14 +220,7 @@ FBPProcess.prototype.openOutputPort = function (name, opt) {
 };
 
 FBPProcess.prototype.openOutputPortArray = function (name) {
-  var array = getPortArray(this.outports, name);
-
-  if (array.length === 0) {
-    console.log('Port ' + this.name + '.' + name + ' not found');
-    return null;
-  }
-
-  return array;
+  return getPortArray(this.outports, this.name, name);
 };
 
 /**
