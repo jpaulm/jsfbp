@@ -1,5 +1,5 @@
 'use strict';
-var Fiber = require('fibers'),
+var Fiber = require('fiber'),
   ProcessStatus = require('./Process').Status,
   Connection = require('./Connection'),
   _ = require('lodash');

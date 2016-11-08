@@ -1,6 +1,6 @@
 'use strict';
 
-var Fiber = require('fibers'),
+var Fiber = require('fiber'),
   IIPConnection = require('../../IIPConnection'),
   Process = require('../../Process'),
   _ = require('lodash'),

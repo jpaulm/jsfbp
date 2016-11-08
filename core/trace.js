@@ -2,7 +2,7 @@
  * Created by danrumney on 5/27/16.
  */
 
-var Fiber = require('fibers');
+var Fiber = require('fiber');
 
 module.exports = function (message) {
   if (global.trace) {
