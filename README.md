@@ -127,21 +127,27 @@ runtime.runAsyncCallback(function (done) {
 
 # Install & Run
 
-1. Install node.js - see http://nodejs.org/download/  .  Node 12.0 leads to compatibility problems with Fiber, see [here](https://gist.github.com/ComFreek/c341bacfaae3aca887df) how to use Node 11.16 on a per-project basis. Alternatively, you can also globally install an older Node version.
+1. Install node.js - see http://nodejs.org/download/  . 
 
 2. Clone or download this project
 
 3. Run `npm install` in the project directory
 
-4. Run `node examples/fbptestxx.js`, where `fbptestxx` is any of the tests listed above. If tracing is desired, change the value of the `trace` variable at the bottom of `fbptestxx.js` to `true`. 
+4. Now run `npm install fibers`.
 
-5. All these tests can be run sequentially by running `examples/fbptests.bat`, or by running `examples/fbptests.sh` under `bash`.
+5. Run `node examples/fbptestxx.js`, where `fbptestxx` is any of the tests listed above. If tracing is desired, change the value of the `trace` variable at the bottom of `fbptestxx.js` to `true`. 
+
+6. All these tests can be run sequentially by running `examples/fbptests.bat`, or by running `examples/fbptests.sh` under `bash`.
+
 
 # Testing with Mocha
 
 The folder called `test` contains a number of Mocha tests.
 
-- Run `npm install` (in case you haven't already done so) and `npm test`
+- Run `npm install` and `npm install fibers` (in case you haven't already done so), `npm install mocha`, `npm install mocha-fibers`, `npm install chai` 
+
+- Now run `npm test` to execute a series of tests (all the `fbptestxx.js` tests in sequence).
+  
 - Alternatively, you can directly execute `node.exe node_modules/mocha/bin/mocha --recursive --require test/test_helper.js` in case you need to adjust the path to Node's binary or pass further parameters to Mocha.
 
 # Testing Web Socket Server
