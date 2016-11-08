@@ -1,7 +1,7 @@
 'use strict';
 
 module.exports = function delay(runtime) {
-//  var proc = fbp.getCurrentProc();
+  //  var proc = fbp.getCurrentProc();
   var inport = this.openInputPort('IN');
   var intvlport = this.openInputPort('INTVL');
   var outport = this.openOutputPort('OUT');
@@ -17,18 +17,18 @@ module.exports = function delay(runtime) {
     //fbp.setCallbackPending(true);
     //console.log('start wait for ' + Math.round(intvl * 100) / 100 + ' msecs: ' + ip.contents);
     runtime.runAsyncCallback(genSleepFun(this, intvl));
-    var name = outport.name.substring(0, outport.name.indexOf("."));
-    console.log(name + ' end sleep ' );
+    //var name = outport.name.substring(0, outport.name.indexOf("."));
+    //console.log(name + ' end sleep ' );
     //fbp.setCallbackPending(false);
     outport.send(ip);
   }
-} 
+};
 
 function genSleepFun(proc, ms) {
   return function (done) {
-    console.log(proc.name + ' start sleep: ' + Math.round(ms * 100) / 100 + ' msecs');
-    
-    setTimeout(function() {
+    //console.log(proc.name + ' start sleep: ' + ms + ' msecs');
+
+    setTimeout(function () {
       done();
     }, ms);
   };

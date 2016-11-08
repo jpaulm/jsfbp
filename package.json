@@ -1,39 +1,50 @@
 {
   "name": "jsfbp",
-  "version": "0.1.0",
+  "version": "1.3.0",
   "description": "FBP implementation written using node-fibers ",
   "repository": {
     "type": "git",
-    "url": "https://github.com/jpaulm/jsfbp.git"
+    "url": "git+https://github.com/jpaulm/jsfbp.git"
+  },
+  "engines": {
+    "node": ">= 0.12.7"
   },
   "keywords": [
     "fbp",
     "flow-based-programming",
-    "node-fibers",
-    "javascript"
+    "node-fibers"
   ],
   "author": "J. Paul Morrison",
+  "contributors": [
+    "Dan Rumney <dancrumb@gmail.com>"
+  ],
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/jpaulm/jsfbp/issues"
   },
   "homepage": "https://github.com/jpaulm/jsfbp",
   "dependencies": {
-    "fibers": "^1.0.5"
+    "fibers": "^1.0.5",
+    "lodash": "^4.13.1",
+    "parsefbp": "^0.3.0"
   },
   "main": "index.js",
   "devDependencies": {
-    "chai": "^2.0.0",
+    "chai": "^3.5.0",
+    "dummy-module": "*",
+    "eslint": "^2.10.2",
+    "eslint-config-defaults": "^9.0.0",
+    "js-beautify": "^1.6.3",
     "mocha": "^2.1.0",
     "mocha-fibers": "^1.1.0",
-    "ws": "^0.7.1"
+    "ws": "^1.1.0"
   },
   "directories": {
-    "doc": "docs",
-    "example": "examples",
-    "test": "test"
+    "doc": "docs"
   },
   "scripts": {
-    "test": "mocha --ui mocha-fibers --recursive -R spec --require test/test_helper.js"
+    "test": "npm install && mocha --ui mocha-fibers --recursive -R spec --require test/test_helper.js test/components test/core",
+    "lint": "eslint components core examples test index.js",
+    "ws": "js-beautify -r -f core/*.js components/*.js core/runtimes/FiberRuntime/index.js "
   }
 }

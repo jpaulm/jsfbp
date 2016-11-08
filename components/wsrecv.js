@@ -1,33 +1,38 @@
 'use strict';
 
-var IP = require('../core/IP')
-  , WebSocketServer = require('ws').Server;
+var WebSocketServer = require('ws').Server;
 
 module.exports = function wsrecv(runtime) {
   var inport = this.openInputPort('PORTNO');
+  var outport = this.openOutputPort('OUT');
+  var wssout = this.openOutputPort('WSSOUT');
+
   var ip = inport.receive();
   var portno = ip.contents;
-  var wss = new WebSocketServer({ port: portno });
+  var wss = new WebSocketServer({
+    port: portno
+  });
+  wssout.send(this.createIP(wss));
+
   var ws = null;
   while (true) {
     var result = runtime.runAsyncCallback(genWsReceiveFun(runtime, wss, ws, this));
     console.log('wsrecv callback complete: ' + this.name);
     //console.log(result);
-    if (result[1].endsWith('@kill')) {          
+    if (result[1].endsWith('@kill')) {
       break;
     }
 
     console.log(result);
-    var outport = this.openOutputPort('OUT');
-    outport.send(this.createIPBracket(IP.OPEN));
+    outport.send(this.createIPBracket(this.IPTypes.OPEN));
     outport.send(this.createIP(result[0]));
     outport.send(this.createIP(result[1]));
-    outport.send(this.createIPBracket(IP.CLOSE));
+    outport.send(this.createIPBracket(this.IPTypes.CLOSE));
   }
-  
+
   wss.close();
   this.dropIP(ip);
-}
+};
 
 function genWsReceiveFun(runtime, wss, ws, proc) {
   return function (done) {
@@ -44,4 +49,4 @@ function genWsReceiveFun(runtime, wss, ws, proc) {
 
 String.prototype.endsWith = function (s) {
   return this.length >= s.length && this.substr(this.length - s.length) == s;
-}
+};

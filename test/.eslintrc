@@ -1,0 +1,12 @@
+{
+  "env": {
+    "mocha":true
+  },
+  "globals": {
+    "expect": false,
+    "MockSender": false,
+    "MockReceiver": false,
+    "TypeReceiver": false,
+    "TestFiber": false
+  }
+}

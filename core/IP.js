@@ -1,16 +1,24 @@
 'use strict';
 
-var Fiber = require('fibers');
+var Enum = require('./Enum');
 
 var IP = module.exports = function IP(contents) {
- // this.NORMAL = 0;
- // this.OPEN = 1;
- // this.CLOSE = 2;
   this.owner = null;
-  this.type = IP.NORMAL; 
-  this.contents = contents;     
+  this.type = IP.Types.NORMAL;
+  this.contents = contents;
 };
 
-IP.NORMAL = 0;
-IP.OPEN = 1;
-IP.CLOSE = 2;
+IP.Types = new Enum([
+  "NORMAL",
+  "OPEN",
+  "CLOSE"
+]);
+
+["NORMAL", "OPEN", "CLOSE"].forEach(function (type) {
+  Object.defineProperty(IP, type, {
+    get: function () {
+      console.error("Accessing IP types from IP object directly is deprecated. Please use IP.Types." + type);
+      return IP.Types[type]
+    }
+  });
+});

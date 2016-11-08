@@ -4,11 +4,12 @@ var fbp = require('..')
 // --- define network ---
 var network = new fbp.Network();
 
-var reader  = network.defProc('./components/reader.js');
-var reader2 = network.defProc('./components/reader.js', 'reader2');
-var copier  = network.defProc('./components/copier.js');
-var recvr   = network.defProc('./components/recvr.js');
-var rrmerge = network.defProc('./components/rrmerge.js');
+
+var reader = network.defProc('./components/reader.js', "Read");
+var reader2 = network.defProc('./components/reader.js', 'Read2');
+var copier = network.defProc('./components/copier.js', 'Copy');
+var recvr = network.defProc('./components/recvr.js', 'Recvr');
+var rrmerge = network.defProc('./components/rrmerge.js', 'RRMerge');
 
 network.initialize(reader, 'FILE', path.resolve(__dirname, 'data/text.txt'));
 network.connect(reader, 'OUT', copier, 'IN', 2);
@@ -19,4 +20,4 @@ network.connect(rrmerge, 'OUT', recvr, 'IN', 2);
 
 // --- run ---
 var fiberRuntime = new fbp.FiberRuntime();
-network.run(fiberRuntime, { trace:false });
+network.run(fiberRuntime, {trace: false});

@@ -10,7 +10,11 @@ module.exports = function repl() {
       break;
     }
     for (var i = 0; i < array.length; i++) {
-      array[i].send(this.createIP(ip.contents));
+      if (ip.type === this.IPTypes.NORMAL) {
+        array[i].send(this.createIP(ip.contents));
+      } else {
+        array[i].send(this.createIPBracket(ip.type, ip.contents));
+      }
     }
     this.dropIP(ip);
   }
