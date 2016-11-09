@@ -1,5 +1,5 @@
 'use strict';
-var Fiber = require('fiber'),
+var Fiber = require('fibers'),
   Connection = require('./Connection');
 
 var IIPConnection = function (data) {

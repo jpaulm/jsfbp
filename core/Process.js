@@ -1,7 +1,7 @@
 'use strict';
 
 
-var Fiber = require('fiber'),
+var Fiber = require('fibers'),
   Enum = require('./Enum'),
   IP = require('./IP'),
   IIPConnection = require('./IIPConnection'),

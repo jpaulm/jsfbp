@@ -1,6 +1,6 @@
 'use strict';
 
-var Fiber = require('fiber'),
+var Fiber = require('fibers'),
   ProcessStatus = require('./Process').Status,
   trace = require('./trace');
 
