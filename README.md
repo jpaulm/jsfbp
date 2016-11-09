@@ -196,39 +196,19 @@ runtime.runAsyncCallback(function (done) {
 
 # Install & Run
 
-We use `node-fibers` which is known to work with `Node.js 12.7` (as of 24.07.2015).
+`jsfbp` is available via NPM:
 
-1. Install node.js - see http://nodejs.org/download/  . 
-2. Clone or download this project
-3. Execute `npm install`
-   Install requires the following `npm` packages: `parsefbp`, `fibers`, `mocha`, `chai`, `lodash` and `mocha-fibers` - you may have to do `npm` installs for some or all of these.
-   
-   If you get an MSB4019 or similar error messages involving `utf-8-validate` and `bufferutil` (some dependencies deep down the dependency tree), you can just ignore them, given the optional nature of these components' compilation.
+```
+npm install jsfbp --save
+```
 
-3b. JSFBP is now on `npm`, so you can simply do `npm install jsfbp`.  
+If you get an MSB4019 or similar error messages involving `utf-8-validate` and `bufferutil` (some dependencies deep down the dependency tree), you can just ignore them, given the optional nature of these components' compilation.
 
-4. Run `node examples/fbptestxx.js`, where `fbptestxx` is any of the tests listed above. If tracing is desired, change the value of the `trace` variable at the bottom of `fbptestxx.js` to `true`. 
-5. All these tests can be run sequentially by running `examples/fbptests.bat`, or by running `examples/fbptests.sh` under `bash`.
+## Examples
 
-*Important* - BitDefender Antivirus 2016 anti-ransomware feature seems to interfere with `git`- we suggest you leave it turned off while working with `git`.
-
-## Full install
-
-If you wish to eliminate the errors mentioned in point #3 under *Install*, you will need to install Python 2.x and Visual Studio Express for Desktop 2013. This doesn't seem to guarantee an error-free `npm install`, however.  Still `jsfbp` works fine, even with these errors.
-
-1. Install node.js - see http://nodejs.org/download/  . 
-2. Install Python 2.x
-3. Install Visual Studio Express for Desktop 2013 (click on http://go.microsoft.com/fwlink/?LinkId=532500&clcid=0x409 )
-4. Clone or download this project
-5. Open a _new_ shell (The shell should not have been opened from before the Visual Studio installation because then the PATH and other environment variables are not yet updated.)
-6. Optionally prepend Python 2.x to your PATH if you haven't already done so
-        -  e.g. `SET PATH=C:\path\to\python2-directory\;%PATH%`
-7. Execute `npm install`
-8. Run `node examples/fbptestxx.js`, where `fbptestxx` is any of the tests listed above. If tracing is desired, change the value of the `trace` variable at the bottom of `fbptestxx.js` to `true`. 
-9. Install requires the following `npm` packages: `parsefbp`, `fibers`, `mocha`, `chai`, `lodash` and `mocha-fibers` - you may have to do `npm` installs for some or all of these.
-10. All these tests can be run sequentially by running `examples/fbptests.bat`, or by running `examples/fbptests.sh` under `bash`.
-
-*Important* - BitDefender Antivirus 2016 anti-ransomware feature seems to interfere with `git`- we suggest you leave it turned off while working with `git`.
+There are a bunch of examples in the examples directory of the jsfbp module. Run `node examples/fbptestxx.js`, where `fbptestxx` is any of 
+the tests listed above. If tracing is desired, change the value of the `trace` variable at the bottom of `fbptestxx.js` to `true`. 
+All these tests can be run sequentially by running `examples/fbptests.bat`, or by running `examples/fbptests.sh` under `bash`.
 
 # Testing with Mocha
 
