@@ -9,24 +9,7 @@
 var fs = require('fs');
 var trace = require('../core/trace');
 
-var WRITE_SIZE = 4;
-
-function getChunkSize() {
-  var size = WRITE_SIZE;
-  var sizePort = this.openInputPort('SIZE');
-  if (sizePort) {
-    var sizeIP = sizePort.receive();
-    if (sizeIP) {
-      size = parseInt(sizeIP.contents, 10);
-    }
-    this.dropIP(sizeIP);
-  }
-  return size;
-}
-
 module.exports = function reader(runtime) {
-  var chunkSize = getChunkSize.call(this);
-
   var filePort = this.openInputPort('FILE');
   var ip = filePort.receive();
   var fname = ip.contents;
@@ -43,41 +26,36 @@ module.exports = function reader(runtime) {
   trace("Got fd: " + fileDescriptor);
 
   var inPort = this.openInputPort('IN');
-  trace("Starting write");
+  trace("Starting read");
   var bracket = inPort.receive();
-  if (bracket.type != this.IPTypes.OPEN) {
+  if(bracket.type != this.IPTypes.OPEN) {
     console.log("ERROR: Received non OPEN bracket");
     console.log(bracket);
     return;
   }
   this.dropIP(bracket);
 
-  writeFile(runtime, this, fileDescriptor, inPort, chunkSize);
+  writeFile(runtime, this, fileDescriptor, inPort);
 
   fs.closeSync(fileDescriptor);
 };
 
-function writeFile(runtime, proc, fileDescriptor, inPort, size) {
-  var buffer = new Buffer(size);
-  var byteCount = 0;
+function writeFile(runtime, proc, fileDescriptor, inPort) {
   do {
     var inIP = inPort.receive();
-    if (inIP.type == proc.IPTypes.NORMAL) {
-      buffer.writeUInt8(inIP.contents, byteCount);
-      byteCount++;
-      if (byteCount === size) {
-        var success = writeBuffer(runtime, fileDescriptor, buffer, byteCount);
-        if (!success) {
-          return;
-        }
-        byteCount = 0;
+    if(inIP.type == proc.IPTypes.NORMAL) {
+      var writeResult = runtime.runAsyncCallback(writeData(fileDescriptor, inIP.contents));
+      if (writeResult[0]) {
+        console.error(writeResult[0]);
+        return;
+      }
+      if(writeResult[1] !== 1) {
+        console.error("Insufficient data written!");
+        return;
       }
     }
     proc.dropIP(inIP);
   } while (inIP.type != proc.IPTypes.CLOSE);
-  if (byteCount > 0) {
-    writeBuffer(runtime, fileDescriptor, buffer, byteCount);
-  }
 }
 
 function openFile(path, flags) {
@@ -88,24 +66,13 @@ function openFile(path, flags) {
   }
 }
 
-function writeBuffer(runtime, fileDescriptor, writeBuffer, byteCount) {
-  var writeResult = runtime.runAsyncCallback(writeData(fileDescriptor, writeBuffer, byteCount));
-  if (writeResult[0]) {
-    console.error(writeResult[0]);
-    return false;
-  }
-  if (writeResult[1] !== byteCount) {
-    console.error("Insufficient data written!");
-    return false;
-  }
-
-  return true;
-}
-
-function writeData(fd, writeBuffer, count) {
+function writeData(fd, byte) {
   return function (done) {
-    fs.write(fd, writeBuffer, 0, count, null, function (err, written) {
+    var writeBuffer = new Buffer(1);
+    writeBuffer[0] = byte;
+    fs.write(fd, writeBuffer, 0, 1, null, function(err, written) {
       done([err, written]);
     });
   }
 }
+

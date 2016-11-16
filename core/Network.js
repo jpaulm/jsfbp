@@ -1,12 +1,12 @@
-var IIPConnection = require('./IIPConnection'),
-  InputPort = require('./InputPort'),
-  OutputPort = require('./OutputPort'),
-  path = require('path'),
-  Process = require('./Process'),
-  ProcessConnection = require('./ProcessConnection'),
-  parseFBP = require('parsefbp'),
-  trace = require('./trace'),
-  _ = require('lodash');
+var IIPConnection = require('./IIPConnection')
+  , InputPort = require('./InputPort')
+  , OutputPort = require('./OutputPort')
+  , path = require('path')
+  , Process = require('./Process')
+  , ProcessConnection = require('./ProcessConnection')
+  , parseFBP = require('parsefbp')
+  , trace = require('./trace')
+  , _ = require('lodash');
 
 var Network = module.exports = function (options) {
   this._processes = {};
@@ -58,13 +58,9 @@ function getPort(connectionEnd) {
 }
 
 Network.createFromGraph = function (graphString, localRoot) {
-  var graphDefinition = parseFBP(graphString, {
-    caseSensitive: true
-  });
+  var graphDefinition = parseFBP(graphString, {caseSensitive: true});
 
-  var network = new Network({
-    componentRoot: localRoot
-  });
+  var network = new Network({componentRoot: localRoot});
   var processes = {};
 
   Object.keys(graphDefinition.processes).forEach(function (processName) {
@@ -78,7 +74,7 @@ Network.createFromGraph = function (graphString, localRoot) {
       network.initialize(processes[target.process], getPort(target), connection.data);
     } else {
       var source = connection.src;
-      network.connect(processes[source.process], getPort(source), processes[target.process], getPort(target), connection.capacity);
+      network.connect(processes[source.process], getPort(source), processes[target.process], getPort(target));
     }
 
   });
@@ -96,12 +92,12 @@ Network.prototype.run = function (runtime, options, callback) {
   _.invokeMap(this._connections, 'setRuntime', runtime);
 
   try {
-    runtime.run(_.values(this._processes), options, callback);
+    runtime.run(_.values(this._processes), options, callback );
   } catch (e) {
     console.log('Connections');
     console.log('-----------');
     this._connections.forEach(function (connection) {
-      console.log(connection.name + ': ' + connection.pendingIPCount() + '/' + connection.capacity);
+      console.log(connection.name +': ' + connection.pendingIPCount() + '/' + connection.capacity);
     });
     throw e;
   }
@@ -140,7 +136,7 @@ Network.prototype.initialize = function (proc, portName, string) {
 };
 
 Network.prototype.connect = function (upproc, upPortName, downproc, downPortName, capacity) {
-  if (!capacity) {
+  if (capacity === undefined) {
     capacity = 10;
   }
   var outport = upproc.outports[upPortName];

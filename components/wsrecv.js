@@ -9,9 +9,7 @@ module.exports = function wsrecv(runtime) {
 
   var ip = inport.receive();
   var portno = ip.contents;
-  var wss = new WebSocketServer({
-    port: portno
-  });
+  var wss = new WebSocketServer({port: portno});
   wssout.send(this.createIP(wss));
 
   var ws = null;

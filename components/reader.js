@@ -10,7 +10,7 @@ module.exports = function reader(runtime) {
   this.dropIP(ip);
 
   var result = runtime.runAsyncCallback(myReadFile(fname, "utf8", this));
-
+  
   if (result[0] == undefined) {
     console.log(result[1]);
     return;
@@ -18,7 +18,7 @@ module.exports = function reader(runtime) {
 
   var outport = this.openOutputPort('OUT');
   var array = result[0].split('\n');
-  array.forEach(function (item) {
+  array.forEach(function(item){
     var ip = this.createIP(item);
     outport.send(ip);
   }.bind(this));

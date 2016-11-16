@@ -63,7 +63,7 @@ module.exports = function collate() {
     }
   }
 
-  ctlfields.forEach(function () {
+  ctlfields.forEach(function() {
     var p = this.createIPBracket(this.IPTypes.CLOSE);
     outport.send(p);
   }.bind(this));

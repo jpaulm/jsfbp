@@ -141,17 +141,13 @@ FiberRuntime.prototype.getUpstreamConnectionState = function (proc) {
   var allDrained = true;
 
   for (var portName in proc.inports) {
-    if (!proc.inports.hasOwnProperty(portName)) {
-      continue;
-    }
+    if (!proc.inports.hasOwnProperty(portName)) { continue; }
 
     var port = proc.inports[portName];
     var connection = port.conn;
-    if (connection instanceof IIPConnection) {
-      continue;
-    }
-
-    if (connection.hasData()) {
+    if (connection instanceof IIPConnection) { continue; }
+    
+    if(connection.hasData()) {
       return ConnectionState.DATA_AVAILABLE
     } else {
       allDrained = allDrained && connection.closed;
@@ -184,7 +180,7 @@ FiberRuntime.prototype._actualRun = function () {
 };
 
 FiberRuntime.prototype._showQueueState = function (x) {
-  if (!global.trace) {
+  if(!global.trace) {
     return;
   }
   var queue = this._queue;
@@ -214,7 +210,7 @@ FiberRuntime.prototype.activateProcess = function (process) {
   return process;
 };
 
-FiberRuntime.prototype.deactivateProcess = function (process) {
+FiberRuntime.prototype.deactivateProcess = function(process) {
   process.trace('Deactivating component');
   var connState = this.getUpstreamConnectionState(process);
 

@@ -1,8 +1,8 @@
 'use strict';
-var Fiber = require('fibers'),
-  ProcessStatus = require('./Process').Status,
-  Connection = require('./Connection'),
-  _ = require('lodash');
+var Fiber = require('fibers')
+  , ProcessStatus = require('./Process').Status
+  , Connection = require('./Connection')
+  , _ = require('lodash');
 
 var ProcessConnection = function (size) {
   this.parent.constructor.call(this);
@@ -10,8 +10,8 @@ var ProcessConnection = function (size) {
   this.name = null;
   this.capacity = size;
 
-  this.downStreamProcess = null; // downstream process
-  this.upSteamProcesses = []; // list of upstream processes
+  this.downStreamProcess = null;  // downstream process
+  this.upSteamProcesses = [];    // list of upstream processes
   this.upstreamProcsUnclosed = 0;
 };
 
@@ -26,12 +26,12 @@ ProcessConnection.prototype.getData = function () {
   proc.trace('Requesting IP from ' + this.name);
 
   while (!this.hasData()) {
-    if (this.closed) {
-      proc.trace('recv EOS from ' + this.name);
-      return null;
-    }
+      if (this.closed) {
+        proc.trace('recv EOS from ' + this.name);
+        return null;
+      }
 
-    proc.yield(ProcessStatus.WAITING_TO_RECEIVE);
+      proc.yield(ProcessStatus.WAITING_TO_RECEIVE);
   }
 
   var runtime = this._runtime;
@@ -78,7 +78,8 @@ ProcessConnection.prototype.putData = function (ip, portName) {
     }
     if (this.contents.length >= this.capacity) {
       proc.yield(ProcessStatus.WAITING_TO_SEND, ProcessStatus.WAITING_TO_SEND);
-    } else {
+    }
+    else {
       break;
     }
   }
@@ -94,8 +95,8 @@ ProcessConnection.prototype.putData = function (ip, portName) {
 ProcessConnection.prototype.closeFromUpstream = function () {
 
   var status = this.downStreamProcess.status;
-  if (status == ProcessStatus.WAITING_TO_RECEIVE ||
-    status == ProcessStatus.NOT_INITIALIZED) {
+  if (status == ProcessStatus.WAITING_TO_RECEIVE
+    || status == ProcessStatus.NOT_INITIALIZED) {
     this._runtime.queueForExecution(this.downStreamProcess);
   }
   this.upstreamProcsUnclosed--;
@@ -119,13 +120,13 @@ ProcessConnection.prototype.closeFromInPort = function () {
   var proc = Fiber.current.fbpProc;
 
   this.closed = true;
-  if (this.hasData()) {
+  if(this.hasData()) {
     console.log(proc.name + ': ' + this.contents.length + ' IPs dropped because of close on ' + this.name);
   }
   this.purgeData();
   var runtime = this._runtime;
 
-  _.forEach(this.upSteamProcesses, function (process) {
+  _.forEach(this.upSteamProcesses, function(process) {
     runtime.pushToQueue(process);
   });
 };

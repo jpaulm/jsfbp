@@ -6,7 +6,7 @@ var Connection = function () {
   this._runtime = null;
 };
 
-Connection.prototype.setRuntime = function (runtime) {
+Connection.prototype.setRuntime = function(runtime) {
   this._runtime = runtime;
 };
 

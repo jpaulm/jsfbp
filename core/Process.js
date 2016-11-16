@@ -1,12 +1,12 @@
 'use strict';
 
 
-var Fiber = require('fibers'),
-  Enum = require('./Enum'),
-  IP = require('./IP'),
-  IIPConnection = require('./IIPConnection'),
-  _ = require('lodash'),
-  trace = require('./trace');
+var Fiber = require('fibers')
+  , Enum = require('./Enum')
+  , IP = require('./IP')
+  , IIPConnection = require('./IIPConnection')
+  , _ = require('lodash')
+  , trace = require('./trace');
 
 var Process = module.exports = function (name, func) {
   this.name = name;
@@ -20,17 +20,15 @@ var Process = module.exports = function (name, func) {
   this.yielded = false;
   this.result = null; // [data, err]
 
-  this.trace('Created with status: ' + Process.Status.__lookup(this._status), this.name);
+  this.trace('Created with status: ' + Process.Status.__lookup(this._status),this.name);
   Object.defineProperty(this, 'status', {
-    get: function () {
-      return this._status;
-    },
-    set: function (status) {
-      if (status === this._status) {
+    get: function() { return this._status; },
+    set: function(status) {
+      if(status === this._status) {
         return;
       }
       this.trace('Transition from ' + Process.Status.__lookup(this._status) + ' to ' + Process.Status.__lookup(status));
-      if (status === Process.Status.ACTIVE && _.includes([Process.Status.NOT_INITIALIZED, Process.Status.DORMANT], this._status)) {
+      if(status === Process.Status.ACTIVE && _.includes([Process.Status.NOT_INITIALIZED, Process.Status.DORMANT], this._status)) {
         this.trace('Activating component');
       }
       this._status = status;
@@ -62,11 +60,11 @@ function getPortArray(ports, name) {
   var re = new RegExp(name + '\\[\\d+\\]');
 
   return Object.keys(ports)
-    .filter(function (portName) {
+    .filter(function(portName) {
       return re.test(portName);
     })
     .sort()
-    .map(function (portName) {
+    .map(function(portName) {
       return ports[portName];
     });
 }
@@ -120,16 +118,16 @@ Process.prototype.dropIP = function (ip) {
   ip.owner = null;
 };
 
-Process.prototype.addInputPort = function (port) {
+Process.prototype.addInputPort = function(port) {
   this.inports[port.portName] = port;
 };
-Process.prototype.addOutputPort = function (port) {
+Process.prototype.addOutputPort = function(port) {
   this.outports[port.portName] = port;
 };
 
 Process.prototype.openInputPort = function (name) {
   var port = this.inports[name];
-  if (port) {
+  if(port) {
     return port;
   } else {
     console.log('Port ' + this.name + '.' + name + ' not found');
@@ -150,7 +148,7 @@ Process.prototype.openInputPortArray = function (name) {
 
 Process.prototype.openOutputPort = function (name, opt) {
   var port = this.outports[name];
-  if (port) {
+  if(port) {
     return port;
   } else {
     if (opt != 'OPTIONAL') {
@@ -178,17 +176,17 @@ Process.prototype.openOutputPortArray = function (name) {
  * @param postStatus Process status will be set to this after yielding. If not set, the status will be changed to ACTIVE
  */
 Process.prototype.yield = function (preStatus, postStatus) {
-  if (preStatus !== undefined || preStatus !== null) {
+  if(preStatus !== undefined || preStatus !== null) {
     this.status = preStatus;
   }
-  if (postStatus === undefined) {
+  if(postStatus === undefined) {
     postStatus = Process.Status.ACTIVE;
   }
 
   this.yielded = true;
   this.trace("Yielding with: " + Process.Status.__lookup(preStatus));
   Fiber.yield();
-  if (postStatus !== this.status) {
+  if(postStatus !== this.status) {
     this.status = postStatus
   }
 
