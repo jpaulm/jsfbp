@@ -2,7 +2,7 @@
 
 # Warning:
 
-A scheduling error was detected a week ago that had been introduced into JSFBP in June of this year. We are working on fixing this, but meanwhile we will be resetting the code back to the state it was in in June, at which point all our tests worked fine!  Strangely enough the Travis CI tests did not detect any problem, so the problem was not detected. Sorry for the inconvenience - we will try to fix this as soon as possible. 
+A scheduling error was detected a week ago that had been introduced into JSFBP in June of this year. While we are working on this, we will be resetting the code back to the state it was in in June, as at that point all our tests worked fine!  Strangely enough the Travis CI tests did not detect any problem, so this was not detected. This in turn means that later changes have had to be backed out, but, as far as we know, all our tests are working. Sorry for any inconvenience - we will try to bring the code back up to date as soon as possible. 
 
 [![NPM](https://nodei.co/npm/jsfbp.png?downloads=true&downloadRank=true&stars=true)](https://nodei.co/npm/jsfbp/)
 
