@@ -1,12 +1,8 @@
 'use strict';
 
 var fbp = require('../..');
-var _ = require('lodash');
-var EOL = require('os').EOL;
 
-var eolBytes = _.invokeMap(EOL.split(''), 'charCodeAt', 0);
-
-describe.skip('breader', function () {
+describe('breader', function () {
   it('should read a file and output its contents as bytes', function (done) {
     var network = new fbp.Network();
 
@@ -15,12 +11,18 @@ describe.skip('breader', function () {
     var breader = network.defProc('./components/breader.js', 'breader');
     var receiver = network.defProc(MockReceiver.generator(result), 'receiver');
 
-    network.initialize(breader, 'FILE', __dirname+'/hello-world.txt');
+    network.initialize(breader, 'FILE', __dirname+'/000000-1.png');
     network.connect(breader, 'OUT', receiver, 'IN');
 
     var fiberRuntime = new fbp.FiberRuntime();
     network.run(fiberRuntime, {trace: false}, function() {
-      expect(result).to.deep.equal([72, 101, 108, 108, 111, 0x20, 87, 111, 114, 108, 100].concat(eolBytes));
+      expect(result).to.deep.equal([
+        0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a, 0x00, 0x00, 0x00, 0x0d, 0x49, 0x48, 0x44, 0x52,
+        0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x01, 0x08, 0x00, 0x00, 0x00, 0x00, 0x3a, 0x7e, 0x9b,
+        0x55, 0x00, 0x00, 0x00, 0x0a, 0x49, 0x44, 0x41, 0x54, 0x78, 0x9c, 0x63, 0x62, 0x00, 0x00, 0x00,
+        0x06, 0x00, 0x03, 0x36, 0x37, 0x7c, 0xa8, 0x00, 0x00, 0x00, 0x00, 0x49, 0x45, 0x4e, 0x44, 0xae,
+        0x42, 0x60, 0x82
+      ]);
       done();
     });
   });
