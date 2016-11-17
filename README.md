@@ -1,9 +1,4 @@
 # jsfbp
-
-# Warning:
-
-A scheduling error was detected a week ago that had been introduced into JSFBP in June of this year. We are working on fixing this, but meanwhile we will be resetting the code back to the state it was in in June, at which point all our tests worked fine!  Strangely enough the Travis CI tests did not detect any problem, so the problem was not detected. Sorry for the inconvenience - we will try to fix this as soon as possible. 
-
 [![NPM](https://nodei.co/npm/jsfbp.png?downloads=true&downloadRank=true&stars=true)](https://nodei.co/npm/jsfbp/)
 
 [![Build Status](https://travis-ci.org/jpaulm/jsfbp.svg?branch=master)](https://travis-ci.org/jpaulm/jsfbp)
@@ -290,10 +285,5 @@ nally. FBP is
 Performance
 ---
 
-The volume test case (`fbptestvl`) with 100,000,000 IPs running through three processes took 164 seconds, on my machine 
-which has 4 AMD Phenom(tm) II X4 925 processors.  
-
-Since there are two connections, giving a total of 200,000,000 send/receive pairs, this works out to approx. 
-0.82 microsecs per send/receive pair. Of course, as it is JavaScript, this test only uses 1 core intensively, 
-although there is some matching activity on the other cores (why...?!)
+The volume test case (`fbptestvl`) with 100,000,000 IPs running through three processes took 164 seconds, on my machine which has 4 AMD Phenom(tm) II X4 925 processors,.  Since there are two connections, giving a total of 200,000,000 send/receive pairs, this works out to approx. 0.82 microsecs per send/receive pair. Of course, as it is JavaScript, this test only uses 1 core intensively, although there is some matching activity on the other cores (why...?!)
 

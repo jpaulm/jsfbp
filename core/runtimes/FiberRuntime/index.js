@@ -11,46 +11,45 @@ Fiber.prototype.fbpProc = null;
 
 var FiberRuntime = module.exports = function () {
   this._queue = [];
-  this._openProcessCount = 0;
+  this._count = null;
 };
 
 
-/*
- * A general method for queing a process for an upcoming tick
- * Guarantees that processes will not be added to the queue if it is already queued
- */
-FiberRuntime.prototype.pushToQueue = function (process) {
-  var processInQueue = _.some(this._queue, function (queuedProcess) {
-    return queuedProcess.name === process.name;
-  });
-  if (!processInQueue) {
-    trace('Pushing ' + process.name + ' to queue');
-    this._queue.push(process);
-  }
+// TOOD Better description of parameter and maybe function name as well
+FiberRuntime.prototype.pushToQueue = function (item) {
+  this._queue.push(item);
 };
 
-/*
- * A specific method for queuing a process for execution
- */
-FiberRuntime.prototype.queueForExecution = function (process) {
-  process.status = Process.Status.READY_TO_EXECUTE;
-  this.pushToQueue(process);
-};
-
-FiberRuntime.prototype._closeProcess = function (proc) {
+FiberRuntime.prototype._close = function (proc) {
   proc.trace('closing');
   proc.status = Process.Status.CLOSED;
-
-  this._openProcessCount--;
+  // console.log('cl' + count);
+  this._count--;
   _.forEach(proc.outports, function (outPort) {
     var conn = outPort.conn;
-    conn.closeFromUpstream();
-  });
+    if (conn.down.status == Process.Status.WAITING_TO_RECEIVE
+      || conn.down.status == Process.Status.NOT_INITIALIZED) {
+      conn.down.status = Process.Status.READY_TO_EXECUTE;
+      this._queue.push(conn.down);
+    }
+    conn.upstreamProcsUnclosed--;
+    if ((conn.upstreamProcsUnclosed) <= 0) {
+      conn.closed = true;
+    }
+  }.bind(this));
 
   _.forEach(proc.inports, function (inport) {
     var conn = inport.conn;
-    conn.closeFromDownstream()
-  });
+    if (conn instanceof IIPConnection) {
+      return;
+    }
+    conn.up.forEach(function (up) {
+      if (up.status == Process.Status.CLOSED) {
+        up.status = Process.Status.DONE;
+        this._queue.push(up);
+      }
+    }.bind(this));
+  }.bind(this));
 
   if (proc.ownedIPs != 0) {
     console.log(proc.name + ' closed without disposing of all IPs');
@@ -63,11 +62,11 @@ FiberRuntime.prototype.getCurrentProc = function () {
 };
 
 FiberRuntime.prototype.queueCallback = function (proc, result) {
-  proc.trace('Returned from callback');
+  proc.trace('queueCallback');
   if (result != undefined) {
     proc.result = result;
   }
-  this.pushToQueue(proc);
+  this._queue.push(proc);
 };
 
 FiberRuntime.prototype.runAsyncCallback = function (cb) {
@@ -76,7 +75,6 @@ FiberRuntime.prototype.runAsyncCallback = function (cb) {
   proc.cbpending = true;
 
   var self = this;
-  proc.trace('Yielding to perform callback');
 
   cb(function (result) {
     proc.yielded = false;
@@ -90,7 +88,7 @@ FiberRuntime.prototype.runAsyncCallback = function (cb) {
 
 FiberRuntime.prototype.run = function (processes, options, callback) {
   this._processList = _.keyBy(processes, 'name');
-  this._openProcessCount = _.size(this._processList);
+  this._count = _.size(this._processList);
 
   global.trace = global.trace || Boolean(options.trace);
 
@@ -101,7 +99,7 @@ FiberRuntime.prototype.run = function (processes, options, callback) {
     var time = startTime.toLocaleString();
     console.log('Start time: ' + time);
 
-    self._actualRun();
+    self._actualRun.call(self);
 
     console.log('Elapsed time in millisecs: ' + (Date.now() - startTime));
 
@@ -110,7 +108,7 @@ FiberRuntime.prototype.run = function (processes, options, callback) {
 };
 
 FiberRuntime.prototype._createFiber = function (process) {
-  trace('Creating new fiber for ' + process.name);
+  trace('creating new fiber for ' + process.name);
 
   process.fiber = new Fiber(process.func.bind(process, this));
   process.fiber.fbpProc = process;
@@ -127,44 +125,63 @@ FiberRuntime.prototype._hasDeadLock = function () {
 };
 
 FiberRuntime.prototype._genInitialQueue = function () {
-  return _.filter(this._processList, 'isSelfStarting');
+  var self = this;
+  var queue = [];
+
+  // A process is selfstarting if its incoming ports are only connected to IIPs
+  _.forEach(self._processList, function (process) {
+    var selfstarting = true;
+    _.forEach(process.inports, function (inport) {
+      selfstarting = selfstarting && (inport.conn instanceof IIPConnection);
+    });
+
+    if (selfstarting) {
+      queue.push(process);
+    }
+  });
+
+  return queue;
 };
 
 
-var ConnectionState = Enum([
+var ProcState = Enum([
   "UPSTREAM_CLOSED",
   "NO_DATA",
   "DATA_AVAILABLE"
 ]);
-
-FiberRuntime.prototype.getUpstreamConnectionState = function (proc) {
+FiberRuntime.prototype._procState = function (proc) {
   var allDrained = true;
+  var hasData = false;
 
-  for (var portName in proc.inports) {
-    if (!proc.inports.hasOwnProperty(portName)) { continue; }
-
-    var port = proc.inports[portName];
+  _.forEach(proc.inports, function(port) {
     var connection = port.conn;
-    if (connection instanceof IIPConnection) { continue; }
-    
-    if(connection.hasData()) {
-      return ConnectionState.DATA_AVAILABLE
-    } else {
-      allDrained = allDrained && connection.closed;
+    if (connection instanceof IIPConnection) {
+      return;
     }
-  }
 
-  return allDrained ? ConnectionState.UPSTREAM_CLOSED : ConnectionState.NO_DATA;
+    allDrained = allDrained && connection.usedslots == 0 && connection.closed;
+    hasData = hasData || connection.usedslots > 0;
+  });
+
+  return  allDrained  ? ProcState.UPSTREAM_CLOSED
+    :     !hasData    ? ProcState.NO_DATA
+    :                   ProcState.DATA_AVAILABLE;
 };
 
 // Fibre running scheduler
 FiberRuntime.prototype._actualRun = function () {
   this._queue = this._genInitialQueue();
+  var runtime = this;
+
+  _.forEach(this._processList, function (process) {
+    _.invokeMap(process.inports, 'setRuntime', runtime);
+    _.invokeMap(process.outports, 'setRuntime', runtime);
+  });
 
   while (true) {
     this._tick();
 
-    if (this._openProcessCount <= 0) {
+    if (this._count <= 0) {
       break;
     }
 
@@ -180,19 +197,16 @@ FiberRuntime.prototype._actualRun = function () {
 };
 
 FiberRuntime.prototype._showQueueState = function (x) {
-  if(!global.trace) {
-    return;
-  }
   var queue = this._queue;
   trace("Yield/return: state of future events queue: ");
   trace("--- This Process");
   trace("- " + x.name + " - status: " + x.getStatusString());
-  trace("--- Queued Processes");
-  _.forEach(queue, function (process) {
+  trace("--- Queue");
+  _.forEach(queue, function(process) {
     trace("- " + process.name + " - status: " + process.getStatusString());
   });
-  if (_.size(this._processList) > _.size(queue)) {
-    trace("--- Unqueued Processes");
+  if(_.size(this._processList) > _.size(queue)) {
+    trace("--- Other Processes");
     _.forEach(_.difference(_.values(this._processList), queue.concat(x)), function (process) {
       trace("- " + process.name + " - status: " + process.getStatusString());
     });
@@ -200,71 +214,61 @@ FiberRuntime.prototype._showQueueState = function (x) {
   trace("--- ");
 };
 
-
-FiberRuntime.prototype.activateProcess = function (process) {
-  if (process.fiber == null) {
-    process = this._createFiber(process);
-  } else {
-    process.status = Process.Status.ACTIVE;
-  }
-  return process;
-};
-
-FiberRuntime.prototype.deactivateProcess = function(process) {
-  process.trace('Deactivating component');
-  var connState = this.getUpstreamConnectionState(process);
-
-  if (ConnectionState.UPSTREAM_CLOSED == connState) {
-    this._closeProcess(process);
-    return true;
-  } else if (ConnectionState.NO_DATA == connState) {
-    process.status = Process.Status.DORMANT;
-    _.forEach(process.inports, function (port) {
-      if (port.conn instanceof IIPConnection) {
-        port.conn.closed = false;
-      }
-    });
-    return true;
-  }
-  return false
-};
-
 FiberRuntime.prototype._tick = function () {
 
-  var process;
+  var x = this._queue.shift();
 
-  while ((process = this._queue.shift()) != undefined) {
+  while (x != undefined) {
 
-    if (process.status != Process.Status.DONE) {
-      process = this.activateProcess(process);
+    if (x.status != Process.Status.DONE) {
+      if (x.fiber == null) {
+        x = this._createFiber(x);
+      } else {
+        x.status = Process.Status.ACTIVE;
+      }
 
-      this._showQueueState(process);
-      var doneWithProcess = false;
+      this._showQueueState(x);
 
-      while (!doneWithProcess) {
-        var connState = this.getUpstreamConnectionState(process);
-        if (process.status === Process.Status.DORMANT && connState === ConnectionState.UPSTREAM_CLOSED) {
-          this._closeProcess(process);
-          doneWithProcess = true;
-        } else if (process.status != Process.Status.CLOSED) {
-          if (!process.cbpending) {
-            process.status = Process.Status.ACTIVE;
+      while (true) {
+        var procState = this._procState(x);
+        if (x.status == Process.Status.DORMANT && ProcState.UPSTREAM_CLOSED == procState) {
+          this._close(x);
+          break;
+        } else if (x.status != Process.Status.CLOSED) {
+          if (!x.cbpending) {
+            x.status = Process.Status.ACTIVE;
 
-            process.trace('Active Fiber');
+            x.trace('Start process run');
             // --------------------------
-            process.fiber.run(process.result);
+            x.fiber.run(x.result);
             // ---------------------------
-            process.trace('Fiber yielded');
-          }
+            x.trace('End process run');
 
-          if (process.yielded) {
-            doneWithProcess = true;
-          } else if (!process.cbpending) {
-            doneWithProcess = this.deactivateProcess(process);
+          }
+          procState = this._procState(x);
+          x.data = null;
+
+          if (x.yielded) {
+            break;
+          } else if (!x.cbpending) {
+
+            if (ProcState.UPSTREAM_CLOSED == procState) {
+              this._close(x);
+              break;
+            } else if (ProcState.NO_DATA == procState) {
+              x.status = Process.Status.DORMANT;
+              _.forEach(x.inports, function (port) {
+                if (port.conn instanceof IIPConnection) {
+                  port.conn.closed = false;
+                }
+              });
+              break;
+            }
           }
         }
       }
     }
+    x = this._queue.shift();
   }
 };
 
