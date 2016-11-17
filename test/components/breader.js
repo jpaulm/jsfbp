@@ -6,7 +6,7 @@ var EOL = require('os').EOL;
 
 var eolBytes = _.invokeMap(EOL.split(''), 'charCodeAt', 0);
 
-describe('breader', function () {
+describe.skip('breader', function () {
   it('should read a file and output its contents as bytes', function (done) {
     var network = new fbp.Network();
 
