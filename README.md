@@ -128,16 +128,16 @@ network.run(fiberRuntime, {trace: true/false}, function success() {
 6. Run it!
 ```
 network.run(fiberRuntime, {trace: true/false}, function success() {
-    console.log("Finished!");
-  });
+  console.log("Finished!");
+});
 ```
 
 
  Activating `trace` can be desired in debugging scenarios.
 
- ### Useful methods
+### Useful methods
  
-- `Network#defProc(component[, name])` Creates a process from a component, defined by the first parameter.
+  - `Network#defProc(component[, name])` Creates a process from a component, defined by the first parameter.
   
   - The first parameter can be a function or a string. When a string is used, the component is loaded according to three
   possiblities:
@@ -201,7 +201,7 @@ runtime.runAsyncCallback(function (done) {
 
 # Install & Run
 
-We use `node-fibers` which is known to work with `Node.js 12.7` (as of 24.07.2015).
+We use `node-fibers` which is known to work with `Node.js 0.12.7` (as of 24.07.2015).
 
 1. Install node.js - see http://nodejs.org/download/  . 
 2. Clone or download this project
