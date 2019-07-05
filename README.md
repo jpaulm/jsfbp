@@ -203,14 +203,11 @@ runtime.runAsyncCallback(function (done) {
 
 We use `node-fibers` which is known to work with `Node.js 0.12.7` (as of 24.07.2015).
 
-1. Install node.js - see http://nodejs.org/download/  . 
+1. Install [Node.js](http://nodejs.org/download/)
 2. Clone or download this project
 3. Execute `npm install`
-   Install requires the following `npm` packages: `parsefbp`, `fibers`, `mocha`, `chai`, `lodash` and `mocha-fibers` - you may have to do `npm` installs for some or all of these.
    
    If you get an MSB4019 or similar error messages involving `utf-8-validate` and `bufferutil` (some dependencies deep down the dependency tree), you can just ignore them, given the optional nature of these components' compilation.
-
-3b. JSFBP is now on `npm`, so you can simply do `npm install jsfbp`.  
 
 4. Run `node examples/fbptestxx.js`, where `fbptestxx` is any of the tests listed above. If tracing is desired, change the value of the `trace` variable at the bottom of `fbptestxx.js` to `true`. 
 5. All these tests can be run sequentially by running `examples/fbptests.bat`, or by running `examples/fbptests.sh` under `bash`.
@@ -221,7 +218,7 @@ We use `node-fibers` which is known to work with `Node.js 0.12.7` (as of 24.07.2
 
 If you wish to eliminate the errors mentioned in point #3 under *Install*, you will need to install Python 2.x and Visual Studio Express for Desktop 2013. This doesn't seem to guarantee an error-free `npm install`, however.  Still `jsfbp` works fine, even with these errors.
 
-1. Install node.js - see http://nodejs.org/download/  . 
+1. Install [Node.js](http://nodejs.org/download/)
 2. Install Python 2.x
 3. Install Visual Studio Express for Desktop 2013 (click on http://go.microsoft.com/fwlink/?LinkId=532500&clcid=0x409 )
 4. Clone or download this project
@@ -240,7 +237,7 @@ If you wish to eliminate the errors mentioned in point #3 under *Install*, you w
 The folder called `test` contains a number of Mocha tests.
 
 1. Run `npm test` to execute a series of tests (all the `fbptestxx.js` tests in sequence).
-2. Alternatively, you can directly execute `node.exe node_modules/mocha/bin/mocha --recursive --require test/test_helper.js` in case you need to adjust the path to Node's binary or pass further parameters to Mocha.
+2. Alternatively, you can directly execute `node ./node_modules/mocha/bin/mocha --recursive --require test/test_helper.js` in case you need to adjust the path to Node's binary or pass further parameters to Mocha.
 
 # Testing Sample HTTP Server
 
