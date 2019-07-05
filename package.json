@@ -27,7 +27,7 @@
     "fibers": "^4.0.1",
     "lodash": "^4.17.11",
     "parsefbp": "^0.3.0",
-    "snyk": "^1.192.2"
+    "snyk": "^1.192.3"
   },
   "main": "index.js",
   "devDependencies": {
