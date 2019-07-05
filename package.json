@@ -26,7 +26,8 @@
   "dependencies": {
     "fibers": "^1.0.5",
     "lodash": "^4.13.1",
-    "parsefbp": "^0.2.0"
+    "parsefbp": "^0.2.0",
+    "snyk": "^1.189.0"
   },
   "main": "index.js",
   "devDependencies": {
@@ -43,6 +44,9 @@
   },
   "scripts": {
     "test": "npm install && mocha --ui mocha-fibers --recursive -R spec --require test/test_helper.js test/components test/core",
-    "lint": "eslint components core examples test index.js"
-  }
+    "lint": "eslint components core examples test index.js",
+    "snyk-protect": "snyk protect",
+    "prepublish": "npm run snyk-protect"
+  },
+  "snyk": true
 }
