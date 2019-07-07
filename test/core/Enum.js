@@ -3,7 +3,7 @@ var Enum = require('../../core/Enum');
 describe('Enum', function () {
   it('should create an enum and provide a lookup function', function () {
     var myEnum = Enum(['a', 'b', 'c']);
-    console.log(myEnum);
+
     expect(myEnum).to.have.ownProperty('a');
     expect(myEnum).to.have.ownProperty('b')
     expect(myEnum).to.have.ownProperty('c');
