@@ -35,7 +35,7 @@
     "eslint": ">=6.0.1",
     "eslint-config-defaults": "^9.0.0",
     "mocha": "^6.1.4",
-    "mocha-fibers": "git+https://git@github.com/ComFreek/mocha-fibers.git",
+    "mocha-fibers": "git+https://git@github.com/jpaulm/mocha-fibers.git",
     "ws": ">=7.0.1",
     "dummy-module": "*"
   },
