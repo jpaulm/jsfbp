@@ -17,4 +17,7 @@ network.sconnect('Copy.OUT', 'Recvr.IN', 5);
 
 // --- run ---
 var fiberRuntime = new fbp.FiberRuntime();
-network.run(fiberRuntime, {trace: false});
+network.run(fiberRuntime, { trace: false });
+
+
+
