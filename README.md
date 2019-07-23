@@ -11,6 +11,8 @@ JSFBP takes advantage of JavaScript's concept of functions as first-degree objec
 
 # General
 
+To run test cases, position in your command shell to `GitHub/jsfbp` and type in `node examples/fbptestxx`, where `xx` is the test case number.
+
 Test cases so far:
 
 - `fbptest01` - 3 processes:
