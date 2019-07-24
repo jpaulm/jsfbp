@@ -11,9 +11,11 @@ JSFBP takes advantage of JavaScript's concept of functions as first-degree objec
 
 # Installing Fibers
 
-Go into command mode, and enter `npm install fibers`.
+Go into command mode, and enter `npm install -g node-gyp`, then `npm install fibers`.  
 
 If this command has trouble finding Python, install Python 2.7.10, then run `npm --add-python-to-path='true' --debug install --global windows-build-tools`.
+
+If you have trouble installing `node-fibers`, you should install Visual Studio Build Tools 2017. Modify, (Repair?), then Launch.
 
 # General
 
