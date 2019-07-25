@@ -9,6 +9,14 @@ A scheduling logic error was detected in November 2016 that had been introduced 
 
 JSFBP takes advantage of JavaScript's concept of functions as first-degree objects to allow applications to be built using "green threads".  JSFBP makes use of an internal "Future Events Queue" which supports the green threads, and provides quite good performance (see below) - the JavaScript events queue is only used for JavaScript asynchronous functions, as before.
 
+# Installing Fibers
+
+Go into command mode, and enter `npm install -g node-gyp`, then `npm install fibers`.  
+
+If this command has trouble finding Python, install Python 2.7.10, then run `npm --add-python-to-path='true' --debug install --global windows-build-tools`.
+
+If you have trouble installing `node-fibers`, you should install Visual Studio Build Tools 2017. Modify, (Repair?), then Launch.
+
 # General
 
 To run test cases, position in your command shell to `GitHub/jsfbp` and type in `node examples/fbptestxx`, where `xx` is the test case number.
