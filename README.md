@@ -11,6 +11,8 @@ JSFBP takes advantage of JavaScript's concept of functions as first-degree objec
 
 # Installing Fibers
 
+As suggested in https://github.com/laverdet/node-fibers/issues/new , make sure your version of `nodejs` is an even one.
+
 Go into command mode, and enter `npm install fibers`.  
 
 If this command has trouble finding Python, install Python 2.7.10, then run `npm --add-python-to-path='true' --debug install --global windows-build-tools`.  Don't know if this is still necessary!
