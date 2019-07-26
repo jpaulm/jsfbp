@@ -157,7 +157,7 @@ network.run(fiberRuntime, {trace: true/false}, function success() {
     - Otherwise, the string is assumed to be a node module that _is_ an FBP component and it is simply
   loaded via `require`.
 
-  - The second paramter is an optional name for the Process. If not provided, it will be inferred from the `component`.
+  - The second parameter is an optional name for the Process. If not provided, it will be inferred from the `component`.
 
 ## For component developers
 
@@ -207,7 +207,7 @@ runtime.runAsyncCallback(function (done) {
 
 # Install & Run
 
-We use `node-fibers` which is known to work with `Node.js 0.12.7` (as of 24.07.2015).
+We use `node-fibers` which is known to work with `Node.js 10.16.0` (as of 25.07.2019).
 
 1. Install [Node.js](http://nodejs.org/download/)
 2. Clone or download this project
