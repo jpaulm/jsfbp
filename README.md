@@ -11,11 +11,11 @@ JSFBP takes advantage of JavaScript's concept of functions as first-degree objec
 
 # Installing Fibers
 
-Go into command mode, and enter `npm install -g node-gyp`, then `npm install fibers`.  
+As suggested in https://github.com/laverdet/node-fibers/issues/new , make sure your version of `nodejs` is an even one.
 
-If this command has trouble finding Python, install Python 2.7.10, then run `npm --add-python-to-path='true' --debug install --global windows-build-tools`.
+Go into command mode, and enter `npm install fibers`.  
 
-If you have trouble installing `node-fibers`, you should install Visual Studio Build Tools 2017. Modify, (Repair?), then Launch.
+If this command has trouble finding Python, install Python 2.7.10, then run `npm --add-python-to-path='true' --debug install --global windows-build-tools`.  Don't know if this is still necessary!
 
 # General
 
@@ -157,7 +157,7 @@ network.run(fiberRuntime, {trace: true/false}, function success() {
     - Otherwise, the string is assumed to be a node module that _is_ an FBP component and it is simply
   loaded via `require`.
 
-  - The second paramter is an optional name for the Process. If not provided, it will be inferred from the `component`.
+  - The second parameter is an optional name for the Process. If not provided, it will be inferred from the `component`.
 
 ## For component developers
 
@@ -207,7 +207,7 @@ runtime.runAsyncCallback(function (done) {
 
 # Install & Run
 
-We use `node-fibers` which is known to work with `Node.js 0.12.7` (as of 24.07.2015).
+We use `node-fibers` which is known to work with `Node.js 10.16.0` (as of 25.07.2019).
 
 1. Install [Node.js](http://nodejs.org/download/)
 2. Clone or download this project
