@@ -68,7 +68,7 @@ function openFile(path, flags) {
 
 function writeData(fd, byte) {
   return function (done) {
-    var writeBuffer = new Buffer(1);
+    var writeBuffer = Buffer.alloc(1);
     writeBuffer[0] = byte;
     fs.write(fd, writeBuffer, 0, 1, null, function(err, written) {
       done([err, written]);
