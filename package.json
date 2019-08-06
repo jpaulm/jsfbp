@@ -26,6 +26,7 @@
   "dependencies": {
     "detect-libc": "^1.0.3",
     "fibers": "^4.0.1",
+    "fibrous": "^0.4.0",
     "lodash": "^4.17.15",
     "npm": "^6.10.2",
     "parsefbp": "^0.3.0",
@@ -34,17 +35,16 @@
   "main": "index.js",
   "devDependencies": {
     "chai": "^4.2.0",
+    "dummy-module": "*",
     "eslint": ">=6.0.1",
     "eslint-config-defaults": "^9.0.0",
-    "mocha": "^6.1.4",
-    "ws": ">=7.0.1",
-    "dummy-module": "*"
+    "mocha": "^6.2.0",
+    "ws": ">=7.0.1"
   },
   "directories": {
     "doc": "docs"
   },
   "scripts": {
-
     "test": "mocha --recursive -R spec --require test/test_helper.js test/components test/core",
     "lint": "eslint components core examples test index.js",
     "snyk-protect": "snyk protect",
