@@ -2,7 +2,7 @@
   "extends": [
     "config:base"
   ]
-  "schedule": 
-     ["after 10pm and before 5am on every weekday", "every weekend"],
+  "schedule": [
+     "after 10pm and before 5am on every weekday", "every weekend"],
   "updateNotScheduled": false,
 }
