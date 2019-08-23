@@ -25,10 +25,8 @@
   "homepage": "https://github.com/jpaulm/jsfbp",
   "dependencies": {
     "detect-libc": "^1.0.3",
-    "fibers": "^4.0.1",
-    "fibrous": "^0.4.0",
-    "lodash": "^4.17.15",
-    "npm": "^6.10.2",
+    "fibers": "^4.0.1",    
+    "lodash": "^4.17.15",    
     "parsefbp": "^0.3.0",
     "snyk": "^1.197.0"
   },
