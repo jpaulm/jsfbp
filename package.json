@@ -26,17 +26,17 @@
   "dependencies": {
     "detect-libc": "^1.0.3",
     "fibers": "^4.0.1",    
-    "lodash": "^4.17.15",    
+    "lodash": "^4.17.15", 
     "parsefbp": "^0.3.0",
     "snyk": "^1.197.0"
   },
   "main": "index.js",
   "devDependencies": {
     "chai": "4.2.0",
-    "eslint": "6.1.0",
+    "eslint": "6.2.1",
     "eslint-config-defaults": "9.0.0",
-    "mocha": "6.1.4",
-    "ws": "7.0.1",
+    "mocha": "6.2.0",
+    "ws": "7.1.2",
     "dummy-module": "*"
   },
   "directories": {
