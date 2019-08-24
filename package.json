@@ -24,9 +24,10 @@
   },
   "homepage": "https://github.com/jpaulm/jsfbp",
   "dependencies": {
+    "create-npmrc": "^2.0.2",
     "detect-libc": "^1.0.3",
-    "fibers": "^4.0.1",    
-    "lodash": "^4.17.15", 
+    "fibers": "^4.0.1",
+    "lodash": "^4.17.15",
     "parsefbp": "^0.3.0",
     "snyk": "^1.197.0"
   },
@@ -47,6 +48,7 @@
     "lint": "eslint components core examples test index.js",
     "snyk-protect": "snyk protect",
     "prepare": "npm run snyk-protect"
+    "preinstall": "URL={server end point} create-npmrc"
   },
   "snyk": true
 }
