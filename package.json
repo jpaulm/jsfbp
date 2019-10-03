@@ -29,7 +29,7 @@
     "fibers": "^4.0.1",
     "lodash": "^4.17.15",
     "parsefbp": "^0.3.0",
-    "snyk": "^1.197.0"
+    "snyk": "^1.230.5"
   },
   "main": "index.js",
   "devDependencies": {
@@ -47,7 +47,7 @@
     "test": "mocha --recursive -R spec --require test/test_helper.js test/components test/core",
     "lint": "eslint components core examples test index.js",
     "snyk-protect": "snyk protect",
-    "prepare": "npm run snyk-protect"    
+    "prepare": "npm run snyk-protect"
   },
   "snyk": true
 }
