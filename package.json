@@ -29,15 +29,15 @@
     "fibers": "^4.0.2",
     "lodash": "^4.17.15",
     "parsefbp": "^0.3.0",
-    "snyk": "^1.197.0"
+    "snyk": "^1.230.5"
   },
   "main": "index.js",
   "devDependencies": {
     "chai": "4.2.0",
-    "eslint": "6.2.2",
+    "eslint": "6.7.0",
     "eslint-config-defaults": "9.0.0",
-    "mocha": "6.2.0",
-    "ws": "7.1.2",
+    "mocha": "6.2.2",
+    "ws": "7.2.0",
     "dummy-module": "*"
   },
   "directories": {
