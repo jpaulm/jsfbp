@@ -37,7 +37,7 @@
     "eslint": "6.7.2",
     "eslint-config-defaults": "9.0.0",
     "mocha": "6.2.2",
-    "ws": "7.2.0",
+    "ws": "7.2.1",
     "dummy-module": "*"
   },
   "directories": {
