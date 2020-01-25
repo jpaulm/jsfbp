@@ -1,4 +1,6 @@
-[![npm version](https://badge.fury.io/js/jsfbp.svg)](https://badge.fury.io/js/jsfbp) [![Build Status](https://travis-ci.org/jpaulm/jsfbp.svg?branch=master)](https://travis-ci.org/jpaulm/jsfbp) [![Known Vulnerabilities](https://snyk.io/test/github/jpaulm/jsfbp/badge.svg?targetFile=package.json)](https://snyk.io/test/github/jpaulm/jsfbp?targetFile=package.json)
+[![npm version](https://badge.fury.io/js/jsfbp.svg)](https://badge.fury.io/js/jsfbp) 
+[![Build Status](https://travis-ci.org/jpaulm/jsfbp.svg?branch=master)](https://travis-ci.org/jpaulm/jsfbp)
+[![Known Vulnerabilities](https://snyk.io/test/github/jpaulm/jsfbp/badge.svg?targetFile=package.json)](https://snyk.io/test/github/jpaulm/jsfbp?targetFile=package.json)
 
 # jsfbp
 
