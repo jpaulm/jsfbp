@@ -4,13 +4,13 @@
 
 # jsfbp
 
-# Warning:
-
 <!-- A scheduling logic error was detected in November 2016 that had been introduced into JSFBP in June, but was not spotted at that time. We have therefore had to reset the code back to the state it was in in June, as at that point all our tests worked fine!  Strangely enough the Travis CI tests did not detect any problem, so this was not detected. This in turn means that later changes have had to be backed out, but, as far as we know, all our tests are working. Sorry for any inconvenience - we will try to bring the code back up to date as soon as possible. -->
 
 "Classical" FBP "green thread" implementation written in JavaScript, using Node-Fibers - <https://github.com/laverdet/node-fibers>.
 
 JSFBP takes advantage of JavaScript's concept of functions as first-degree objects to allow applications to be built using "green threads".  JSFBP makes use of an internal "Future Events Queue" which supports the green threads, and provides quite good performance (see below) - the JavaScript events queue is only used for JavaScript asynchronous functions, as before.
+
+I personally do not recommend using this FBP implementation, as compared with the Java, C# or C++ implementations on https://github.com/jpaulm , as `jsfbp` uses Node-Fibers, which has not been "blessed" by the JavaScript community, and even then, if I understand it correctly, does not support multiple cores (unlike the afore-mentioned implementations), although of course you could use sockets.  My personal experience is also that JavaScript is hard to debug because of its lack of strict typing, although again TypeScript may solve this issue.
 
 # Installing Fibers
 
