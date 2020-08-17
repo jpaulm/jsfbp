@@ -27,7 +27,7 @@
     "create-npmrc": "^2.0.2",
     "detect-libc": "^1.0.3",
     "fibers": "^5.0.0",
-    "lodash": "^4.17.15",
+    "lodash": "^4.17.20",
     "parsefbp": "^0.3.0",
 
     "snyk": "^1.316.1"
