@@ -2,7 +2,12 @@
 [![Build Status](https://travis-ci.org/jpaulm/jsfbp.svg?branch=master)](https://travis-ci.org/jpaulm/jsfbp)
 [![Known Vulnerabilities](https://snyk.io/test/github/jpaulm/jsfbp/badge.svg?targetFile=package.json)](https://snyk.io/test/github/jpaulm/jsfbp?targetFile=package.json)
 
-# jsfbp
+jsfbp
+===
+
+### JavaScript Implementation of FBP
+
+General web site on Flow-Based Programming: https://jpaulm.github.io/fbp/ .
 
 <!-- A scheduling logic error was detected in November 2016 that had been introduced into JSFBP in June, but was not spotted at that time. We have therefore had to reset the code back to the state it was in in June, as at that point all our tests worked fine!  Strangely enough the Travis CI tests did not detect any problem, so this was not detected. This in turn means that later changes have had to be backed out, but, as far as we know, all our tests are working. Sorry for any inconvenience - we will try to bring the code back up to date as soon as possible. -->
 
