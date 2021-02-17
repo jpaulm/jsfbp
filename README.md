@@ -2,15 +2,20 @@
 [![Build Status](https://travis-ci.org/jpaulm/jsfbp.svg?branch=master)](https://travis-ci.org/jpaulm/jsfbp)
 [![Known Vulnerabilities](https://snyk.io/test/github/jpaulm/jsfbp/badge.svg?targetFile=package.json)](https://snyk.io/test/github/jpaulm/jsfbp?targetFile=package.json)
 
-# jsfbp
+jsfbp
+===
 
-# Warning:
+### JavaScript Implementation of FBP
+
+General web site on Flow-Based Programming: https://jpaulm.github.io/fbp/ .
 
 <!-- A scheduling logic error was detected in November 2016 that had been introduced into JSFBP in June, but was not spotted at that time. We have therefore had to reset the code back to the state it was in in June, as at that point all our tests worked fine!  Strangely enough the Travis CI tests did not detect any problem, so this was not detected. This in turn means that later changes have had to be backed out, but, as far as we know, all our tests are working. Sorry for any inconvenience - we will try to bring the code back up to date as soon as possible. -->
 
 "Classical" FBP "green thread" implementation written in JavaScript, using Node-Fibers - <https://github.com/laverdet/node-fibers>.
 
 JSFBP takes advantage of JavaScript's concept of functions as first-degree objects to allow applications to be built using "green threads".  JSFBP makes use of an internal "Future Events Queue" which supports the green threads, and provides quite good performance (see below) - the JavaScript events queue is only used for JavaScript asynchronous functions, as before.
+
+I personally do not recommend using this FBP implementation, as compared with the Java, C# or C++ implementations on https://github.com/jpaulm , as `jsfbp` uses Node-Fibers, which has not been "blessed" by the JavaScript community, and even then, if I understand it correctly, does not support multiple cores (unlike the afore-mentioned implementations), although of course you could use sockets.  My personal experience is also that JavaScript is hard to debug because of its lack of strict typing, although again TypeScript may solve this issue.
 
 # Installing Fibers
 
@@ -36,7 +41,7 @@ Test cases so far:
 - `fbptest02` - `gendata` replaced with `reader`
 - `fbptest03` - `gendata` and `reader` both feeding into `copier.IN`
 - `fbptest04` - `gendata` feeding `repl` which sends 3 copies of input IP (as specified in network), each copy going to a separate element of array port `OUT`; all 3 copies then feeding into `recvr.IN`
-- `fbptest05` - Two copies of `reader` running concurrently, one feeds direct to `rrmerge` ("round robin" merge) input port element 0; other one into `copier` and then into `rrmerge` input port element 1; from `rrmerge.OUT` to `recvr.IN`
+- `fbptest05` - Two copies of `reader` running concurrently, one feeds directly into `rrmerge` ("round robin" merge) input port element 0; other one into `copier` and then into `rrmerge` input port element 1; from `rrmerge.OUT` to `recvr.IN`
 - `fbptest06` - The output streams of the `repl` (in `fbptest04`) are fed to the input array port of `rrmerge`, and from its `OUT` to `recvr.IN`
 - `fbptest07` - Creates a deadlock condition - the status of each Process is displayed
 - `fbptest08` - reads text, reverses it twice and outputs it
@@ -149,13 +154,13 @@ network.run(fiberRuntime, {trace: true/false}, function success() {
   - `Network#defProc(component[, name])` Creates a process from a component, defined by the first parameter.
 
   - The first parameter can be a function or a string. When a string is used, the component is loaded according to three
-  possiblities:
-    - If the component string starts `'./'` then the component is assumed to be one of he JSFBP components and is loaded.
+  possibilities:
+    - If the component string starts with `'./'` then the component is assumed to be one of he JSFBP components and is loaded.
   For example: `'./components/copier.js'`
     - If the component string starts with `'/'` then the component is assumed to be local to the application. If your network has
     local components, then the network needs to have been instantiated with a `{ componentRoot: 'dir' }` object so that
     it knows where to find the components.
-    - If the component string contains a `/`, then it assumed to be of the form `'package/component'`. Thus `package` is loaded
+    - If the component string contains a `/`, then it is assumed to be of the form `'package/component'`. Thus `package` is loaded
   and then `component` is retrieved from it. If `package` is `'jsfbp'`, then it is loaded from the JSFBP `components` directory.
     - Otherwise, the string is assumed to be a node module that _is_ an FBP component and it is simply
   loaded via `require`.
