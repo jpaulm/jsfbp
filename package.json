@@ -40,7 +40,7 @@
     "chai": "4.3.3",
     "eslint": "7.21.0",
     "eslint-config-defaults": "9.0.0",
-    "mocha": "8.3.1",
+    "mocha": "8.3.2",
     "ws": "7.4.4",
     "dummy-module": "*"
   },
