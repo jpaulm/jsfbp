@@ -17,7 +17,7 @@ JSFBP takes advantage of JavaScript's concept of functions as first-degree objec
 
 <!-- I personally do not recommend using this FBP implementation, as compared with the Java, C# or C++ implementations on https://github.com/jpaulm , as `jsfbp` uses Node-Fibers, which has not been "blessed" by the JavaScript community, and even then, if I understand it correctly, does not support multiple cores (unlike the afore-mentioned implementations), although of course you could use sockets.  My personal experience is also that JavaScript is hard to debug because of its lack of strict typing, although again TypeScript may solve this issue. -->
 
-JSFBP is no longer supported, as Node-Fibers is being discontinued (I assume early 2021).  Here is the relevant quote from https://github.com/laverdet/node-fibers : 
+**JSFBP is no longer supported, as Node-Fibers is being discontinued (I assume early 2021).**  Here is the relevant quote from https://github.com/laverdet/node-fibers : 
 
 <blockquote>"The author of this project recommends you avoid its use if possible. The original version of this module targeted nodejs v0.1.x in early 2011 when JavaScript on the server looked a lot different. Since then async/await, Promises, and Generators were standardized and the ecosystem as a whole has moved in that direction."</blockquote>
 
