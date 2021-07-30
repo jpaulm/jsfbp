@@ -38,7 +38,7 @@
   "main": "index.js",
   "devDependencies": {
     "chai": "4.3.4",
-    "eslint": "7.31.0",
+    "eslint": "7.32.0",
     "eslint-config-defaults": "9.0.0",
     "mocha": "8.4.0",
     "ws": "7.5.3",
