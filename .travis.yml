@@ -1,7 +1,7 @@
 language: node_js
 node_js:
   - "node"
-  - "12.4.0"
+  - "12.22.5"
 
 cache: npm
 install: npm ci
