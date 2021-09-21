@@ -5,7 +5,7 @@
 jsfbp
 ===
 
-### JavaScript Implementation of FBP
+### JavaScript Implementation of FBP - no longer supported.  Please take a copy by Oct. 1, 2021 if you need one! 
 
 General web site on Flow-Based Programming: https://jpaulm.github.io/fbp/ .
 
